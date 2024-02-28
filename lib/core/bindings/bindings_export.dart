@@ -1,0 +1,10 @@
+export 'chat_bindings.dart';
+export 'create_event_binding.dart';
+export 'create_media_bindings.dart';
+export 'home_bindings.dart';
+export 'login_bindings.dart';
+export 'main_bindings.dart';
+export 'my_profile_bindings.dart';
+export 'nav_bar_bindings.dart';
+export 'profile_bindings.dart';
+export 'sign_up_bindings.dart';

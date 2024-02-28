@@ -1,0 +1,4 @@
+enum CameraDevice {
+  rear,
+  front,
+}

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "61477570914",
+    "firebase_url": "https://treeme-chat-default-rtdb.firebaseio.com",
+    "project_id": "treeme-chat",
+    "storage_bucket": "treeme-chat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:61477570914:android:cef8ab406d2eae6d25043b",
+        "android_client_info": {
+          "package_name": "com.wiz.treeme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "61477570914-42n8fhm058782c1iandcla7qctrkk4p9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wiz.treeme",
+            "certificate_hash": "8b5034683f6351bd6ba2d38c74304a105e30c721"
+          }
+        },
+        {
+          "client_id": "61477570914-b1mvk11vq8rn17pi281vrgj71mc80qn2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE8Ggq08jqaBQetuoy2zbb8m7gKcAb58s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "61477570914-b1mvk11vq8rn17pi281vrgj71mc80qn2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "61477570914-4hka7qilmf6k5cbava102sff9gmsleo1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.wiz.treeme"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
