@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:treeme/core/resources/assets_manager.dart';
 import 'package:treeme/core/resources/color_manager.dart';
 import 'package:treeme/core/resources/font_manager.dart';
@@ -186,9 +189,10 @@ class SelectContactsScreen extends GetView<CreateEventController> {
                 EdgeInsets.symmetric(horizontal: AppSize.s30.w, vertical: AppSize.s30.h),
             child: CustomElevatedButton(
               title: 'NEXT',
-              onPressed: () {
+              onPressed: ()async{
                 // controller.getRoom();
                 Get.toNamed(AppRoutes.createMedia);
+                
                 // controller.createNewEvent();
               },
             ),

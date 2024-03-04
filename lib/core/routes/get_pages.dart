@@ -44,12 +44,14 @@ class AppPages {
         name: AppRoutes.register,
         page: () => SignUpScreen(),
         bindings: [LoginBindings(), SignUpBindings()]),
-    GetPage(name: AppRoutes.home, page: () => const HomeScreen(), binding: HomeBinding()),
+    GetPage(
+        name: AppRoutes.home,
+        page: () => const HomeScreen(),
+        binding: HomeBinding()),
     GetPage(
         name: AppRoutes.navBar,
         page: () => const NavBarScreen(),
-        bindings:[ NavBarBindings(),
-          HomeBinding()]),
+        bindings: [NavBarBindings(), HomeBinding()]),
     GetPage(
       name: AppRoutes.createEvent,
       page: () => const CreateEventScreen(),
@@ -63,9 +65,13 @@ class AppPages {
         page: () => const SelectOwnerContact(),
         binding: CreateEventBindings()),
     GetPage(
-        name: AppRoutes.typeWithTheme,
-        page: () => const TypeWiththemeScreen(),
-        binding: CreateEventBindings()),
+      name: AppRoutes.typeWithTheme,
+      page: () => const TypeWiththemeScreen(),
+      bindings: [
+        MyContactBinding(),
+        CreateEventBindings(),
+      ],
+    ),
     GetPage(
         name: AppRoutes.selectContactScreen,
         page: () => const SelectContactsScreen(),
@@ -74,11 +80,14 @@ class AppPages {
         name: AppRoutes.profile,
         page: () => const ProfileScreen(),
         binding: ProfileBindings()),
-    GetPage(name: AppRoutes.chat, page: () => ChatScreen(), binding: ChatBindings()),
+    GetPage(
+        name: AppRoutes.chat,
+        page: () => ChatScreen(),
+        binding: ChatBindings()),
     GetPage(
       name: AppRoutes.createMedia,
       page: () => CreateMediaScreen(),
-        binding: CreateEventBindings(),
+      binding: CreateEventBindings(),
       // binding: CreateMediaBindings()
     ),
     GetPage(

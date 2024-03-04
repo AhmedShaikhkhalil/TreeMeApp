@@ -37,19 +37,19 @@ class HomeScreen extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     List<CardBTH> list = [
-      CardBTH('Ahmed', Color(0xff46D1F7), [Color(0xff46D1F7), Color(0xffBAECFB)],
-          'assets/images/darticon.png'),
+      CardBTH('Ahmed', Color(0xff46D1F7),
+          [Color(0xff46D1F7), Color(0xffBAECFB)], 'assets/images/darticon.png'),
       CardBTH('Ali', Color(0xffFEAA46), [Color(0xffFEAA46), Color(0xffFBD4A4)],
           'assets/images/cannon.png'),
-      CardBTH('Mohammed', Color(0xffEA4477), [Color(0xffEA4477), Color(0xffFB84A7)],
+      CardBTH(
+          'Mohammed',
+          Color(0xffEA4477),
+          [Color(0xffEA4477), Color(0xffFB84A7)],
           'assets/images/cotton candy.png'),
     ];
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-
-
-          child: GetBuilder<HomeController>(builder: (logic) {
+      body: SafeArea(child: GetBuilder<HomeController>(builder: (logic) {
         return Stack(
           children: [
             BackgroundArcs(Color(0xff46D1F7)),
@@ -65,18 +65,20 @@ class HomeScreen extends GetView<HomeController> {
                         height: AppSize.s50.h,
                         width: AppSize.s50.w,
                         decoration: BoxDecoration(
-                            shape: BoxShape.circle, color: Colors.redAccent,
-
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: AppConfig.avatar != null || Storage().avatar != null
-                                ? CachedNetworkImageProvider(API.imageUrl(AppConfig.avatar ??
-                                Storage().avatar ??
-                                'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.businessnetworks.com%2Fimage%2Fdefault-avatarpng&psig=AOvVaw3u97diAqPZhe1_v73AuGm_&ust=1690873615751000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCOjKsJuxuIADFQAAAAAdAAAAABAH'))
-                                : const Image(image: SvgProvider(ImageAssets.splashLogo))
-                                .image)
-                        ),
-
+                            shape: BoxShape.circle,
+                            color: Colors.redAccent,
+                            image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: AppConfig.avatar != null ||
+                                        Storage().avatar != null
+                                    ? CachedNetworkImageProvider(API.imageUrl(
+                                        AppConfig.avatar ??
+                                            Storage().avatar ??
+                                            'https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.businessnetworks.com%2Fimage%2Fdefault-avatarpng&psig=AOvVaw3u97diAqPZhe1_v73AuGm_&ust=1690873615751000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCOjKsJuxuIADFQAAAAAdAAAAABAH'))
+                                    : const Image(
+                                            image: SvgProvider(
+                                                ImageAssets.splashLogo))
+                                        .image)),
                       ),
                       title: RichText(
                           textAlign: TextAlign.start,
@@ -106,7 +108,8 @@ class HomeScreen extends GetView<HomeController> {
                           height: AppSize.s40.h,
                           width: AppSize.s40.w,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(AppSize.s12.r),
+                              borderRadius:
+                                  BorderRadius.circular(AppSize.s12.r),
                               color: ColorManager.white,
                               boxShadow: [
                                 BoxShadow(
@@ -131,8 +134,11 @@ class HomeScreen extends GetView<HomeController> {
                             child: CircularProgressIndicator.adaptive(),
                           );
                         case RequestStatus.SUCESS:
-                          if (controller.rxMyHomeModel.value.eventData?.isEmpty == true ||
-                              controller.rxMyHomeModel.value.eventData == null) {
+                          if (controller
+                                      .rxMyHomeModel.value.eventData?.isEmpty ==
+                                  true ||
+                              controller.rxMyHomeModel.value.eventData ==
+                                  null) {
                             return Center(
                               child: Text(
                                 'No Event Data',
@@ -146,7 +152,8 @@ class HomeScreen extends GetView<HomeController> {
                               shrinkWrap: true,
                               physics: const BouncingScrollPhysics(),
                               clipBehavior: Clip.none,
-                              itemCount: controller.rxMyHomeModel.value.eventData?.length,
+                              itemCount: controller
+                                  .rxMyHomeModel.value.eventData?.length,
                               scrollDirection: Axis.horizontal,
                               itemBuilder: (context, i) {
                                 return GestureDetector(
@@ -156,39 +163,51 @@ class HomeScreen extends GetView<HomeController> {
                                             null, 'EventApp', 'Users'));
                                     Get.to(ChatPage(
                                       fcmUser: controller.fcmsTokens(controller
-                                          .rxMyHomeModel.value.eventData![i].avatars??[]),
+                                              .rxMyHomeModel
+                                              .value
+                                              .eventData![i]
+                                              .avatars ??
+                                          []),
                                       room: Room(
-                                          name: controller
-                                              .rxMyHomeModel.value.eventData![i].title,
-                                          id: controller.rxMyHomeModel.value.eventData![i]
-                                                  .documentId ??
+                                          name: controller.rxMyHomeModel.value
+                                              .eventData![i].title,
+                                          id: controller.rxMyHomeModel.value
+                                                  .eventData![i].documentId ??
                                               '',
                                           type: RoomType.group,
-                                          users: controller
-                                              .rxMyHomeModel.value.eventData![i].userIds!
-                                              .map((e) => User(id: e,imageUrl: controller.imageUrl(controller
-                                              .rxMyHomeModel.value.eventData![i].avatars)))
+                                          users: controller.rxMyHomeModel.value
+                                              .eventData![i].userIds!
+                                              .map((e) => User(
+                                                  id: e,
+                                                  imageUrl: controller.imageUrl(
+                                                      controller
+                                                          .rxMyHomeModel
+                                                          .value
+                                                          .eventData![i]
+                                                          .avatars)))
                                               .toList()),
                                       newRoom: false,
                                       havePinMassage: true,
-                                      color: controller
-                                          .rxMyHomeModel.value.eventData![i].eventColor,
+                                      color: controller.rxMyHomeModel.value
+                                          .eventData![i].eventColor,
                                     ));
                                   },
                                   child: Stack(
                                     alignment: Alignment.topRight,
                                     children: [
                                       EventWidget(
-                                        cardBTH:
-                                            controller.rxMyHomeModel.value.eventData![i],
+                                        cardBTH: controller
+                                            .rxMyHomeModel.value.eventData![i],
                                       ),
-                                      CounterNumberWidget(data: FirebaseChatCore.instance
-                                          .getFirebaseFirestore()
-                                          .collection(
-                                          '${'EventApp'}/${controller.rxMyHomeModel.value.eventData?[i].documentId}/messages')
-                                          .orderBy('updatedAt',
-                                          descending: false)
-                                          .snapshots(),)
+                                      CounterNumberWidget(
+                                        data: FirebaseChatCore.instance
+                                            .getFirebaseFirestore()
+                                            .collection(
+                                                '${'EventApp'}/${controller.rxMyHomeModel.value.eventData?[i].documentId}/messages')
+                                            .orderBy('updatedAt',
+                                                descending: false)
+                                            .snapshots(),
+                                      )
                                       // Align(
                                       //   alignment: Alignment.topRight,
                                       //   child: Badge(
@@ -215,7 +234,8 @@ class HomeScreen extends GetView<HomeController> {
                           return Center(
                             child: Text(
                               'NO Data',
-                              style: getBoldStyle(color: ColorManager.mainColor),
+                              style:
+                                  getBoldStyle(color: ColorManager.mainColor),
                             ),
                           );
                       }
@@ -228,7 +248,9 @@ class HomeScreen extends GetView<HomeController> {
                     flex: 4,
                     child: Container(
                       padding: EdgeInsets.only(
-                          left: AppSize.s30.w, right: AppSize.s30.w, top: AppSize.s36.h),
+                          left: AppSize.s30.w,
+                          right: AppSize.s30.w,
+                          top: AppSize.s36.h),
                       decoration: BoxDecoration(
                         color: ColorManager.chatBackGround,
                         borderRadius: BorderRadius.vertical(
@@ -278,16 +300,17 @@ class HomeScreen extends GetView<HomeController> {
                                     child: CircularProgressIndicator.adaptive(),
                                   );
                                 case RequestStatus.SUCESS:
-                                  if (controller.rxMyHomeModel.value.conversationData
-                                              ?.isEmpty ==
+                                  if (controller.rxMyHomeModel.value
+                                              .conversationData?.isEmpty ==
                                           true ||
-                                      controller.rxMyHomeModel.value.conversationData ==
+                                      controller.rxMyHomeModel.value
+                                              .conversationData ==
                                           null) {
                                     return Center(
                                       child: Text(
                                         'NO Data',
-                                        style:
-                                            getBoldStyle(color: ColorManager.mainColor),
+                                        style: getBoldStyle(
+                                            color: ColorManager.mainColor),
                                       ),
                                     );
                                   }
@@ -298,22 +321,27 @@ class HomeScreen extends GetView<HomeController> {
                                     child: ListView.builder(
                                       shrinkWrap: true,
                                       scrollDirection: Axis.vertical,
-                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
                                       clipBehavior: Clip.antiAliasWithSaveLayer,
-                                      itemCount: controller
-                                          .rxMyHomeModel.value.conversationData?.length,
+                                      itemCount: controller.rxMyHomeModel.value
+                                          .conversationData?.length,
                                       itemBuilder: (context, index) {
                                         return Container(
-                                          margin: EdgeInsets.only(bottom: AppSize.s15.h),
+                                          margin: EdgeInsets.only(
+                                              bottom: AppSize.s15.h),
                                           decoration: BoxDecoration(
                                               color: ColorManager.white,
                                               borderRadius:
-                                                  BorderRadius.circular(AppSize.s10.r)),
+                                                  BorderRadius.circular(
+                                                      AppSize.s10.r)),
                                           child: ZoomIn(
                                             child: StreamBuilder<
-                                                    QuerySnapshot<Map<String, dynamic>>>(
+                                                    QuerySnapshot<
+                                                        Map<String, dynamic>>>(
                                                 // initialData: ,
-                                                stream: FirebaseChatCore.instance
+                                                stream: FirebaseChatCore
+                                                    .instance
                                                     .getFirebaseFirestore()
                                                     .collection(
                                                         '${'Conversation'}/${controller.rxMyHomeModel.value.conversationData?[index].conversationId}/messages')
@@ -325,7 +353,8 @@ class HomeScreen extends GetView<HomeController> {
                                                     return CircularProgressIndicator();
                                                   }
                                                   if (snapshot.hasError) {
-                                                    return Text('Error: ${snapshot.error}');
+                                                    return Text(
+                                                        'Error: ${snapshot.error}');
                                                   }
 
                                                   if (!snapshot.hasData) {
@@ -341,9 +370,12 @@ class HomeScreen extends GetView<HomeController> {
                                                   // controller.showdeliverd(snapshot.data);
                                                   return ListTile(
                                                     onTap: () {
-                                                      FirebaseChatCore.instance.setConfig(
-                                                          FirebaseChatCoreConfig(null,
-                                                              'Conversation', 'Users'));
+                                                      FirebaseChatCore.instance
+                                                          .setConfig(
+                                                              FirebaseChatCoreConfig(
+                                                                  null,
+                                                                  'Conversation',
+                                                                  'Users'));
                                                       Get.to(ChatPage(
                                                         room: Room(
                                                           id: controller
@@ -364,99 +396,126 @@ class HomeScreen extends GetView<HomeController> {
                                                               '',
                                                           users: [
                                                             User(
-                                                              id: controller
-                                                                      .rxMyHomeModel
-                                                                      .value
-                                                                      .conversationData![
-                                                                          index]
-                                                                      .data
-                                                                      ?.firebaseIds
-                                                                      ?.receiver ??
-                                                                  '',
-                                                              imageUrl:controller
-                                                                  .rxMyHomeModel
-                                                                  .value
-                                                                  .conversationData?[index]
-                                                                  .userData?[0]
-                                                                  .avatar == null ?  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(controller
-                                                                  .rxMyHomeModel
-                                                                  .value
-                                                                  .conversationData?[index]
-                                                                  .userData?[0]
-                                                                  ?.avatar??'',)
-                                                            )
+                                                                id: controller
+                                                                        .rxMyHomeModel
+                                                                        .value
+                                                                        .conversationData![
+                                                                            index]
+                                                                        .data
+                                                                        ?.firebaseIds
+                                                                        ?.receiver ??
+                                                                    '',
+                                                                imageUrl: controller
+                                                                            .rxMyHomeModel
+                                                                            .value
+                                                                            .conversationData?[
+                                                                                index]
+                                                                            .userData?[
+                                                                                0]
+                                                                            .avatar ==
+                                                                        null
+                                                                    ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                                                                    : API
+                                                                        .imageUrl(
+                                                                        controller.rxMyHomeModel.value.conversationData?[index].userData?[0]?.avatar ??
+                                                                            '',
+                                                                      ))
                                                           ],
                                                         ),
                                                         newRoom: false,
-                                                        fcmUser: [controller
-                                                            .rxMyHomeModel
-                                                            .value
-                                                            .conversationData![index]
-                                                            .userData?[0]
-                                                            .fcmToken??'' ],
+                                                        fcmUser: [
+                                                          controller
+                                                                  .rxMyHomeModel
+                                                                  .value
+                                                                  .conversationData![
+                                                                      index]
+                                                                  .userData?[0]
+                                                                  .fcmToken ??
+                                                              ''
+                                                        ],
                                                       ));
                                                     },
-                                                    leading:Container(
+                                                    leading: Container(
                                                       height: AppSize.s50.h,
                                                       width: AppSize.s50.w,
                                                       decoration: BoxDecoration(
-                                                          shape: BoxShape.circle, color: Colors.redAccent,
-
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color:
+                                                              Colors.redAccent,
                                                           image: DecorationImage(
                                                               fit: BoxFit.cover,
                                                               image: CachedNetworkImageProvider(controller
-                                                                  .rxMyHomeModel
-                                                                  .value
-                                                                  .conversationData?[index]
-                                                                  .userData?[0]
-                                                                  .avatar == null ?  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(controller
-                                                                  .rxMyHomeModel
-                                                                  .value
-                                                                  .conversationData?[index]
-                                                                  .userData?[0]
-                                                                  ?.avatar??''))
-                                                                  )
-                                                      ),
-
+                                                                          .rxMyHomeModel
+                                                                          .value
+                                                                          .conversationData?[
+                                                                              index]
+                                                                          .userData?[
+                                                                              0]
+                                                                          .avatar ==
+                                                                      null
+                                                                  ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                                                                  : API.imageUrl(controller
+                                                                          .rxMyHomeModel
+                                                                          .value
+                                                                          .conversationData?[
+                                                                              index]
+                                                                          .userData?[0]
+                                                                          ?.avatar ??
+                                                                      '')))),
                                                     ),
-                                                    contentPadding: EdgeInsets.only(
-                                                        left: 12,
-                                                        top: 18,
-                                                        bottom: 12,
-                                                        right: 16),
+                                                    contentPadding:
+                                                        EdgeInsets.only(
+                                                            left: 12,
+                                                            top: 18,
+                                                            bottom: 12,
+                                                            right: 16),
                                                     horizontalTitleGap: 8,
                                                     title: Text(
                                                       controller
                                                               .rxMyHomeModel
                                                               .value
-                                                              .conversationData?[index]
+                                                              .conversationData?[
+                                                                  index]
                                                               .userData?[0]
                                                               ?.name ??
                                                           '',
                                                       style: getBoldStyle(
-                                                          color: ColorManager.goodMorning,
-                                                          fontSize: FontSize.s16.sp),
+                                                          color: ColorManager
+                                                              .goodMorning,
+                                                          fontSize:
+                                                              FontSize.s16.sp),
                                                     ),
                                                     subtitle: Text(
                                                       '${snapshot.data?.docs.last['type'] != 'text' ? 'Media' : snapshot.data?.docs.last['text']}',
                                                       style: getBoldStyle(
-                                                          color: Color(0xffC3C2C9),
-                                                          fontSize: FontSize.s14.sp),
+                                                          color:
+                                                              Color(0xffC3C2C9),
+                                                          fontSize:
+                                                              FontSize.s14.sp),
                                                     ),
                                                     trailing: Column(
-                                                      mainAxisSize: MainAxisSize.min,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
                                                       mainAxisAlignment:
-                                                          MainAxisAlignment.center,
-
+                                                          MainAxisAlignment
+                                                              .center,
                                                       children: [
-                                                        TimeMassageWidget(data:  FirebaseChatCore.instance
-                                                            .getFirebaseFirestore()
-                                                            .collection(
-                                                            '${'Conversation'}/${controller.rxMyHomeModel.value.conversationData?[index].conversationId}/messages')
-                                                            .orderBy('updatedAt',
-                                                            descending: false)
-                                                            .snapshots(),),
-                                                        SizedBox(height: 10,),
+                                                        TimeMassageWidget(
+                                                          data: FirebaseChatCore
+                                                              .instance
+                                                              .getFirebaseFirestore()
+                                                              .collection(
+                                                                  '${'Conversation'}/${controller.rxMyHomeModel.value.conversationData?[index].conversationId}/messages')
+                                                              .orderBy(
+                                                                  'updatedAt',
+                                                                  descending:
+                                                                      false)
+                                                              .snapshots(),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
                                                         // controller.number.value == 0
                                                         //     ? SizedBox()
                                                         //     : Container(
@@ -490,13 +549,18 @@ class HomeScreen extends GetView<HomeController> {
                                                         //                   .s12.sp),
                                                         //         ),
                                                         //       )
-                                                        CounterNumberWidget(data: FirebaseChatCore.instance
-                                                            .getFirebaseFirestore()
-                                                            .collection(
-                                                            '${'Conversation'}/${controller.rxMyHomeModel.value.conversationData?[index].conversationId}/messages')
-                                                            .orderBy('updatedAt',
-                                                            descending: false)
-                                                            .snapshots(),)
+                                                        CounterNumberWidget(
+                                                          data: FirebaseChatCore
+                                                              .instance
+                                                              .getFirebaseFirestore()
+                                                              .collection(
+                                                                  '${'Conversation'}/${controller.rxMyHomeModel.value.conversationData?[index].conversationId}/messages')
+                                                              .orderBy(
+                                                                  'updatedAt',
+                                                                  descending:
+                                                                      false)
+                                                              .snapshots(),
+                                                        )
                                                       ],
                                                     ),
                                                   );

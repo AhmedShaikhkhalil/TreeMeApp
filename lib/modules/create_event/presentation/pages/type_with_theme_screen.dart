@@ -115,7 +115,7 @@ class TypeWiththemeScreen extends GetView<CreateEventController> {
                         print(controller.eventTime.value);
                         print(controller.eventDate.value);
                         Get.toNamed(
-                          AppRoutes.selecetOwner,
+                          AppRoutes.createEvent,
                         );
                       },
                       child: TypeThemeWidgets(
