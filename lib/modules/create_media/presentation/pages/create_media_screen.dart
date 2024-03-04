@@ -1393,6 +1393,7 @@ import 'package:get/get.dart';
 import 'package:treeme/core/resources/resource.dart';
 import 'package:treeme/core/widgets/custom_elevated_button_widget.dart';
 import 'package:treeme/modules/create_event/presentation/manager/create_event_controller.dart';
+import 'package:vs_story_designer/vs_story_designer.dart';
 
 class CreateMediaScreen extends StatefulWidget {
   const CreateMediaScreen({Key? key}) : super(key: key);
@@ -1484,22 +1485,39 @@ class _CreateMediaScreenState extends State<CreateMediaScreen> {
         ),
       ),
       body: GetBuilder<CreateEventController>(
-
         builder: (logic) {
           return
-            SizedBox(child: Text('Deleted'));
-          //   StoriesEditor(
-          //   giphyKey: 'VK4ckKZgLUk2G2l2n4Ssukm67DV947Yn',
-          //   onDone: (uri) {
-          //     debugPrint(uri);
-          //     logic.urlMedia.value = uri;
-          //     logic.createNewEvent();
-          //     // Share.shareFiles([uri]);
-          //   },
-          //   onDoneButtonStyle: CustomElevatedButton(title: 'Next'),
-          //   middleBottomWidget: SizedBox(),
-          //   editorBackgroundColor: Color(0xffE5E5E5),
-          // );
+              // SizedBox(child: Text('Deleted'));
+              //   StoriesEditor(
+              //   giphyKey: 'VK4ckKZgLUk2G2l2n4Ssukm67DV947Yn',
+              //   onDone: (uri) {
+              //     debugPrint(uri);
+              //     logic.urlMedia.value = uri;
+              //     logic.createNewEvent();
+              //     // Share.shareFiles([uri]);
+              //   },
+              //   onDoneButtonStyle: CustomElevatedButton(title: 'Next'),
+              //   middleBottomWidget: SizedBox(),
+              //   editorBackgroundColor: Color(0xffE5E5E5),
+              // );
+
+              VSStoryDesigner(
+            giphyKey: 'VK4ckKZgLUk2G2l2n4Ssukm67DV947Yn',
+            onDone: (uri) {
+              debugPrint(uri);
+              logic.urlMedia.value = uri;
+              logic.createNewEvent();
+              // Share.shareFiles([uri]);
+            },
+            onDoneButtonStyle: SizedBox(
+                height: 50.0,
+                width: 100,
+                child: CustomElevatedButton(title: 'Next')),
+            middleBottomWidget: SizedBox(),
+            editorBackgroundColor: Color(0xffE5E5E5),
+            centerText:
+                "Start Designing", //mandatory param, this text will appear in center of story designer
+          );
         },
       ),
     );

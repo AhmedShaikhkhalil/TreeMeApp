@@ -250,7 +250,7 @@ class CreateEventController extends GetxController {
     } else if (eventTime.value == '') {
       errorToast('Enter Event Time');
     } else {
-      Get.toNamed(AppRoutes.typeWithTheme);
+      Get.toNamed(AppRoutes.selecetOwner);
     }
   }
 

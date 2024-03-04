@@ -9,6 +9,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.22"
+  align_positioned:
+    dependency: transitive
+    description:
+      name: align_positioned
+      sha256: "90899a9a21259a608402d109fde83068e375042703c9c7d2c31c936a443e55f5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.1"
   animate_do:
     dependency: "direct main"
     description:
@@ -69,58 +77,58 @@ packages:
     dependency: "direct main"
     description:
       name: audioplayers
-      sha256: "61583554386721772f9309f509e17712865b38565a903c761f96b1115a979282"
+      sha256: c05c6147124cd63e725e861335a8b4d57300b80e6e92cea7c145c739223bbaef
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.0"
+    version: "5.2.1"
   audioplayers_android:
     dependency: transitive
     description:
       name: audioplayers_android
-      sha256: dbdc9b7f2aa2440314c638aa55aadd45c7705e8340d5eddf2e3fb8da32d4ae2c
+      sha256: b00e1a0e11365d88576320ec2d8c192bc21f1afb6c0e5995d1c57ae63156acb5
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.2"
+    version: "4.0.3"
   audioplayers_darwin:
     dependency: transitive
     description:
       name: audioplayers_darwin
-      sha256: "6aea96df1d12f7ad5a71d88c6d1b22a216211a9564219920124c16768e456e9d"
+      sha256: "3034e99a6df8d101da0f5082dcca0a2a99db62ab1d4ddb3277bed3f6f81afe08"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.0"
+    version: "5.0.2"
   audioplayers_linux:
     dependency: transitive
     description:
       name: audioplayers_linux
-      sha256: "396b62ac62c92dd26c3bc5106583747f57a8b325ebd2b41e5576f840cfc61338"
+      sha256: "60787e73fefc4d2e0b9c02c69885402177e818e4e27ef087074cf27c02246c9e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "3.1.0"
   audioplayers_platform_interface:
     dependency: transitive
     description:
       name: audioplayers_platform_interface
-      sha256: f7daaed4659143094151ecf6bacd927d29ab8acffba98c110c59f0b81ae51143
+      sha256: "365c547f1bb9e77d94dd1687903a668d8f7ac3409e48e6e6a3668a1ac2982adb"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.1"
+    version: "6.1.0"
   audioplayers_web:
     dependency: transitive
     description:
       name: audioplayers_web
-      sha256: ec84fd46eed1577148ed4113f5998a36a18da4fce7170c37ce3e21b631393339
+      sha256: "22cd0173e54d92bd9b2c80b1204eb1eb159ece87475ab58c9788a70ec43c2a62"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "4.1.0"
   audioplayers_windows:
     dependency: transitive
     description:
       name: audioplayers_windows
-      sha256: "1d3aaac98a192b8488167711ba1e67d8b96333e8d0572ede4e2912e5bbce69a3"
+      sha256: "9536812c9103563644ada2ef45ae523806b0745f7a78e89d1b5fb1951de90e1a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "3.1.0"
   avatar_stack:
     dependency: "direct main"
     description:
@@ -229,10 +237,10 @@ packages:
     dependency: transitive
     description:
       name: connectivity_plus
-      sha256: "3f8fe4e504c2d33696dac671a54909743bc6a902a9bb0902306f7a2aed7e528e"
+      sha256: "224a77051d52a11fbad53dd57827594d3bd24f945af28bd70bab376d68d437f0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.9"
+    version: "5.0.2"
   connectivity_plus_linux:
     dependency: transitive
     description:
@@ -257,14 +265,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.4"
-  connectivity_plus_web:
-    dependency: transitive
-    description:
-      name: connectivity_plus_web
-      sha256: "81332be1b4baf8898fed17bb4fdef27abb7c6fd990bf98c54fd978478adf2f1a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.5"
   connectivity_plus_windows:
     dependency: transitive
     description:
@@ -293,10 +293,10 @@ packages:
     dependency: "direct main"
     description:
       name: cross_connectivity
-      sha256: "1b8f916ea1478616e5b560c3f6f4661fb4794bd0ea6ea275dc476a3946ea288b"
+      sha256: "4a947a6f7a5d8707954b5f74a54a5208b6326b7c84af2b234c299616eeb6f403"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.5"
+    version: "3.1.0"
   cross_file:
     dependency: transitive
     description:
@@ -816,6 +816,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  google_fonts:
+    dependency: "direct main"
+    description:
+      name: google_fonts
+      sha256: f0b8d115a13ecf827013ec9fc883390ccc0e87a96ed5347a3114cac177ef18e8
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.0"
   grouped_list:
     dependency: "direct main"
     description:
@@ -844,10 +852,10 @@ packages:
     dependency: transitive
     description:
       name: http
-      sha256: "5895291c13fa8a3bd82e76d5627f69e0d85ca6a30dcac95c4ea19a5d555879c2"
+      sha256: a2bbf9d017fcced29139daa8ed2bba4ece450ab222871df93ca9eec6f80c34ba
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.6"
+    version: "1.2.0"
   http_parser:
     dependency: transitive
     description:
@@ -856,6 +864,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  image:
+    dependency: transitive
+    description:
+      name: image
+      sha256: "4c68bfd5ae83e700b5204c1e74451e7bf3cf750e6843c6e158289cf56bda018e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.7"
+  image_gallery_saver:
+    dependency: transitive
+    description:
+      name: image_gallery_saver
+      sha256: "0aba74216a4d9b0561510cb968015d56b701ba1bd94aace26aacdd8ae5761816"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   image_picker:
     dependency: "direct main"
     description:
@@ -1016,6 +1040,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.0"
+  matrix4_transform:
+    dependency: transitive
+    description:
+      name: matrix4_transform
+      sha256: "42c42610deecc382be2653f4a21358537401bd5b027c168a174c7c6a64959908"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
   meta:
     dependency: transitive
     description:
@@ -1056,6 +1088,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  oktoast:
+    dependency: transitive
+    description:
+      name: oktoast
+      sha256: f1366c5c793ddfb8f55bc6fc3e45db43c45debf173b765fb4c5ec096cbdeb84a
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.0"
   open_filex:
     dependency: "direct main"
     description:
@@ -1144,6 +1184,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1"
+  perfect_freehand:
+    dependency: transitive
+    description:
+      name: perfect_freehand
+      sha256: "6ced289209b3b26dc23c8d21960ceff3d39442cebd8e12ce722c4385c63553e5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.2"
   permission_handler:
     dependency: "direct main"
     description:
@@ -1677,6 +1725,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.0+2"
+  vs_media_picker:
+    dependency: transitive
+    description:
+      name: vs_media_picker
+      sha256: "138c5708e4e8e7c31415a8d6cd232641851fec3faaec451d52d24011acc94476"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
+  vs_story_designer:
+    dependency: "direct main"
+    description:
+      name: vs_story_designer
+      sha256: "4b0028c6373a6ce3f0502450ecbe3de6a7001c2aba6ee81bef8df10ade7e3c33"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   wakelock:
     dependency: "direct overridden"
     description:

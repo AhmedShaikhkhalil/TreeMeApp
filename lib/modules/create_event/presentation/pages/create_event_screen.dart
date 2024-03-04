@@ -25,7 +25,10 @@ class CreateEventScreen extends GetView<CreateEventController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: CustomScrollView(
+        body:
+
+
+        CustomScrollView(
       slivers: [
         SliverAppBar(
           expandedHeight: AppSize.s400.h,
@@ -38,12 +41,13 @@ class CreateEventScreen extends GetView<CreateEventController> {
                   bottomLeft: Radius.elliptical(125, 35),
                 ),
               ),
-              child: Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: SvgPicture.asset(ImageAssets.intersectCorner),
-                  ),
+              child:
+              // Stack(
+              //   children: [
+                  // Align(
+                  //   alignment: Alignment.topRight,
+                  //   child: SvgPicture.asset(ImageAssets.intersectCorner),
+                  // ),
                   // BackgroundArcs(Colors.white),
                   Center(
                     child: Column(
@@ -82,14 +86,13 @@ class CreateEventScreen extends GetView<CreateEventController> {
                       ],
                     ),
                   ),
-                ],
-              ),
+              //   ],
+              // ),
             ),
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
           toolbarHeight: 50.h,
-
           leading: GestureDetector(
             onTap: () => Get.back(),
             child: Container(
@@ -98,7 +101,8 @@ class CreateEventScreen extends GetView<CreateEventController> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(AppSize.s12.r),
                   border: Border.all(
-                      color: ColorManager.white.withOpacity(0.29), width: AppSize.s1.w),
+                      color: ColorManager.white.withOpacity(0.29),
+                      width: AppSize.s1.w),
                   // color: Colors.transparent,
                   gradient: LinearGradient(
                       colors: [
@@ -122,8 +126,8 @@ class CreateEventScreen extends GetView<CreateEventController> {
         SliverToBoxAdapter(
             // hasScrollBody: true,
             child: Padding(
-          padding:
-              EdgeInsets.symmetric(horizontal: AppSize.s30.w, vertical: AppSize.s33.h),
+          padding: EdgeInsets.symmetric(
+              horizontal: AppSize.s30.w, vertical: AppSize.s33.h),
           child: Column(
             children: [
               CustomTextFieldWithLabel(
@@ -161,8 +165,8 @@ class CreateEventScreen extends GetView<CreateEventController> {
                                 onDateTimeChanged: (value) {
                                   print(value);
                                   controller.eventTimeChange.value = true;
-                                  String date =
-                                      DateFormatTimeToString(value).formatDateToString();
+                                  String date = DateFormatTimeToString(value)
+                                      .formatDateToString();
                                   controller.eventTime.value = date;
                                   print(controller.eventTime.value);
                                 },
@@ -177,8 +181,9 @@ class CreateEventScreen extends GetView<CreateEventController> {
                                 title: 'DONE',
                                 onPressed: () {
                                   if (controller.eventTimeChange.isFalse) {
-                                    String date = DateFormatTimeToString(DateTime.now())
-                                        .formatDateToString();
+                                    String date =
+                                        DateFormatTimeToString(DateTime.now())
+                                            .formatDateToString();
                                     controller.eventTime.value = date;
                                     log(controller.eventTime.value);
                                     Get.back();
@@ -193,7 +198,8 @@ class CreateEventScreen extends GetView<CreateEventController> {
                       isDismissible: false);
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(ColorManager.white),
+                  backgroundColor:
+                      MaterialStateProperty.all(ColorManager.white),
                   // side: MaterialStateProperty.all(BorderSide())
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSize.s20.r),
@@ -201,34 +207,41 @@ class CreateEventScreen extends GetView<CreateEventController> {
                   elevation: MaterialStateProperty.all(0),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(AppSize.s8.h),
-                  // onTap: () {},
+                child: Obx(
+                  () => ListTile(
+                    contentPadding: EdgeInsets.all(AppSize.s8.h),
+                    // onTap: () {},
 
-                  leading: SvgPicture.asset(ImageAssets.dateTimeIcon),
-                  minLeadingWidth: AppSize.s50.w,
-                  title: Text(
-                    'Event Time',
-                    style: getBoldStyle(
-                        color: ColorManager.goodMorning, fontSize: FontSize.s16.sp),
-                  ),
-                  subtitle: Text(
-                    'Pick The Time Please',
-                    style: getLightStyle(
-                        color: ColorManager.subTitleCreateEvent,
-                        fontSize: FontSize.s14.sp),
-                  ),
+                    leading: SvgPicture.asset(ImageAssets.dateTimeIcon),
+                    minLeadingWidth: AppSize.s50.w,
+                    title: Text(
+                      'Event Time',
+                      style: getBoldStyle(
+                          color: ColorManager.goodMorning,
+                          fontSize: FontSize.s16.sp),
+                    ),
+                    subtitle: Text(
+                      controller.eventTime.value.isEmpty
+                          ? 'Pick The Time Please'
+                          : controller.eventTime.value,
+                      style: getLightStyle(
+                          color: ColorManager.subTitleCreateEvent,
+                          fontSize: FontSize.s14.sp),
+                    ),
 
-                  trailing: Icon(
-                    Icons.arrow_forward,
-                    color: ColorManager.goodMorning,
-                    size: AppSize.s25.w,
+                    trailing: Icon(
+                      Icons.arrow_forward,
+                      color: ColorManager.goodMorning,
+                      size: AppSize.s25.w,
+                    ),
                   ),
                 ),
               ),
               SizedBox(
                 height: AppSize.s15.h,
               ),
+
+
               ElevatedButton(
                 // decoration: BoxDecoration(
                 //   color: ColorManager.white,
@@ -250,13 +263,14 @@ class CreateEventScreen extends GetView<CreateEventController> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SfDateRangePicker(
-                          onSelectionChanged: (dateRangePickerSelectionChangedArgs) {
+                          onSelectionChanged:
+                              (dateRangePickerSelectionChangedArgs) {
                             controller.eventDateChange.value = true;
                             print(dateRangePickerSelectionChangedArgs.value);
                             String date = DateFromattoString(
                                     dateRangePickerSelectionChangedArgs.value)
                                 .formatToString();
-                            controller.eventDate = date.obs;
+                            controller.eventDate.value = date;
                             log(controller.eventDate.value);
                           },
                           view: DateRangePickerView.month,
@@ -276,6 +290,7 @@ class CreateEventScreen extends GetView<CreateEventController> {
                                 fontSize: FontSize.s16.sp),
                           ),
                           viewSpacing: 50,
+                          selectionColor: Colors.transparent,
                           monthCellStyle: DateRangePickerMonthCellStyle(
                             textStyle: getRegularStyle(
                                 color: ColorManager.goodMorning,
@@ -284,6 +299,18 @@ class CreateEventScreen extends GetView<CreateEventController> {
                           headerHeight: 60,
                           monthFormat: 'MMMM',
                           showNavigationArrow: true,
+                          cellBuilder:(BuildContext context, DateRangePickerCellDetails details){
+                            return Obx(
+                              ()=> Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: (controller.eventDate.isNotEmpty&& DateTime.tryParse(controller.eventDate.value) == details.date)?  Colors.deepPurple : Colors.transparent,
+                                ),
+                                child: Text(details.date.day.toString() , style: TextStyle(color: (controller.eventDate.isNotEmpty&&  DateTime.tryParse(controller.eventDate.value) == details.date)? Colors.white: Colors.black),),
+                              ),
+                            );
+                          }
                         ),
                         SizedBox(
                           height: AppSize.s15.h,
@@ -292,22 +319,25 @@ class CreateEventScreen extends GetView<CreateEventController> {
                             title: 'SELECT',
                             onPressed: () {
                               if (controller.eventDateChange.isFalse) {
-                                String date =
-                                    DateFromattoString(DateTime.now()).formatToString();
+                                String date = DateFromattoString(DateTime.now())
+                                    .formatToString();
                                 controller.eventDate.value = date;
-                                log(controller.eventDate.value);
+                                log('selected' + controller.eventDate.value);
+
                                 Get.back();
                               } else {
                                 log(controller.eventDate.value);
                                 Get.back();
                               }
                             }),
+
                       ],
                     ),
                   ));
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(ColorManager.white),
+                  backgroundColor:
+                      MaterialStateProperty.all(ColorManager.white),
                   // side: MaterialStateProperty.all(BorderSide())
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSize.s20.r),
@@ -315,39 +345,46 @@ class CreateEventScreen extends GetView<CreateEventController> {
                   elevation: MaterialStateProperty.all(0),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: ListTile(
-                  contentPadding: EdgeInsets.all(AppSize.s8.h),
-                  // onTap: () {},
+                child: Obx(
+                  () => ListTile(
+                    contentPadding: EdgeInsets.all(AppSize.s8.h),
+                    // onTap: () {},
 
-                  leading: SvgPicture.asset(ImageAssets.dateDateIcon),
-                  minLeadingWidth: AppSize.s50.w,
-                  title: Text(
-                    'Event Date',
-                    style: getBoldStyle(
-                        color: ColorManager.goodMorning, fontSize: FontSize.s16.sp),
-                  ),
-                  subtitle: Text(
-                    'Pick The Date Please',
-                    style: getLightStyle(
-                        color: ColorManager.subTitleCreateEvent,
-                        fontSize: FontSize.s14.sp),
-                  ),
+                    leading: SvgPicture.asset(ImageAssets.dateDateIcon),
+                    minLeadingWidth: AppSize.s50.w,
+                    title: Text(
+                      'Event Date',
+                      style: getBoldStyle(
+                          color: ColorManager.goodMorning,
+                          fontSize: FontSize.s16.sp),
+                    ),
+                    subtitle: Text(
+                      controller.eventDate.value.isEmpty
+                          ? 'Pick The Date Please'
+                          : controller.eventDate.value,
+                      style: getLightStyle(
+                          color: ColorManager.subTitleCreateEvent,
+                          fontSize: FontSize.s14.sp),
+                    ),
 
-                  trailing: Icon(
-                    Icons.arrow_forward,
-                    color: ColorManager.goodMorning,
-                    size: AppSize.s25.w,
+                    trailing: Icon(
+                      Icons.arrow_forward,
+                      color: ColorManager.goodMorning,
+                      size: AppSize.s25.w,
+                    ),
                   ),
                 ),
               ),
               SizedBox(
                 height: AppSize.s30.h,
               ),
-              CustomElevatedButton(title: 'NEXT', onPressed: () => controller.validate()),
+              CustomElevatedButton(
+                  title: 'NEXT', onPressed: () => controller.validate()),
             ],
           ),
         ))
       ],
-    ));
+    )
+    );
   }
 }

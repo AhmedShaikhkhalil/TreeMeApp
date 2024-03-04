@@ -32,7 +32,7 @@ class NavBarScreen extends StatelessWidget {
               floatingActionButton: showFab
                   ? FloatingActionButton(
                       onPressed: () {
-                        Get.toNamed(AppRoutes.createEvent);
+                        Get.toNamed(AppRoutes.typeWithTheme);
                       },
                       backgroundColor: Colors.transparent,
                       foregroundColor: Colors.white,
