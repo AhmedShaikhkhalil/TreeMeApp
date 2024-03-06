@@ -1,11 +1,16 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:treeme/core/utils/services/storage.dart';
 import 'package:treeme/modules/auth/data/data_sources/auth_data_source.dart';
 import 'package:treeme/modules/auth/presentation/manager/login_controller.dart';
+import 'package:treeme/modules/auth/presentation/pages/otp_signup.dart';
 
 import '../../../../core/helpers/constants.dart';
 import '../../../../core/netwrok/failure.dart';
@@ -22,8 +27,15 @@ class SignUpController extends GetxController {
     this._authDataSource,
     this._storage,
   );
+  int? _resendToken;
   bool showPass = true;
   bool showConfPass = true;
+  String errorText = '';
+  String sendCode = '';
+  String oTPCode = '';
+
+  late StreamController<ErrorAnimationType> errorController;
+
 
   showPassword() {
     showPass = !showPass;
@@ -37,6 +49,7 @@ class SignUpController extends GetxController {
 
   @override
   void onInit() {
+    errorController = StreamController<ErrorAnimationType>();
     signUpRecognizer = TapGestureRecognizer()
       ..onTap = () {
         Get.back();
@@ -64,9 +77,10 @@ class SignUpController extends GetxController {
   }
 
   Future<void> register(
-      String name, String password, String confirmPassword, String phone) async {
+      ) async {
+
     final registerModel =
-        await _authDataSource.register(name, password, confirmPassword, phone);
+        await _authDataSource.register(registerNameController.text.trim(), registerPasswordController.text.trim(), registerPasswordConfirmController.text.trim(), registerNumberController.text);
     registerModel.fold((l) => errorToast(l.message), (r) async {
       _storage.jwtToken = r.token?.apiToken ?? '';
       _storage.fistName = r.data?.name ?? '';
@@ -79,39 +93,44 @@ class SignUpController extends GetxController {
       AppConfig.userId = _storage.userId;
       AppConfig.phoneNumber = r.data?.phone ?? '';
       print('tokem ${_storage.jwtToken}');
-      successToast('A code will be sent to you');
-     Get.toNamed(AppRoutes.login);
+      Get.toNamed(AppRoutes.navBar);
+      successToast(r.message!);
     });
     // clearTextField();
   }
 
-  _verifyPhone(String? phoneNumber) async {
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await FirebaseAuth.instance.signInWithCredential(credential).then((value) async {
-          if (value.user != null) {
-            Get.to(AppRoutes.navBar);
-            // Navigator.pushAndRemoveUntil(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => Home()),
-            //         (route) => false);
-          }
-        });
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        print(e.message);
-      },
-      codeSent: (String? verficationID, int? resendToken) {
-        verificationIdUser = verficationID;
-      },
-      codeAutoRetrievalTimeout: (String verificationID) {
-        Get.to(() => OTPLoginScreen());
-      },
-      timeout: Duration(seconds: 30),
-    );
-  }
-}
+  Future<void> verifyPhone() async {
+    try{
+      await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: registerNumberController.text.trim(),
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            await FirebaseAuth.instance
+                .signInWithCredential(credential)
+                .then((value) async {
+              if (value.user != null) {
+                register();
+              }
+            });
+
+          },
+          verificationFailed: (FirebaseAuthException e) {
+            errorToast(e.message??'Error');
+          },
+          codeSent: (String? verficationID, int? resendToken) {
+            verificationIdUser = verficationID;
+            _resendToken = resendToken;
+
+            Get.to(() => OTPSignupScreen());
+          },
+          codeAutoRetrievalTimeout: (String verificationID) {
+            verificationID = verificationIdUser??'' ;
+          },
+          timeout: Duration(seconds: 9));
+    }catch (e){
+      log('verifyPhoneNumber $e');
+    }
+
+  }}
 
 extension TaskX<T extends Either<Object, U>, U> on Task<T> {
   Task<Either<Failure, U>> mapLeftToFailure() {

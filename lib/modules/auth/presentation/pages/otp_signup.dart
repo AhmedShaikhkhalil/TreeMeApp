@@ -6,14 +6,16 @@ import 'package:treeme/core/resources/resource.dart';
 import 'package:treeme/core/routes/app_routes.dart';
 import 'package:treeme/modules/auth/presentation/manager/login_controller.dart';
 
-class OTPLoginScreen extends StatefulWidget {
-  const OTPLoginScreen({Key? key}) : super(key: key);
+import '../manager/sign_up_controller.dart';
+
+class OTPSignupScreen extends StatefulWidget {
+  const OTPSignupScreen({Key? key}) : super(key: key);
 
   @override
-  State<OTPLoginScreen> createState() => _OTPLoginScreenState();
+  State<OTPSignupScreen> createState() => _OTPSignupScreenState();
 }
 
-class _OTPLoginScreenState extends State<OTPLoginScreen> {
+class _OTPSignupScreenState extends State<OTPSignupScreen> {
   late TextEditingController otpController;
 
   @override
@@ -41,7 +43,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         padding: EdgeInsets.symmetric(horizontal: AppSize.s18.w),
         child: SafeArea(
           child: SingleChildScrollView(
-            child: GetBuilder<LoginController>(builder: (logic) {
+            child: GetBuilder<SignUpController>(builder: (logic) {
               return Form(
                 key: _formKey,
                 child: Column(
@@ -92,7 +94,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
                         animationDuration: const Duration(milliseconds: 300),
 
                         keyboardType: TextInputType.number,
-                        // errorAnimationController: logic.errorController,
+                        errorAnimationController: logic.errorController,
                         controller: otpController,
                         // onSubmitted: (value) async {
                         //   try {
@@ -157,14 +159,14 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
                             minimumSize: Size(double.infinity, 64.h)),
                         onPressed: () async {
                           try {
-                            print(logic.verificationIdUser!);
                             await FirebaseAuth.instance
                                 .signInWithCredential(PhoneAuthProvider.credential(
-                                    verificationId: logic.verificationIdUser!,
-                                    smsCode: logic.sendCode))
+                                verificationId: logic.verificationIdUser!,
+                                smsCode: logic.sendCode))
                                 .then((value) async {
+                                  print(value);
                               if (value.user != null) {
-                                logic.login();
+                                logic.register();
                               }
                             });
                           } catch (e) {

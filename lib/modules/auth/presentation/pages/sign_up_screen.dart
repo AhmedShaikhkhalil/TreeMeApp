@@ -8,9 +8,11 @@ import 'package:treeme/core/resources/assets_manager.dart';
 import 'package:treeme/core/resources/color_manager.dart';
 import 'package:treeme/core/resources/strings_manager.dart';
 import 'package:treeme/core/resources/values_manager.dart';
+import 'package:treeme/modules/auth/presentation/pages/otp_signup.dart';
 
 import '../../../../core/resources/font_manager.dart';
 import '../../../../core/resources/styles_manager.dart';
+import '../../../../core/routes/app_routes.dart';
 import '../../../../core/widgets/custom_textField_with_label.dart';
 import '../manager/sign_up_controller.dart';
 
@@ -185,11 +187,9 @@ class SignUpScreen extends StatelessWidget {
                             minimumSize: Size(double.infinity, 64.h)),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            logic.register(
-                                logic.registerNameController.text.trim(),
-                                logic.registerPasswordController.text.trim(),
-                                logic.registerPasswordConfirmController.text.trim(),
-                                logic.registerNumberController.text);
+
+logic.verifyPhone();
+
                           }
                         },
                         child: Text(
