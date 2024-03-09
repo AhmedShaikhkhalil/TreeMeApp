@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:grouped_list/grouped_list.dart';
@@ -145,7 +146,15 @@ class SelectOwnerContact extends GetView<CreateEventController> {
                                             fontSize: FontSize.s16.sp),
                                       ),
                                 trailing: element.userData == null
-                                    ? TextButton(onPressed: () {}, child: Text('Invite'))
+                                    ? TextButton(onPressed: () {
+                                       String message =
+                                            "Try Tree me: app://com.wiz.treeme/invite";
+                                        List<String> recipents = [
+                                          element.phone ?? ""
+                                        ];
+
+                                        _sendSMS(message, recipents);
+                                    }, child: Text('Invite'))
                                     : Obx(() {
                                         return Radio(
                                           value: element.userData?.id,
@@ -186,5 +195,12 @@ class SelectOwnerContact extends GetView<CreateEventController> {
             )
           ],
         ));
+  }
+    void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 }

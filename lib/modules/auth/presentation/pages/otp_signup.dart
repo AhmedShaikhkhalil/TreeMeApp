@@ -6,6 +6,7 @@ import 'package:treeme/core/resources/resource.dart';
 import 'package:treeme/core/routes/app_routes.dart';
 import 'package:treeme/modules/auth/presentation/manager/login_controller.dart';
 
+import '../../../../core/utils/error_toast.dart';
 import '../manager/sign_up_controller.dart';
 
 class OTPSignupScreen extends StatefulWidget {
@@ -166,7 +167,10 @@ class _OTPSignupScreenState extends State<OTPSignupScreen> {
                                 .then((value) async {
                                   print(value);
                               if (value.user != null) {
-                                logic.register();
+      Get.offAndToNamed(AppRoutes.navBar);
+
+                                      // successToast(r.message!);
+
                               }
                             });
                           } catch (e) {

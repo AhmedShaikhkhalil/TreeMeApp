@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:grouped_list/grouped_list.dart';
@@ -49,7 +50,8 @@ class SelectContactsScreen extends GetView<CreateEventController> {
                       child: Text(
                         'Select your\n Contacts',
                         style: getBoldStyle(
-                            color: ColorManager.goodMorning, fontSize: FontSize.s16.sp),
+                            color: ColorManager.goodMorning,
+                            fontSize: FontSize.s16.sp),
                       ),
                     ),
                     leading: GestureDetector(
@@ -97,7 +99,8 @@ class SelectContactsScreen extends GetView<CreateEventController> {
                   hasScrollBody: true,
                   // fillOverscroll: true,
                   child: Obx(() {
-                    switch (controller.contactController.rxRequestStatus.value) {
+                    switch (
+                        controller.contactController.rxRequestStatus.value) {
                       case RequestStatus.LOADING:
                         return Center(
                           child: CircularProgressIndicator.adaptive(),
@@ -105,17 +108,18 @@ class SelectContactsScreen extends GetView<CreateEventController> {
 
                       case RequestStatus.SUCESS:
                         return GroupedListView<Data, String>(
-                          elements:
-                              controller.contactController.rxMyContactModel.value.data ??
-                                  [],
+                          elements: controller.contactController
+                                  .rxMyContactModel.value.data ??
+                              [],
                           groupBy: (element) => element.status ?? '',
 
-                          groupSeparatorBuilder: (String groupByValue) => controller
-                              .contactController
-                              .groupSeparatorBuilder(groupByValue),
+                          groupSeparatorBuilder: (String groupByValue) =>
+                              controller.contactController
+                                  .groupSeparatorBuilder(groupByValue),
                           itemBuilder: (context, Data element) => Container(
                             margin: EdgeInsets.symmetric(
-                                horizontal: AppSize.s30.w, vertical: AppSize.s5.h),
+                                horizontal: AppSize.s30.w,
+                                vertical: AppSize.s5.h),
                             child: ListTile(
                               // onTap: () {
                               //   if (element.userData != null) {
@@ -124,13 +128,15 @@ class SelectContactsScreen extends GetView<CreateEventController> {
                               // },
                               tileColor: ColorManager.white,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppSize.s10.r)),
+                                  borderRadius:
+                                      BorderRadius.circular(AppSize.s10.r)),
                               leading: CircleAvatar(
                                   radius: AppSize.s28,
-                                  foregroundImage:   CachedNetworkImageProvider(element.userData?.avatar== null ?  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(
-
-                                      element.userData?.avatar))
-                              ),
+                                  foregroundImage: CachedNetworkImageProvider(
+                                      element.userData?.avatar == null
+                                          ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                                          : API.imageUrl(
+                                              element.userData?.avatar))),
                               contentPadding: EdgeInsets.only(
                                   left: 12, top: 18, bottom: 12, right: 16),
                               horizontalTitleGap: 8,
@@ -149,12 +155,22 @@ class SelectContactsScreen extends GetView<CreateEventController> {
                                           fontSize: FontSize.s16.sp),
                                     ),
                               trailing: element.userData == null
-                                  ? TextButton(onPressed: () {}, child: Text('Invite'))
+                                  ? TextButton(
+                                      onPressed: () {
+                                        String message =
+                                            "Try Tree me: app://com.wiz.treeme/invite";
+                                        List<String> recipents = [
+                                          element.phone ?? ""
+                                        ];
+
+                                        _sendSMS(message, recipents);
+                                      },
+                                      child: Text('Invite'))
                                   : Obx(() {
                                       return Checkbox(
                                         checkColor: Colors.white,
-                                        overlayColor:
-                                            MaterialStateProperty.all(Color(0xffD9D9D9)),
+                                        overlayColor: MaterialStateProperty.all(
+                                            Color(0xffD9D9D9)),
                                         value: element.isCheck.value,
                                         activeColor: Color(0xffFB84A7),
                                         shape: CircleBorder(),
@@ -185,14 +201,14 @@ class SelectContactsScreen extends GetView<CreateEventController> {
             ),
           ),
           Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: AppSize.s30.w, vertical: AppSize.s30.h),
+            padding: EdgeInsets.symmetric(
+                horizontal: AppSize.s30.w, vertical: AppSize.s30.h),
             child: CustomElevatedButton(
               title: 'NEXT',
-              onPressed: ()async{
+              onPressed: () async {
                 // controller.getRoom();
                 Get.toNamed(AppRoutes.createMedia);
-                
+
                 // controller.createNewEvent();
               },
             ),
@@ -200,6 +216,14 @@ class SelectContactsScreen extends GetView<CreateEventController> {
         ],
       ),
     );
+  }
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 }
 // trailing: Checkbox(

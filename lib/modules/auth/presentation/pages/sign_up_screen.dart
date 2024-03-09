@@ -101,7 +101,8 @@ class SignUpScreen extends StatelessWidget {
                             bottom: AppSize.s18.h),
                         fillColor: ColorManager.white,
                         hintStyle: getRegularStyle(
-                            color: ColorManager.hintColor, fontSize: FontSize.s16.sp),
+                            color: ColorManager.hintColor,
+                            fontSize: FontSize.s16.sp),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppSize.s10.r),
                             borderSide: BorderSide.none),
@@ -116,7 +117,8 @@ class SignUpScreen extends StatelessWidget {
                       keyboardType: TextInputType.number,
                       onChanged: (phone) {
                         print(phone.completeNumber);
-                        logic.registerNumberController.text = phone.completeNumber;
+                        logic.registerNumberController.text =
+                            phone.completeNumber;
                       },
                     ),
                     SizedBox(
@@ -182,20 +184,20 @@ class SignUpScreen extends StatelessWidget {
                             shadowColor: Colors.transparent,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppSize.s16.r)),
+                                borderRadius:
+                                    BorderRadius.circular(AppSize.s16.r)),
                             padding: EdgeInsets.zero,
                             minimumSize: Size(double.infinity, 64.h)),
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-
-logic.verifyPhone();
-
+                            logic.register();
                           }
                         },
                         child: Text(
                           AppStrings.signUp.toUpperCase(),
                           style: getBoldStyle(
-                              color: ColorManager.white, fontSize: FontSize.s16.sp),
+                              color: ColorManager.white,
+                              fontSize: FontSize.s16.sp),
                         ),
                       ),
                     ),

@@ -103,9 +103,10 @@ dependencies:
   flutter_sound: ^9.2.13
   record: ^4.4.4
   flutter_sound_record: ^3.3.1
-#  story_designer: ^2.0.1
+#  story_designer: ^2.0.FFmpegKitConfig
   vs_story_designer: ^2.2.0
   google_fonts: 6.1.0
+  flutter_sms: ^2.3.3
 #  firebase_app_check: ^0.2.1+14
 #  flutter_firebase_chat_core:
 #    git:

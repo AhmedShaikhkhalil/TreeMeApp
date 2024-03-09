@@ -960,10 +960,10 @@ class _audioWidgetState extends State<audioWidget> with SingleTickerProviderStat
                   onPressed: () async {
                     if (isPlaying) {
                       await audioPlayer.pause();
-                      _controller.stop();
+                      // _controller.stop();
                     } else {
                       await audioPlayer.play(UrlSource(widget.p0.uri));
-                      _controller.forward();
+                      // _controller.forward();
                     }
                     if (mounted) {
                       setState(() {

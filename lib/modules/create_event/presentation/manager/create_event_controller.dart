@@ -29,7 +29,7 @@ class CreateEventController extends GetxController {
   RxString eventTime = ''.obs;
   RxString eventTypeID = ''.obs;
   RxString participants = ''.obs;
-  RxString urlMedia= ''.obs;
+  RxString urlMedia = ''.obs;
   RxInt OwnerID = 0.obs;
   RxBool eventTimeChange = false.obs;
   RxBool eventDateChange = false.obs;
@@ -48,8 +48,10 @@ class CreateEventController extends GetxController {
   late final StreamSubscription myStream;
 
   final Rx<NewEventModel> rxNewEventModel = NewEventModel().obs;
-  void setRxNewEventModel(NewEventModel _value) => rxNewEventModel.value = _value;
-  final TextEditingController titleTextEditingController = TextEditingController();
+  void setRxNewEventModel(NewEventModel _value) =>
+      rxNewEventModel.value = _value;
+  final TextEditingController titleTextEditingController =
+      TextEditingController();
   @override
   void onInit() {
     super.onInit();
@@ -80,7 +82,6 @@ class CreateEventController extends GetxController {
   }
 
   Future<void> createNewEvent() async {
-
     setRxRequestStatus(RequestStatus.LOADING);
     final Either<Failure, NewEventModel> newEventApp =
         await _createEventDataSource.newEvent(
@@ -139,7 +140,7 @@ class CreateEventController extends GetxController {
 
       setRxNewEventModel(r);
       setRxNewEventModelRequestStatus(RequestStatus.SUCESS);
-      Future.delayed(Duration(seconds: 2),(){
+      Future.delayed(Duration(seconds: 2), () {
         FirebaseChatCore.instance
             .setConfig(FirebaseChatCoreConfig(null, 'EventApp', 'Users'));
         Get.offAll(
@@ -148,35 +149,31 @@ class CreateEventController extends GetxController {
               newRoom: true,
               urlPinMassage: urlMedia.value,
               havePinMassage: true,
-
               room: Room(
                 name: r.data!.title,
                 id: r.documentId ?? '',
                 type: RoomType.group,
-                users: r.data!.userIds!
-                    .map((e) => User(id: e))
-                    .toList(),
+                users: r.data!.userIds!.map((e) => User(id: e)).toList(),
               ),
               color: r.data?.eventColor),
           predicate: (route) => route.settings.name == AppRoutes.navBar,
         );
-
       });
-
     });
   }
-  String imageUrl(List<Participants>? participants){
-    if(participants != null && participants.isNotEmpty == true) {
+
+  String imageUrl(List<Participants>? participants) {
+    if (participants != null && participants.isNotEmpty == true) {
       for (var avatar in participants) {
-        if(avatar != null) {
+        if (avatar != null) {
           return API.imageUrl(avatar.avatar);
         }
         return 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
-
       }
     }
     return 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
   }
+
   void isCheck(Data contactModel) {
     contactModel.isCheck.toggle();
 
@@ -184,12 +181,13 @@ class CreateEventController extends GetxController {
         contactModel.isCheck.value == true) {
       selsect.value.add(contactModel.userData!.id.toString());
     } else {
-      selsect.value
-          .removeWhere((element) => element == contactModel.userData!.id.toString());
+      selsect.value.removeWhere(
+          (element) => element == contactModel.userData!.id.toString());
     }
     print(contactModel.userData?.id.toString());
     print(selsect.value.toString().replaceAll('[', '').replaceAll(']', ''));
-    participants.value = selsect.value.toString().replaceAll('[', '').replaceAll(']', '');
+    participants.value =
+        selsect.value.toString().replaceAll('[', '').replaceAll(']', '');
     update();
     refresh();
   }
@@ -255,11 +253,11 @@ class CreateEventController extends GetxController {
   }
 
   validateSelectOwner() {
-    // if (OwnerID.value == 0) {
-    //   errorToast('You Should Select the Owner ');
-    // } else {
+    if (OwnerID.value == 0) {
+      errorToast('You Should Select the Owner ');
+    } else {
       Get.toNamed(AppRoutes.selectContactScreen);
-    // }
+    }
   }
 
   // getRoom(String docs) async {

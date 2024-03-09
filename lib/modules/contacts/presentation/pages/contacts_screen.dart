@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:grouped_list/grouped_list.dart';
@@ -53,7 +54,8 @@ class ContactsScreen extends GetView<MyContactController> {
                             width: 50.w,
                             padding: EdgeInsets.all(AppSize.s15.h),
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(AppSize.s12.r),
+                                borderRadius:
+                                    BorderRadius.circular(AppSize.s12.r),
                                 // color: ColorManager.white,
                                 // border: Border.all(
                                 //     color: ColorManager.white.withOpacity(0.29),
@@ -82,7 +84,8 @@ class ContactsScreen extends GetView<MyContactController> {
                     title: Text(
                       'My Contacts',
                       style: getBoldStyle(
-                          color: ColorManager.goodMorning, fontSize: FontSize.s16.sp),
+                          color: ColorManager.goodMorning,
+                          fontSize: FontSize.s16.sp),
                     ),
                     flexibleSpace: Container(
                       height: 56.h,
@@ -112,7 +115,8 @@ class ContactsScreen extends GetView<MyContactController> {
                                 bottom: AppSize.s10.h),
                             fillColor: ColorManager.chatBackGround,
                             hintStyle: getRegularStyle(
-                                color: ColorManager.hintColor, fontSize: FontSize.s16.sp),
+                                color: ColorManager.hintColor,
+                                fontSize: FontSize.s16.sp),
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
                             // suffix: suffix,
@@ -144,18 +148,22 @@ class ContactsScreen extends GetView<MyContactController> {
 
                         case RequestStatus.SUCESS:
                           return ListView.builder(
-                            itemCount:
-                                controller.rxMySearchContact.value.data?.length ?? 0,
+                            itemCount: controller
+                                    .rxMySearchContact.value.data?.length ??
+                                0,
                             itemBuilder: (context, index) {
                               return Container(
                                 margin: EdgeInsets.symmetric(
-                                    horizontal: AppSize.s30.w, vertical: AppSize.s5.h),
+                                    horizontal: AppSize.s30.w,
+                                    vertical: AppSize.s5.h),
                                 child: ListTile(
                                   onTap: () {
-                                    if (controller.rxMySearchContact.value.data?[index] !=
+                                    if (controller.rxMySearchContact.value
+                                            .data?[index] !=
                                         null) {
                                       ShowBottomSheetHelperImpl()
-                                          .showBottomSheet(ShowBottomSheetInput(Container(
+                                          .showBottomSheet(
+                                              ShowBottomSheetInput(Container(
                                         height: 300,
                                         padding: EdgeInsets.all(AppSize.s20.h),
                                         decoration: BoxDecoration(
@@ -167,27 +175,28 @@ class ContactsScreen extends GetView<MyContactController> {
                                         child: Column(
                                           children: [
                                             CircleAvatar(
-                                              radius: AppSize.s32,
-                                              foregroundImage:
-                                              CachedNetworkImageProvider(controller
-                                                      .rxMySearchContact
-                                                      .value
-                                                      .data?[index]
-                                                      .avatar == null ?  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(controller
-
-                                                  .rxMySearchContact
-                                                  .value
-                                                  .data?[index]
-                                                  .avatar))
-
-                                            ),
+                                                radius: AppSize.s32,
+                                                foregroundImage:
+                                                    CachedNetworkImageProvider(controller
+                                                                .rxMySearchContact
+                                                                .value
+                                                                .data?[index]
+                                                                .avatar ==
+                                                            null
+                                                        ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                                                        : API.imageUrl(controller
+                                                            .rxMySearchContact
+                                                            .value
+                                                            .data?[index]
+                                                            .avatar))),
                                             SizedBox(
                                               height: AppSize.s15.h,
                                             ),
                                             Text(
                                               '${controller.rxMySearchContact.value.data?[index]?.name ?? controller.rxMySearchContact.value.data?[index].phone}',
                                               style: getBoldStyle(
-                                                  color: ColorManager.goodMorning,
+                                                  color:
+                                                      ColorManager.goodMorning,
                                                   fontSize: FontSize.s16.sp),
                                             ),
                                             SizedBox(
@@ -196,7 +205,8 @@ class ContactsScreen extends GetView<MyContactController> {
                                             Text(
                                               '${controller.rxMySearchContact.value.data?[index].phone ?? ''}',
                                               style: getBoldStyle(
-                                                  color: ColorManager.goodMorning,
+                                                  color:
+                                                      ColorManager.goodMorning,
                                                   fontSize: FontSize.s16.sp),
                                             ),
                                             SizedBox(
@@ -204,16 +214,20 @@ class ContactsScreen extends GetView<MyContactController> {
                                             ),
                                             GestureDetector(
                                               onTap: () {
-                                                controller.sendMessage(controller
-                                                        .rxMySearchContact
-                                                        .value
-                                                        .data?[index]
-                                                        ?.id
-                                                        .toString() ??
-                                                    '',controller
-                                                    .rxMySearchContact
-                                                    .value
-                                                    .data?[index].avatar ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png');
+                                                controller.sendMessage(
+                                                    controller
+                                                            .rxMySearchContact
+                                                            .value
+                                                            .data?[index]
+                                                            ?.id
+                                                            .toString() ??
+                                                        '',
+                                                    controller
+                                                            .rxMySearchContact
+                                                            .value
+                                                            .data?[index]
+                                                            .avatar ??
+                                                        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png');
                                               },
                                               child: Container(
                                                 width: 107.w,
@@ -221,18 +235,24 @@ class ContactsScreen extends GetView<MyContactController> {
                                                 margin: EdgeInsets.symmetric(
                                                     horizontal: AppSize.s6.w),
                                                 decoration: BoxDecoration(
-                                                    gradient: const LinearGradient(
-                                                        colors: [
+                                                    gradient:
+                                                        const LinearGradient(
+                                                            colors: [
                                                           Color(0xffFBD4A4),
                                                           Color(0xffFEAA46)
                                                         ],
-                                                        end: Alignment.topCenter,
-                                                        begin: Alignment.bottomCenter,
-                                                        tileMode: TileMode.decal),
-                                                    borderRadius: BorderRadius.circular(
-                                                        AppSize.s14.r)),
+                                                            end: Alignment
+                                                                .topCenter,
+                                                            begin: Alignment
+                                                                .bottomCenter,
+                                                            tileMode:
+                                                                TileMode.decal),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            AppSize.s14.r)),
                                                 child: Column(
-                                                  mainAxisSize: MainAxisSize.min,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
@@ -246,8 +266,10 @@ class ContactsScreen extends GetView<MyContactController> {
                                                     Text(
                                                       'Message',
                                                       style: getSemiBoldStyle(
-                                                          color: ColorManager.white,
-                                                          fontSize: FontSize.s12.sp),
+                                                          color: ColorManager
+                                                              .white,
+                                                          fontSize:
+                                                              FontSize.s12.sp),
                                                     ),
                                                   ],
                                                 ),
@@ -260,13 +282,23 @@ class ContactsScreen extends GetView<MyContactController> {
                                   },
                                   tileColor: ColorManager.white,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(AppSize.s10.r)),
+                                      borderRadius:
+                                          BorderRadius.circular(AppSize.s10.r)),
                                   leading: CircleAvatar(
                                       radius: AppSize.s28,
-                                      foregroundImage:   CachedNetworkImageProvider(controller.rxMySearchContact.value.data?[index].avatar== null ?  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(
-
-                                          controller.rxMySearchContact.value.data?[index].avatar))
-                                  ),
+                                      foregroundImage:
+                                          CachedNetworkImageProvider(controller
+                                                      .rxMySearchContact
+                                                      .value
+                                                      .data?[index]
+                                                      .avatar ==
+                                                  null
+                                              ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                                              : API.imageUrl(controller
+                                                  .rxMySearchContact
+                                                  .value
+                                                  .data?[index]
+                                                  .avatar))),
                                   contentPadding: EdgeInsets.only(
                                       left: 12, top: 18, bottom: 12, right: 16),
                                   horizontalTitleGap: 8,
@@ -276,22 +308,33 @@ class ContactsScreen extends GetView<MyContactController> {
                                         color: ColorManager.goodMorning,
                                         fontSize: FontSize.s16.sp),
                                   ),
-                                  subtitle:
-                                      controller.rxMySearchContact.value.data?[index] ==
-                                              null
-                                          ? null
-                                          : Text(
-                                              '${controller.rxMySearchContact.value.data?[index].phone ?? ''}',
-                                              style: getBoldStyle(
-                                                  color: ColorManager.goodMorning,
-                                                  fontSize: FontSize.s16.sp),
-                                            ),
-                                  trailing:
-                                      controller.rxMySearchContact.value.data?[index] ==
-                                              null
-                                          ? TextButton(
-                                              onPressed: () {}, child: Text('Invite'))
-                                          : null,
+                                  subtitle: controller.rxMySearchContact.value
+                                              .data?[index] ==
+                                          null
+                                      ? null
+                                      : Text(
+                                          '${controller.rxMySearchContact.value.data?[index].phone ?? ''}',
+                                          style: getBoldStyle(
+                                              color: ColorManager.goodMorning,
+                                              fontSize: FontSize.s16.sp),
+                                        ),
+                                  trailing: controller.rxMySearchContact.value
+                                              .data?[index] ==
+                                          null
+                                      ? TextButton(
+                                          onPressed: () {
+                                            String message =
+                                                "Try Tree me: app://com.wiz.treeme/invite";
+                                            List<String> recipents = [
+                                              controller.rxMySearchContact.value
+                                                      .data?[index].phone ??
+                                                  ""
+                                            ];
+
+                                            _sendSMS(message, recipents);
+                                          },
+                                          child: Text('Invite'))
+                                      : null,
                                 ),
                               );
                             },
@@ -312,18 +355,20 @@ class ContactsScreen extends GetView<MyContactController> {
 
                       case RequestStatus.SUCESS:
                         return GroupedListView<Data, String>(
-                          elements: controller.rxMyContactModel.value.data ?? [],
+                          elements:
+                              controller.rxMyContactModel.value.data ?? [],
                           groupBy: (element) => element.status ?? '',
                           groupSeparatorBuilder: (String groupByValue) =>
                               controller.groupSeparatorBuilder(groupByValue),
                           itemBuilder: (context, Data element) => Container(
                             margin: EdgeInsets.symmetric(
-                                horizontal: AppSize.s30.w, vertical: AppSize.s5.h),
+                                horizontal: AppSize.s30.w,
+                                vertical: AppSize.s5.h),
                             child: ListTile(
                               onTap: () {
                                 if (element.userData != null) {
-                                  ShowBottomSheetHelperImpl()
-                                      .showBottomSheet(ShowBottomSheetInput(Container(
+                                  ShowBottomSheetHelperImpl().showBottomSheet(
+                                      ShowBottomSheetInput(Container(
                                     height: 300,
                                     padding: EdgeInsets.all(AppSize.s20.h),
                                     decoration: BoxDecoration(
@@ -337,11 +382,12 @@ class ContactsScreen extends GetView<MyContactController> {
                                         CircleAvatar(
                                             radius: AppSize.s32,
                                             foregroundImage:
-                                            CachedNetworkImageProvider(element.userData?.avatar== null ?  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(
-
-                                                element.userData?.avatar))
-
-                                        ),
+                                                CachedNetworkImageProvider(element
+                                                            .userData?.avatar ==
+                                                        null
+                                                    ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                                                    : API.imageUrl(element
+                                                        .userData?.avatar))),
                                         SizedBox(
                                           height: AppSize.s15.h,
                                         ),
@@ -366,7 +412,11 @@ class ContactsScreen extends GetView<MyContactController> {
                                         GestureDetector(
                                           onTap: () {
                                             controller.sendMessage(
-                                                element.userData?.id.toString() ?? '',element.userData?.avatar  ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png');
+                                                element.userData?.id
+                                                        .toString() ??
+                                                    '',
+                                                element.userData?.avatar ??
+                                                    'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png');
                                           },
                                           child: Container(
                                             width: 107.w,
@@ -380,13 +430,16 @@ class ContactsScreen extends GetView<MyContactController> {
                                                       Color(0xffFEAA46)
                                                     ],
                                                     end: Alignment.topCenter,
-                                                    begin: Alignment.bottomCenter,
+                                                    begin:
+                                                        Alignment.bottomCenter,
                                                     tileMode: TileMode.decal),
                                                 borderRadius:
-                                                    BorderRadius.circular(AppSize.s14.r)),
+                                                    BorderRadius.circular(
+                                                        AppSize.s14.r)),
                                             child: Column(
                                               mainAxisSize: MainAxisSize.min,
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
                                               children: [
                                                 SvgPicture.asset(
                                                   ImageAssets.messageIcon,
@@ -399,7 +452,8 @@ class ContactsScreen extends GetView<MyContactController> {
                                                   'Message',
                                                   style: getSemiBoldStyle(
                                                       color: ColorManager.white,
-                                                      fontSize: FontSize.s12.sp),
+                                                      fontSize:
+                                                          FontSize.s12.sp),
                                                 ),
                                               ],
                                             ),
@@ -412,13 +466,15 @@ class ContactsScreen extends GetView<MyContactController> {
                               },
                               tileColor: ColorManager.white,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppSize.s10.r)),
+                                  borderRadius:
+                                      BorderRadius.circular(AppSize.s10.r)),
                               leading: CircleAvatar(
-                                radius: AppSize.s28,
-                                foregroundImage:   CachedNetworkImageProvider(element.userData?.avatar== null ?  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(
-
-                                    element.userData?.avatar))
-                              ),
+                                  radius: AppSize.s28,
+                                  foregroundImage: CachedNetworkImageProvider(
+                                      element.userData?.avatar == null
+                                          ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                                          : API.imageUrl(
+                                              element.userData?.avatar))),
                               contentPadding: EdgeInsets.only(
                                   left: 12, top: 18, bottom: 12, right: 16),
                               horizontalTitleGap: 8,
@@ -437,7 +493,17 @@ class ContactsScreen extends GetView<MyContactController> {
                                           fontSize: FontSize.s16.sp),
                                     ),
                               trailing: element.userData == null
-                                  ? TextButton(onPressed: () {}, child: Text('Invite'))
+                                  ? TextButton(
+                                      onPressed: () {
+                                        String message =
+                                            "Try Tree me: app://com.wiz.treeme/invite";
+                                        List<String> recipents = [
+                                          element.phone ?? ""
+                                        ];
+
+                                        _sendSMS(message, recipents);
+                                      },
+                                      child: Text('Invite'))
                                   : null,
                             ),
                           ),
@@ -449,21 +515,24 @@ class ContactsScreen extends GetView<MyContactController> {
                         );
 
                         return ListView.builder(
-                          itemCount: controller.rxMyContactModel.value.data?.length,
+                          itemCount:
+                              controller.rxMyContactModel.value.data?.length,
                           clipBehavior: Clip.none,
                           physics: BouncingScrollPhysics(),
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             return Container(
                               margin: EdgeInsets.symmetric(
-                                  horizontal: AppSize.s30.w, vertical: AppSize.s5.h),
+                                  horizontal: AppSize.s30.w,
+                                  vertical: AppSize.s5.h),
                               child: ListTile(
                                 onTap: () {
                                   Get.toNamed(AppRoutes.profile);
                                 },
                                 tileColor: ColorManager.white,
                                 shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(AppSize.s10.r)),
+                                    borderRadius:
+                                        BorderRadius.circular(AppSize.s10.r)),
                                 leading: CircleAvatar(
                                   radius: AppSize.s28,
                                 ),
@@ -501,5 +570,13 @@ class ContactsScreen extends GetView<MyContactController> {
         ),
       ],
     );
+  }
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 }

@@ -92,9 +92,8 @@ class SignUpController extends GetxController {
       AppConfig.firstName = _storage.fistName;
       AppConfig.userId = _storage.userId;
       AppConfig.phoneNumber = r.data?.phone ?? '';
-      print('tokem ${_storage.jwtToken}');
-      Get.toNamed(AppRoutes.navBar);
-      successToast(r.message!);
+      // Get.toNamed(AppRoutes.navBar);
+      verifyPhone();
     });
     // clearTextField();
   }
