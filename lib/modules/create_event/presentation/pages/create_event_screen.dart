@@ -25,10 +25,7 @@ class CreateEventScreen extends GetView<CreateEventController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body:
-
-
-        CustomScrollView(
+        body: CustomScrollView(
       slivers: [
         SliverAppBar(
           expandedHeight: AppSize.s400.h,
@@ -42,50 +39,50 @@ class CreateEventScreen extends GetView<CreateEventController> {
                 ),
               ),
               child:
-              // Stack(
-              //   children: [
+                  // Stack(
+                  //   children: [
                   // Align(
                   //   alignment: Alignment.topRight,
                   //   child: SvgPicture.asset(ImageAssets.intersectCorner),
                   // ),
                   // BackgroundArcs(Colors.white),
                   Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(ImageAssets.calenderLarge),
-                        SizedBox(
-                          height: AppSize.s16.h,
-                        ),
-                        Text(
-                          AppStrings.createNewEvent,
-                          style: getBoldStyle(
-                              color: ColorManager.chatBackGround,
-                              fontSize: FontSize.s20.sp),
-                        ),
-                        SizedBox(
-                          height: AppSize.s13.h,
-                        ),
-                        RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(children: [
-                              TextSpan(
-                                  text:
-                                      'Let Us Help You Create Unforgettable\n Surprises. ',
-                                  style: getMediumStyle(
-                                      color: ColorManager.chatBackGround,
-                                      fontSize: FontSize.s14.sp),
-                                  children: [
-                                    WidgetSpan(
-                                        child: Lottie.network(
-                                            'https://fonts.gstatic.com/s/e/notoemoji/latest/1f609/lottie.json',
-                                            height: AppSize.s20.h,
-                                            width: AppSize.s20.w))
-                                  ])
-                            ])),
-                      ],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(ImageAssets.calenderLarge),
+                    SizedBox(
+                      height: AppSize.s16.h,
                     ),
-                  ),
+                    Text(
+                      AppStrings.createNewEvent,
+                      style: getBoldStyle(
+                          color: ColorManager.chatBackGround,
+                          fontSize: FontSize.s20.sp),
+                    ),
+                    SizedBox(
+                      height: AppSize.s13.h,
+                    ),
+                    RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(children: [
+                          TextSpan(
+                              text:
+                                  'Let Us Help You Create Unforgettable\n Surprises. ',
+                              style: getMediumStyle(
+                                  color: ColorManager.chatBackGround,
+                                  fontSize: FontSize.s14.sp),
+                              children: [
+                                WidgetSpan(
+                                    child: Lottie.network(
+                                        'https://fonts.gstatic.com/s/e/notoemoji/latest/1f609/lottie.json',
+                                        height: AppSize.s20.h,
+                                        width: AppSize.s20.w))
+                              ])
+                        ])),
+                  ],
+                ),
+              ),
               //   ],
               // ),
             ),
@@ -240,8 +237,6 @@ class CreateEventScreen extends GetView<CreateEventController> {
               SizedBox(
                 height: AppSize.s15.h,
               ),
-
-
               ElevatedButton(
                 // decoration: BoxDecoration(
                 //   color: ColorManager.white,
@@ -263,55 +258,70 @@ class CreateEventScreen extends GetView<CreateEventController> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SfDateRangePicker(
-                          onSelectionChanged:
-                              (dateRangePickerSelectionChangedArgs) {
-                            controller.eventDateChange.value = true;
-                            print(dateRangePickerSelectionChangedArgs.value);
-                            String date = DateFromattoString(
-                                    dateRangePickerSelectionChangedArgs.value)
-                                .formatToString();
-                            controller.eventDate.value = date;
-                            log(controller.eventDate.value);
-                          },
-                          view: DateRangePickerView.month,
-                          monthViewSettings: DateRangePickerMonthViewSettings(
-                              viewHeaderStyle: DateRangePickerViewHeaderStyle(
-                                textStyle: getBoldStyle(
-                                    color: ColorManager.goodMorning,
-                                    fontSize: FontSize.s16.sp),
-                              ),
-                              dayFormat: 'EE',
-                              showTrailingAndLeadingDates: true),
-                          allowViewNavigation: true,
-                          headerStyle: DateRangePickerHeaderStyle(
-                            textAlign: TextAlign.center,
-                            textStyle: getBoldStyle(
-                                color: ColorManager.goodMorning,
-                                fontSize: FontSize.s16.sp),
-                          ),
-                          viewSpacing: 50,
-                          selectionColor: Colors.transparent,
-                          monthCellStyle: DateRangePickerMonthCellStyle(
-                            textStyle: getRegularStyle(
-                                color: ColorManager.goodMorning,
-                                fontSize: FontSize.s16.sp),
-                          ),
-                          headerHeight: 60,
-                          monthFormat: 'MMMM',
-                          showNavigationArrow: true,
-                          cellBuilder:(BuildContext context, DateRangePickerCellDetails details){
-                            return Obx(
-                              ()=> Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: (controller.eventDate.isNotEmpty&& DateTime.tryParse(controller.eventDate.value) == details.date)?  Colors.deepPurple : Colors.transparent,
+                            onSelectionChanged:
+                                (dateRangePickerSelectionChangedArgs) {
+                              controller.eventDateChange.value = true;
+                              print(dateRangePickerSelectionChangedArgs.value);
+                              String date = DateFromattoString(
+                                      dateRangePickerSelectionChangedArgs.value)
+                                  .formatToString();
+                              controller.eventDate.value = date;
+                              log(controller.eventDate.value);
+                            },
+                            view: DateRangePickerView.month,
+                            monthViewSettings: DateRangePickerMonthViewSettings(
+                                viewHeaderStyle: DateRangePickerViewHeaderStyle(
+                                  textStyle: getBoldStyle(
+                                      color: ColorManager.goodMorning,
+                                      fontSize: FontSize.s16.sp),
                                 ),
-                                child: Text(details.date.day.toString() , style: TextStyle(color: (controller.eventDate.isNotEmpty&&  DateTime.tryParse(controller.eventDate.value) == details.date)? Colors.white: Colors.black),),
-                              ),
-                            );
-                          }
-                        ),
+                                dayFormat: 'EE',
+                                showTrailingAndLeadingDates: true),
+                            allowViewNavigation: true,
+                            headerStyle: DateRangePickerHeaderStyle(
+                              textAlign: TextAlign.center,
+                              textStyle: getBoldStyle(
+                                  color: ColorManager.goodMorning,
+                                  fontSize: FontSize.s16.sp),
+                            ),
+                            viewSpacing: 50,
+                            selectionColor: Colors.transparent,
+                            monthCellStyle: DateRangePickerMonthCellStyle(
+                              textStyle: getRegularStyle(
+                                  color: ColorManager.goodMorning,
+                                  fontSize: FontSize.s16.sp),
+                            ),
+                            headerHeight: 60,
+                            monthFormat: 'MMMM',
+                            showNavigationArrow: true,
+                            cellBuilder: (BuildContext context,
+                                DateRangePickerCellDetails details) {
+                              return Obx(
+                                () => Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: (controller.eventDate.isNotEmpty &&
+                                            DateTime.tryParse(controller
+                                                    .eventDate.value) ==
+                                                details.date)
+                                        ? Colors.deepPurple
+                                        : Colors.transparent,
+                                  ),
+                                  child: Text(
+                                    details.date.day.toString(),
+                                    style: TextStyle(
+                                        color:
+                                            (controller.eventDate.isNotEmpty &&
+                                                    DateTime.tryParse(controller
+                                                            .eventDate.value) ==
+                                                        details.date)
+                                                ? Colors.white
+                                                : Colors.black),
+                                  ),
+                                ),
+                              );
+                            }),
                         SizedBox(
                           height: AppSize.s15.h,
                         ),
@@ -330,7 +340,6 @@ class CreateEventScreen extends GetView<CreateEventController> {
                                 Get.back();
                               }
                             }),
-
                       ],
                     ),
                   ));
@@ -384,7 +393,6 @@ class CreateEventScreen extends GetView<CreateEventController> {
           ),
         ))
       ],
-    )
-    );
+    ));
   }
 }

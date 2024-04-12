@@ -28,7 +28,7 @@ class CreateEventController extends GetxController {
   final MyContactController contactController;
   RxString eventTime = ''.obs;
   RxString eventTypeID = ''.obs;
-  RxString participants = ''.obs;
+  RxString participants = '1,2'.obs;
   RxString urlMedia = ''.obs;
   RxInt OwnerID = 0.obs;
   RxBool eventTimeChange = false.obs;
@@ -253,11 +253,11 @@ class CreateEventController extends GetxController {
   }
 
   validateSelectOwner() {
-    if (OwnerID.value == 0) {
-      errorToast('You Should Select the Owner ');
-    } else {
+    // if (OwnerID.value == 0) {
+    //   errorToast('You Should Select the Owner ');
+    // } else {
       Get.toNamed(AppRoutes.selectContactScreen);
-    }
+    // }
   }
 
   // getRoom(String docs) async {

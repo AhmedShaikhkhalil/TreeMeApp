@@ -61,12 +61,12 @@ dependencies:
   permission_handler: ^10.4.2
   flutter_chat_types: ^3.6.2
   audioplayers: ^5.2.1
-#  ffmpeg_kit_flutter_min_gpl: ^5.1.0
+  ffmpeg_kit_flutter: ^6.0.3
   chewie: ^1.5.0
 #  video_editor: ^2.4.0
-#  audio_waveforms: ^1.0.4
+  audio_waveforms: ^1.0.4
   path: ^1.8.3
-#  video_player: ^2.6.1
+  video_player: ^2.6.1
   helpers: ^1.2.3
   flutter_colorpicker: ^1.0.3
 #  google_fonts: ^5.0.0
@@ -104,16 +104,17 @@ dependencies:
   record: ^4.4.4
   flutter_sound_record: ^3.3.1
 #  story_designer: ^2.0.FFmpegKitConfig
-  vs_story_designer: ^2.2.0
-  google_fonts: 6.1.0
+  # vs_story_designer: ^2.2.0
+  google_fonts: ^4.0.4
   flutter_sms: ^2.3.3
+  gal: ^2.3.0
 #  firebase_app_check: ^0.2.1+14
 #  flutter_firebase_chat_core:
 #    git:
 #      url: https://github.com/Mohammed1907s/flutter_firebase_chat_core.git
 #      ref: main
   flutter_local_notifications: ^15.1.0+1
-#  video_editor: ^3.0.0
+  video_editor: ^3.0.0
 #  stories_editor:
 #    git:
 #      url: https://github.com/Mohammed1907s/stories_editor.git
@@ -121,7 +122,7 @@ dependencies:
 #  visibility_detector: ^0.4.0+2
 
 #  meta: ^1.9.1
-#  easy_audio_trimmer:
+  easy_audio_trimmer: 1.0.2+4
 
 
 

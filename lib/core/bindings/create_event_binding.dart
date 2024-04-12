@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:treeme/modules/create_event/data/data_sources/create_new_event_data_source.dart';
+import 'package:treeme/modules/create_media/presentation/manager/create_media_controller.dart';
 
 import '../../modules/create_event/presentation/manager/create_event_controller.dart';
 import '../netwrok/web_connection.dart';
@@ -12,7 +13,9 @@ class CreateEventBindings implements Bindings {
       () => CreateEventDataSource(
           Get.find<WebServiceConnections>(), Get.find<IConnectivityChecker>()),
     );
-    Get.lazyPut(
-        () => CreateEventController(Get.find<ICreateEventDataSource>(), Get.find()));
+
+    Get.lazyPut(() =>
+        CreateEventController(Get.find<ICreateEventDataSource>(), Get.find()));
+    Get.lazyPut(() => CreateMediaController());
   }
 }

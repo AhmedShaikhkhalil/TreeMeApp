@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 class TextOverlay {
-  String? id;
+  int? id;
   String text;
   double fontSize;
   double? scaleFactor;
@@ -11,6 +11,7 @@ class TextOverlay {
   Offset? position = const Offset(0.0, 0);
   double? startTime;
   double? endTime;
+  Size? size;
   TextOverlay(
       {required this.text,
       required this.fontSize,
@@ -18,5 +19,6 @@ class TextOverlay {
       required this.fontFamily,
       this.isSelected = false,
       this.id,
+      this.size,
       this.position});
 }

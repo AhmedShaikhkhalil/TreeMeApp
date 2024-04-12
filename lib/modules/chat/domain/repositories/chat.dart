@@ -40,7 +40,9 @@ class ChatPage extends StatefulWidget {
     required this.room,
     required this.newRoom,
     this.color,
-    this.fcmUser, this.urlPinMassage,  this.havePinMassage,
+    this.fcmUser,
+    this.urlPinMassage,
+    this.havePinMassage,
   });
 
   final types.Room room;
@@ -71,8 +73,10 @@ class _ChatPageState extends State<ChatPage> {
   Future record() async {
     if (!isRecorderReady) return;
     Directory directory = await getApplicationDocumentsDirectory();
-    String filepath =
-        directory.path + '/' + DateTime.now().millisecondsSinceEpoch.toString() + '.wav';
+    String filepath = directory.path +
+        '/' +
+        DateTime.now().millisecondsSinceEpoch.toString() +
+        '.wav';
     _filePath = filepath;
     print(filepath.toString() + '7878787878787878787878');
     await recorder.startRecorder(
@@ -89,10 +93,10 @@ class _ChatPageState extends State<ChatPage> {
     //     .child(
     //     _filePath.substring(_filePath.lastIndexOf('/'), _filePath.length))
     //     .putFile(File(_filePath));
-    final reference = await FirebaseStorage.instance
-        .ref('TreeMe/ voice')
-        .child(_filePath.substring(_filePath.lastIndexOf('/'), _filePath.length));
-    final name = _filePath.substring(_filePath.lastIndexOf('/'), _filePath.length);
+    final reference = await FirebaseStorage.instance.ref('TreeMe/ voice').child(
+        _filePath.substring(_filePath.lastIndexOf('/'), _filePath.length));
+    final name =
+        _filePath.substring(_filePath.lastIndexOf('/'), _filePath.length);
     await reference.putFile(File(_filePath));
     final size = File(_filePath).lengthSync();
     final uri = await reference.getDownloadURL();
@@ -158,7 +162,8 @@ class _ChatPageState extends State<ChatPage> {
   initRecorder() async {
     final status = await Permission.microphone.request();
     final status2 = await Permission.storage.request();
-    if (status != PermissionStatus.granted && status2 != PermissionStatus.granted) {
+    if (status != PermissionStatus.granted &&
+        status2 != PermissionStatus.granted) {
       throw 'microphone permission not granted';
     }
 
@@ -176,12 +181,10 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   @override
- void initState()  {
+  void initState() {
     super.initState();
-    if(widget.havePinMassage ==true){
-      setState(() {
-
-      });
+    if (widget.havePinMassage == true) {
+      setState(() {});
     }
     sendPinMassage();
     // FirebaseChatCore.instance.sendMessage(
@@ -189,43 +192,43 @@ class _ChatPageState extends State<ChatPage> {
     //   widget.room.id,
     // );
   }
-void sendPinMassage() async{
-  if(widget.newRoom && widget.urlPinMassage != null){
-    File result = File('${widget.urlPinMassage}');
 
-    if (result != null ) {
-      _setAttachmentUploading(true);
-      final size = result.lengthSync();
-      final bytes = await result.readAsBytes();
-      final image = await decodeImageFromList(bytes);
-      final name = result.uri.pathSegments.last;
+  void sendPinMassage() async {
+    if (widget.newRoom && widget.urlPinMassage != null) {
+      File result = File('${widget.urlPinMassage}');
 
-      UploadTask uploadTask;
+      if (result != null) {
+        _setAttachmentUploading(true);
+        final size = result.lengthSync();
+        final bytes = await result.readAsBytes();
+        final image = await decodeImageFromList(bytes);
+        final name = result.uri.pathSegments.last;
 
+        UploadTask uploadTask;
 
-      try {
-        final reference = FirebaseStorage.instance.ref().child('TreeMe').child('/$name');
-        uploadTask = reference.putData(await result.readAsBytes());
-        final uri = await (await uploadTask).ref.getDownloadURL();
+        try {
+          final reference =
+              FirebaseStorage.instance.ref().child('TreeMe').child('/$name');
+          uploadTask = reference.putData(await result.readAsBytes());
+          final uri = await (await uploadTask).ref.getDownloadURL();
 
-        final message = types.PartialImage(
-          height: image.height.toDouble(),
-          name: name,
-          size: size,
-          uri: uri,
-          width: image.width.toDouble(),
-        );
+          final message = types.PartialImage(
+            height: image.height.toDouble(),
+            name: name,
+            size: size,
+            uri: uri,
+            width: image.width.toDouble(),
+          );
 
-        sendMessage(message, widget.room.id,true);
-        _setAttachmentUploading(false);
-      } finally {
-        _setAttachmentUploading(false);
+          sendMessage(message, widget.room.id, true);
+          _setAttachmentUploading(false);
+        } finally {
+          _setAttachmentUploading(false);
+        }
       }
     }
-
   }
 
-}
   void _handleAtachmentPressed() {
     showModalBottomSheet<void>(
       context: context,
@@ -316,7 +319,8 @@ void sendPinMassage() async{
       final file = File(filePath);
       UploadTask uploadTask;
       try {
-        final reference = FirebaseStorage.instance.ref().child('TreeMe').child('/$name');
+        final reference =
+            FirebaseStorage.instance.ref().child('TreeMe').child('/$name');
         uploadTask = reference.putData(await file.readAsBytes());
         final uri = await (await uploadTask).ref.getDownloadURL();
 
@@ -327,7 +331,7 @@ void sendPinMassage() async{
           uri: uri,
         );
 
-        sendMessage(message, widget.room.id,null);
+        sendMessage(message, widget.room.id, null);
         _setAttachmentUploading(false);
       } finally {
         _setAttachmentUploading(false);
@@ -352,7 +356,8 @@ void sendPinMassage() async{
 
       UploadTask uploadTask;
       try {
-        final reference = FirebaseStorage.instance.ref().child('TreeMe').child('/$name');
+        final reference =
+            FirebaseStorage.instance.ref().child('TreeMe').child('/$name');
         uploadTask = reference.putData(await file.readAsBytes());
         final uri = await (await uploadTask).ref.getDownloadURL();
 
@@ -364,11 +369,7 @@ void sendPinMassage() async{
           width: image.width.toDouble(),
         );
 
-        sendMessage(
-          message,
-          widget.room.id,
-          null
-        );
+        sendMessage(message, widget.room.id, null);
         _setAttachmentUploading(false);
       } finally {
         _setAttachmentUploading(false);
@@ -480,7 +481,7 @@ void sendPinMassage() async{
         .update(messageMap);
   }
 
-  void sendMessage(dynamic partialMessage, String roomId,bool? isPin) async {
+  void sendMessage(dynamic partialMessage, String roomId, bool? isPin) async {
     if (FirebaseAuth.instance.currentUser == null) return;
 
     types.Message? message;
@@ -503,7 +504,7 @@ void sendPinMassage() async{
       message = types.ImageMessage.fromPartial(
           author: types.User(id: FirebaseAuth.instance.currentUser!.uid),
           id: '',
-         remoteId:  isPin != null ? 'Pin': '',
+          remoteId: isPin != null ? 'Pin' : '',
           partialImage: partialMessage,
           showStatus: true,
           status: types.Status.sent);
@@ -515,7 +516,9 @@ void sendPinMassage() async{
           showStatus: true,
           status: types.Status.sent);
     }
-
+    print('room Collection' +
+        FirebaseChatCore.instance.config.roomsCollectionName);
+    print(roomId);
     if (message != null) {
       final messageMap = message.toJson();
       messageMap.removeWhere((key, value) => key == 'author' || key == 'id');
@@ -539,18 +542,14 @@ void sendPinMassage() async{
   static Status _parseStatus(String statusString) {
     return Status.values.firstWhere(
       (status) => status.toString() == 'Status.$statusString',
-      orElse: () =>
-          Status.sent, // Default value if the string doesn't match any enum value
+      orElse: () => Status
+          .sent, // Default value if the string doesn't match any enum value
     );
   }
 
   void _handleSendPressed(types.PartialText message) {
     print(message.text);
-    sendMessage(
-      message,
-      widget.room.id,
-      null
-    );
+    sendMessage(message, widget.room.id, null);
     print(widget.fcmUser);
     if (widget.fcmUser != null) {
       widget.fcmUser?.forEach((element) {
@@ -583,7 +582,9 @@ void sendPinMassage() async{
                         .toList()
                         .first
                     : ColorManager.mainColor,
-        margin: nextMessageInGroup ? const BubbleEdges.symmetric(horizontal: 6) : null,
+        margin: nextMessageInGroup
+            ? const BubbleEdges.symmetric(horizontal: 6)
+            : null,
         nip: nextMessageInGroup
             ? BubbleNip.no
             : Storage().firebaseUID != message.author.id
@@ -597,7 +598,11 @@ void sendPinMassage() async{
       appBar: AppBar(
         elevation: 0,
         backgroundColor: widget.color != null
-            ? widget.color!.split(',').map((e) => HexColor.fromHex(e)).toList().first
+            ? widget.color!
+                .split(',')
+                .map((e) => HexColor.fromHex(e))
+                .toList()
+                .first
             : ColorManager.mainColor,
         title: Text(widget.room.name ?? 'Chat'),
 
@@ -637,9 +642,12 @@ void sendPinMassage() async{
                         log('author ${visible.toString()}');
                         log('author ${p0.author.id.toString()}');
                         log('firebaseUID ${Storage().firebaseUID.toString()}');
-                        if(!visible) {
-                          final updatedMessage =
-                          p0.copyWith(author : p0.author,id: p0.id,showStatus: true, status: types.Status.seen);
+                        if (!visible) {
+                          final updatedMessage = p0.copyWith(
+                              author: p0.author,
+                              id: p0.id,
+                              showStatus: true,
+                              status: types.Status.seen);
                           FirebaseChatCore.instance
                               .updateMessage(updatedMessage, widget.room.id);
                         }
@@ -655,67 +663,71 @@ void sendPinMassage() async{
                       theme: DefaultChatTheme(
                           attachmentButtonIcon: recorder.isRecording
                               ? StreamBuilder<RecordingDisposition>(
-                            stream: recorder.onProgress,
-                            builder: (context, snapshot) {
-                              final duration = snapshot.hasData
-                                  ? snapshot.data!.duration
-                                  : Duration.zero;
-                              String towDidits(int n) => n.toString().padLeft(0);
-                              final towDiditsMinutes =
-                              towDidits(duration.inMinutes.remainder(60));
-                              final towDiditsSecond =
-                              towDidits(duration.inSeconds.remainder(60));
-                              durationAudio = snapshot.data!.duration;
-                              if (duration.inMinutes == 1) {
-                                stop();
-                                setState(() {});
-                                durationAudio = snapshot.data!.duration;
-                              }
+                                  stream: recorder.onProgress,
+                                  builder: (context, snapshot) {
+                                    final duration = snapshot.hasData
+                                        ? snapshot.data!.duration
+                                        : Duration.zero;
+                                    String towDidits(int n) =>
+                                        n.toString().padLeft(0);
+                                    final towDiditsMinutes = towDidits(
+                                        duration.inMinutes.remainder(60));
+                                    final towDiditsSecond = towDidits(
+                                        duration.inSeconds.remainder(60));
+                                    durationAudio = snapshot.data!.duration;
+                                    if (duration.inMinutes == 1) {
+                                      stop();
+                                      setState(() {});
+                                      durationAudio = snapshot.data!.duration;
+                                    }
 
-                              return Text(
-                                '$towDiditsMinutes:$towDiditsSecond',
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  color: ColorManager.mainColor,
-                                ),
-                              );
-                            },
-                          )
+                                    return Text(
+                                      '$towDiditsMinutes:$towDiditsSecond',
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: ColorManager.mainColor,
+                                      ),
+                                    );
+                                  },
+                                )
                               : Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: widget.color == null
-                                      ? [
-                                    ColorManager.mainColor,
-                                    ColorManager.gradiantSplash
-                                  ]
-                                      : widget.color!
-                                      .split(',')
-                                      .map((e) => HexColor.fromHex(e))
-                                      .toList(),
-                                  tileMode: TileMode.decal,
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: widget.color == null
+                                            ? [
+                                                ColorManager.mainColor,
+                                                ColorManager.gradiantSplash
+                                              ]
+                                            : widget.color!
+                                                .split(',')
+                                                .map((e) => HexColor.fromHex(e))
+                                                .toList(),
+                                        tileMode: TileMode.decal,
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
+                                      shape: BoxShape.circle),
+                                  child: const Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                                shape: BoxShape.circle),
-                            child: Icon(
-                              Icons.add,
-                              color: Colors.white,
-                            ),
-                          ),
                           inputContainerDecoration: BoxDecoration(
-                              color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                          backgroundColor: Color(0xffF7F7F7),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20)),
+                          backgroundColor: const Color(0xffF7F7F7),
                           // attachmentButtonMargin: EdgeInsets.zero,
                           inputTextColor: Colors.black,
                           sendButtonMargin: EdgeInsets.zero,
-                          sendButtonIcon: SvgPicture.asset(ImageAssets.sendButton),
+                          sendButtonIcon:
+                              SvgPicture.asset(ImageAssets.sendButton),
                           inputTextDecoration: InputDecoration(
                               hintText: 'Type Your massage',
                               enabled: true,
-                              hintStyle: getBoldStyle(color: Color(0xff8D96A5)))),
-                      l10n: ChatL10nEn(
+                              hintStyle: getBoldStyle(
+                                  color: const Color(0xff8D96A5)))),
+                      l10n: const ChatL10nEn(
                         inputPlaceholder: 'Type Your massage',
                         unreadMessagesLabel: "Unread messages",
                       ),
@@ -730,10 +742,10 @@ void sendPinMassage() async{
                               recorder.isRecording ? Icons.stop : Icons.mic,
                               color: widget.color != null
                                   ? widget.color!
-                                  .split(',')
-                                  .map((e) => HexColor.fromHex(e))
-                                  .toList()
-                                  .first
+                                      .split(',')
+                                      .map((e) => HexColor.fromHex(e))
+                                      .toList()
+                                      .first
                                   : ColorManager.mainColor,
                             ),
                             onPressed: () async {
@@ -746,16 +758,15 @@ void sendPinMassage() async{
                             },
                             splashRadius: 24,
                           ),
-                          options: InputOptions(
+                          options: const InputOptions(
                               enableSuggestions: true,
-                              sendButtonVisibilityMode: SendButtonVisibilityMode.editing),
+                              sendButtonVisibilityMode:
+                                  SendButtonVisibilityMode.editing),
                           onSendPressed: _handleSendPressed,
                           onAttachmentPressed: _handleAtachmentPressed),
                       showUserNames: true,
-                      typingIndicatorOptions: TypingIndicatorOptions(
-
-                      ),
-                     // disableImageGallery: true,
+                      typingIndicatorOptions: const TypingIndicatorOptions(),
+                      // disableImageGallery: true,
                       bubbleBuilder: _bubbleBuilder,
                       onPreviewDataFetched: _handlePreviewDataFetched,
                       onSendPressed: _handleSendPressed,
@@ -774,73 +785,92 @@ void sendPinMassage() async{
 
                       user: types.User(
                         id: Storage().firebaseUID ?? '',
-                        imageUrl:AppConfig.avatar == null ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(AppConfig.avatar!),
+                        imageUrl: AppConfig.avatar == null
+                            ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                            : API.imageUrl(AppConfig.avatar!),
                       ),
                     );
                   },
                 ),
                 Positioned(
-                  top: 0,right: 0,
+                  top: 0,
+                  right: 0,
                   left: 0,
                   child: Visibility(
-                    visible: widget.havePinMassage == true ,
+                    visible: widget.havePinMassage == true,
                     child: Visibility(
-                      visible: showPinMassage ,
-                      replacement:AnimatedContainer(
+                      visible: showPinMassage,
+                      replacement: AnimatedContainer(
                         height: 50,
                         decoration: BoxDecoration(
                             color: widget.color != null
-                                ? widget.color!.split(',').map((e) => HexColor.fromHex(e)).toList().first
+                                ? widget.color!
+                                    .split(',')
+                                    .map((e) => HexColor.fromHex(e))
+                                    .toList()
+                                    .first
                                 : ColorManager.mainColor,
-                            borderRadius: BorderRadius.only(bottomRight: Radius.circular(120),bottomLeft: Radius.circular(120))
-                        ),
-                        duration: Duration(milliseconds: 250), // Animation speed
+                            borderRadius: const BorderRadius.only(
+                                bottomRight: Radius.circular(120),
+                                bottomLeft: Radius.circular(120))),
+                        duration: const Duration(
+                            milliseconds: 250), // Animation speed
                         child: GestureDetector(
-                            onTap:  (){
+                            onTap: () {
                               setState(() {
                                 showPinMassage = !showPinMassage;
-                              });},
-                            child: Image.asset('assets/images/play_image.png',color: Colors.white,scale: 4,)),
+                              });
+                            },
+                            child: Image.asset(
+                              'assets/images/play_image.png',
+                              color: Colors.white,
+                              scale: 4,
+                            )),
                       ),
                       child: Stack(
                         alignment: Alignment.bottomCenter,
                         children: [
-                          PinMassageWidget(id: widget.room.id,),
+                          PinMassageWidget(
+                            id: widget.room.id,
+                          ),
                           Align(
                             alignment: AlignmentDirectional.bottomCenter,
                             child: GestureDetector(
-                              onTap: (){
+                              onTap: () {
                                 setState(() {
                                   showPinMassage = !showPinMassage;
                                 });
                               },
                               child: Container(
-                                height: 50.h,
-                                    width: 50.h,
-                                    margin: EdgeInsets.only(top: 20),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color:  widget.color != null
-                                          ? widget.color!.split(',').map((e) => HexColor.fromHex(e)).toList().first
-                                          : ColorManager.mainColor,
-                                    ),
-                                  child: Icon(Icons.arrow_upward)),
+                                  height: 50.h,
+                                  width: 50.h,
+                                  margin: const EdgeInsets.only(top: 20),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: widget.color != null
+                                        ? widget.color!
+                                            .split(',')
+                                            .map((e) => HexColor.fromHex(e))
+                                            .toList()
+                                            .first
+                                        : ColorManager.mainColor,
+                                  ),
+                                  child: const Icon(Icons.arrow_upward)),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-
                 ),
               ],
             );
           } catch (e) {
             print(e.toString());
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.data == null) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),
@@ -913,7 +943,8 @@ class audioWidget extends StatefulWidget {
   State<audioWidget> createState() => _audioWidgetState();
 }
 
-class _audioWidgetState extends State<audioWidget> with SingleTickerProviderStateMixin {
+class _audioWidgetState extends State<audioWidget>
+    with SingleTickerProviderStateMixin {
   final audioPlayer = AudioPlayer();
   late final AnimationController _controller;
   bool isPlaying = false;
@@ -940,8 +971,10 @@ class _audioWidgetState extends State<audioWidget> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     String towDidits(int n) => n.toString().padLeft(0);
-    final towDiditsMinutes = towDidits(widget.p0.duration.inMinutes.remainder(60));
-    final towDiditsSecond = towDidits(widget.p0.duration.inSeconds.remainder(60));
+    final towDiditsMinutes =
+        towDidits(widget.p0.duration.inMinutes.remainder(60));
+    final towDiditsSecond =
+        towDidits(widget.p0.duration.inSeconds.remainder(60));
     return Container(
       child: Stack(
         alignment: Alignment.centerLeft,
