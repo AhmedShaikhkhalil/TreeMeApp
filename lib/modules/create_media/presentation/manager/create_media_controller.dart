@@ -3,20 +3,26 @@ import 'dart:io';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:audioplayers/audioplayers.dart' hide PlayerState;
 import 'package:chewie/chewie.dart';
-import 'package:easy_audio_trimmer/easy_audio_trimmer.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit_config.dart';
-import 'package:ffmpeg_kit_flutter/log.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
-import 'package:ffmpeg_kit_flutter/session.dart';
-import 'package:ffmpeg_kit_flutter/statistics.dart';
+import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_full_gpl/log.dart';
+import 'package:ffmpeg_kit_flutter_full_gpl/return_code.dart';
+import 'package:ffmpeg_kit_flutter_full_gpl/session.dart';
+import 'package:ffmpeg_kit_flutter_full_gpl/statistics.dart';
+// import 'package:easy_audio_trimmer/easy_audio_trimmer.dart';
+// import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+// import 'package:ffmpeg_kit_flutter/ffmpeg_kit_config.dart';
+// import 'package:ffmpeg_kit_flutter/log.dart';
+// import 'package:ffmpeg_kit_flutter/return_code.dart';
+// import 'package:ffmpeg_kit_flutter/session.dart';
+// import 'package:ffmpeg_kit_flutter/statistics.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gal/gal.dart';
 import 'package:get/get.dart';
-import 'package:helpers/helpers.dart' show OpacityTransition;
+// import 'package:helpers/helpers.dart' show OpacityTransition;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:stack_board/stack_board.dart';
@@ -68,7 +74,7 @@ class CreateMediaController extends GetxController
   double yPosition = 50.0;
   var uuid = const Uuid();
   TextEditingController textController = TextEditingController();
-  final Trimmer trimmer = Trimmer();
+  // final Trimmer trimmer = Trimmer();
   double startValueAudio = 0.0;
   double endValueAudio = 0.0;
 
@@ -370,7 +376,7 @@ class CreateMediaController extends GetxController
       filePath = result.files.single.path;
       print(filePath);
       isLoadingAudio = true;
-      await trimmer.loadAudio(audioFile: File(result.files.single.path ?? ''));
+      // await trimmer.loadAudio(audioFile: File(result.files.single.path ?? ''));
       isLoadingAudio = false;
       progressVisibility = true;
       audioPlayer.setSourceDeviceFile(result.files.single.path ?? '');
@@ -606,23 +612,23 @@ class CreateMediaController extends GetxController
       Directory tempDir = await getTemporaryDirectory();
       String outputDir = tempDir.path;
 
-      String outputVideoPath = path.join(outputDir, 'out.mp4');
+      String outputVideoPath = path.join(outputDir, 'put.mp4');
       const text = 'Mohammedd';
 
       final command =
-          '-i $inputVideoPath  drawtext=text=$text:x=$xPosition:y=$yPosition:fontcolor=white --enable-libfreetype -c:a copy -y  $outputVideoPath';
+          '-i $inputVideoPath -vf drawtext=text=$text:x=$xPosition:y=$yPosition:fontcolor=white -codec:a copy -y  $outputVideoPath';
 
       await FFmpegKit.executeAsync(command, (Session session) async {
         session.getReturnCode().then((returnCode) async {
-          if (returnCode == 0) {
-            videoFilePath = outputVideoPath;
-            addTextResult = 'Text added successfully!';
-            print(returnCode);
-            await Gal.putVideo(outputVideoPath).then((value) {});
-          } else {
-            addTextResult =
-                'Failed to add text to video. Return Code: $returnCode';
-          }
+          // if (returnCode == 0) {
+          videoFilePath = outputVideoPath;
+          addTextResult = 'Text added successfully!';
+          print(returnCode);
+          await Gal.putVideo(outputVideoPath).then((value) {});
+          // } else {
+          //   addTextResult =
+          //       'Failed to add text to video. Return Code: $returnCode';
+          // }
           update();
         });
       }, (Log log) {
@@ -656,54 +662,128 @@ class CreateMediaController extends GetxController
     }
   }
 
+  // Future<void> initializeVideoPlayer() async {
+  //   String inputVideoPath = videoFilePath;
+  //   String inputImagePath = imageFilePath;
+
+  //   Directory tempDir = await getApplicationDocumentsDirectory();
+  //   String outputDir = tempDir.path;
+  //   ImageOverly selectedImage = imageOverlays[0];
+  //   String outputVideoPath = path.join(outputDir, 'putout1.mp4');
+  //   print('offset ${selectedImage.imagePositionX}:y=${selectedImage.position}');
+  //   if (await File(inputVideoPath).exists()) {
+  //     print('${selectedImage.position}   ${selectedImage.size} ');
+
+  //     String ffmpegCommand =
+  //         "-i $inputVideoPath -i $inputImagePath -filter_complex \"[1:v]scale=${selectedImage.size.width}:${selectedImage.size.height} [ovrl]; [0:v][ovrl]overlay=${selectedImage.position.dx}:${selectedImage.position.dy}:enable='between(t,1,${selectedImage.endRange})'[video]; [video]drawtext=text='$text':x=$xPosition:y=$yPosition:fontcolor=white\" -codec:a copy -y $outputVideoPath";
+  //     await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+  //       session.getReturnCode().then(
+  //         (returnCode) async {
+  //           // if (returnCode == ReturnCode.success) {
+  //           print(returnCode);
+  //           await Gal.putVideo(outputVideoPath).then((value) {});
+
+  //           videoPlayerController =
+  //               VideoPlayerController.file(File(outputVideoPath));
+  //           await videoPlayerController!.initialize();
+
+  //           chewieController = ChewieController(
+  //             videoPlayerController: videoPlayerController!,
+  //             // autoPlay: true,
+  //             looping: true,
+  //           );
+  //           update();
+
+  //           // } else {
+  //           //   addTextResult =
+  //           //       'Failed to add text to video. Return Code: $returnCode';
+  //           // }
+  //         },
+  //       );
+  //     }, (Log log) {
+  //       print(log.getMessage());
+  //     }, (Statistics statistics) {
+  //       print(statistics.getVideoFps());
+  //       // CALLED WHEN SESSION GENERATES STATISTICS
+  //     });
+  //   }
+  // }
+
   Future<void> initializeVideoPlayer() async {
     String inputVideoPath = videoFilePath;
-    String inputImagePath = imageFilePath;
-
     Directory tempDir = await getApplicationDocumentsDirectory();
     String outputDir = tempDir.path;
-    ImageOverly selectedImage = imageOverlays[0];
-    String outputVideoPath = path.join(outputDir, 'putout1.mp4');
-    print('offset ${selectedImage.imagePositionX}:y=${selectedImage.position}');
-    if (await File(inputVideoPath).exists()) {
-      //:x=${selectedImage.imagePositionX}:y=${selectedImage.imagePositionY}
-      // String ffmpegCommand =
-      //     "-i $inputVideoPath -i $inputImagePath  -filter_complex 'overlay=10:main_h-overlay_h-10,scale=200x200'       -codec:a copy -y $outputVideoPath";
-      print('${selectedImage.position}   ${selectedImage.size} ');
+    String outputVideoPath = path.join(outputDir, 'output1.mp4');
 
-      String ffmpegCommand =
-          "-i $inputVideoPath -i $inputImagePath -filter_complex \"[1:v]scale=${selectedImage.size.width}:${selectedImage.size.height} [ovrl]; [0:v][ovrl]overlay=${selectedImage.position.dx}:${selectedImage.position.dy}:enable='between(t,1,${selectedImage.endRange})'\" -codec:a copy -y $outputVideoPath";
-      await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
-        session.getReturnCode().then(
-          (returnCode) async {
-            // if (returnCode == ReturnCode.success) {
-            print(returnCode);
-            await Gal.putVideo(outputVideoPath).then((value) {});
-
-            videoPlayerController =
-                VideoPlayerController.file(File(outputVideoPath));
-            await videoPlayerController!.initialize();
-
-            chewieController = ChewieController(
-              videoPlayerController: videoPlayerController!,
-              // autoPlay: true,
-              looping: true,
-            );
-            update();
-
-            // } else {
-            //   addTextResult =
-            //       'Failed to add text to video. Return Code: $returnCode';
-            // }
-          },
-        );
-      }, (Log log) {
-        print(log.getMessage());
-      }, (Statistics statistics) {
-        print(statistics.getVideoFps());
-        // CALLED WHEN SESSION GENERATES STATISTICS
-      });
+    // Check if the video file exists
+    if (!await File(inputVideoPath).exists()) {
+      print("Video file does not exist.");
+      return;
     }
+
+    // Initialize the FFmpeg command with the input video
+    String ffmpegCommand = "-i $inputVideoPath";
+
+    // Adding multiple image overlays
+    int index = 0;
+    String filterComplex = "";
+    for (var overlay in imageOverlays) {
+      ffmpegCommand += " -i ${overlay.selectedImage}";
+      filterComplex +=
+          "[${index + 1}:v]scale=${overlay.size.width}:${overlay.size.height} [img$index];";
+      filterComplex +=
+          "[0:v][img$index]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,${1},${10})'[v$index];";
+      index++;
+    }
+
+    // Set the last video output from overlays as the input for texts
+    String lastVideo = "[v${index - 1}]";
+
+    // Adding multiple text overlays
+    for (var textOverlay in textOverlays) {
+      filterComplex +=
+          "$lastVideo drawtext=text='${textOverlay.text}':x=${textOverlay.position!.dx - 200}:y=${textOverlay.position!.dy + 200}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,${1},${10})'[v$index];";
+      lastVideo = "[v$index]";
+      index++;
+    }
+
+    // Remove the last semicolon
+    if (filterComplex.isNotEmpty) {
+      filterComplex = filterComplex.substring(0, filterComplex.length - 1);
+    }
+
+    // Complete the FFmpeg command
+    ffmpegCommand +=
+        " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -codec:a copy -y $outputVideoPath";
+
+    // Execute FFmpeg
+    await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+      final returnCode = await session.getReturnCode();
+      if (returnCode!.isValueSuccess()) {
+        print("FFmpeg process successful, video saved to $outputVideoPath");
+        await initializeVideoPlayerController(outputVideoPath);
+      } else {
+        print(
+            "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+      }
+    }, (Log log) {
+      print(log.getMessage());
+    }, (Statistics statistics) {
+      print("Current frame rate: ${statistics.getVideoFps()}");
+    });
+  }
+
+  Future<void> initializeVideoPlayerController(String videoPath) async {
+    videoPlayerController = VideoPlayerController.file(File(videoPath));
+    await videoPlayerController!.initialize();
+    chewieController = ChewieController(
+      videoPlayerController: videoPlayerController!,
+      autoPlay: true,
+      looping: true,
+    );
+
+    await Gal.putVideo(videoPath).then((value) {});
+    update();
   }
 
   Future<void> createVideoFromimages() async {
@@ -820,14 +900,16 @@ class CreateMediaController extends GetxController
             child: Row(children: [
               // Text(formatter(Duration(seconds: pos.toInt()))),
               // const Expanded(child: SizedBox()),
-              OpacityTransition(
-                visible: videoEditorController!.isTrimming,
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(formatter(videoEditorController!.startTrim)),
-                  const SizedBox(width: 10),
-                  Text(formatter(videoEditorController!.endTrim)),
-                ]),
-              ),
+              // OpacityTransition(
+              //   visible: videoEditorController!.isTrimming,
+              //   child:
+
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(formatter(videoEditorController!.startTrim)),
+                const SizedBox(width: 10),
+                Text(formatter(videoEditorController!.endTrim)),
+              ]),
+              // ),
             ]),
           );
         },
@@ -868,6 +950,9 @@ class CreateMediaController extends GetxController
   }
 
   void udpateOffset(int? id, Offset offset) {}
+  String toHexString(Color color) {
+    return '${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
+  }
 }
 // import 'package:get/get.dart';
 

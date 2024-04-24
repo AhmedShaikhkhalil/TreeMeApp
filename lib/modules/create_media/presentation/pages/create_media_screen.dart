@@ -1,13 +1,14 @@
 import 'dart:io';
 
-import 'package:easy_audio_trimmer/easy_audio_trimmer.dart' as trimmer;
+// import 'package:easy_audio_trimmer/easy_audio_trimmer.dart' as trimmer;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:helpers/helpers.dart';
-import 'package:helpers/helpers/transition.dart';
+// import 'package:helpers/helpers.dart';
+// import 'package:helpers/helpers/transition.dart';
 import 'package:stack_board/stack_board.dart';
 import 'package:sticker_view/stickerview.dart';
 import 'package:treeme/core/resources/resource.dart';
+import 'package:treeme/modules/create_media/domain/entities/image_overlay.dart';
 import 'package:treeme/modules/create_media/presentation/manager/create_media_controller.dart';
 import 'package:video_editor/video_editor.dart';
 
@@ -244,23 +245,41 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                               },
                               onOffsetChanged: (offset) {
                                 print(offset);
-                                Offset newOffset = Offset(
+                              
+
+                                if (t.child is Image) {  Offset newOffset = Offset(
                                     offset.dx / videoWidthRatio,
                                     offset.dy * videoHieghtRatio);
                                 print(newOffset);
+                                  int index = logic.imageOverlays
+                                      .indexWhere((p0) => p0.id == t.id);
 
-                                if (t.child is Image) {
-                                  logic.imageOverlays.replaceWhere(
-                                      (p0) => p0.id == t.id, (imageOverlay) {
-                                    imageOverlay.position = newOffset;
-                                    return imageOverlay;
-                                  });
+                                  logic.imageOverlays[index] = logic
+                                      .imageOverlays[index]
+                                    ..position = newOffset;
+
+                                  // replaceWhere(
+                                  //     (p0) => p0.id == t.id, (imageOverlay) {
+                                  //   imageOverlay.position = newOffset;
+                                  //   return imageOverlay;
+                                  // });
                                 } else {
-                                  logic.textOverlays.replaceWhere(
-                                      (p0) => p0.id == t.id, (textOverlay) {
-                                    textOverlay.position = newOffset;
-                                    return textOverlay;
-                                  });
+
+                                    Offset newOffset = Offset(
+                                   offset.dx* videoWidthRatio,
+                                    offset.dy * videoHieghtRatio);
+                                    print(newOffset);
+                                  int index = logic.textOverlays
+                                      .indexWhere((p0) => p0.id == t.id);
+              
+                                  logic.textOverlays[index] = logic
+                                      .textOverlays[index]
+                                    ..position = newOffset;
+                                  // logic.textOverlays.replaceWhere(
+                                  //     (p0) => p0.id == t.id, (textOverlay) {
+                                  //   textOverlay.position = newOffset;
+                                  //   return textOverlay;
+                                  // });
                                 }
                                 // return false;
                               },
@@ -269,56 +288,53 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                     size.width * videoWidthRatio,
                                     size.height * videoHieghtRatio);
                                 if (t.child is Image) {
+                                  int index = logic.imageOverlays
+                                      .indexWhere((p0) => p0.id == t.id);
                                   setState(() {
-                                    logic.imageOverlays.replaceWhere(
-                                        (p0) => p0.id == t.id, (imageOverlays) {
-                                      imageOverlays.size = newSize;
-                                      return imageOverlays;
-                                    });
+                                    logic.imageOverlays[index] = logic
+                                        .imageOverlays[index]
+                                      ..size = newSize;
+                                    // logic.imageOverlays.replaceWhere(
+                                    //     (p0) => p0.id == t.id, (imageOverlays) {
+                                    //   imageOverlays.size = newSize;
+                                    //   return imageOverlays;
+                                    // });
                                   });
                                 } else {
+                                  int index = logic.textOverlays
+                                      .indexWhere((p0) => p0.id == t.id);
+                                  logic.textOverlays[index] =
+                                      logic.textOverlays[index]..size = newSize;
                                   // logic.textOverlays.replaceWhere(
                                   //     (p0) => p0.id == t.id,
                                   //     (textOverlay) {
                                   //   textOverlay.position = offset;
                                   //   return textOverlay;
                                   // });
+
+                                  return false;
                                 }
                               },
                               caseStyle: const CaseStyle(
                                 borderColor: Colors.grey,
                                 iconColor: Colors.white,
                               ),
-                              child: Obx(() {
-                                return SizedBox(
-                                  width: t.child is Image
-                                      ? logic.imageOverlays
-                                          .firstWhere(
-                                              (element) => element.id == t.id)
-                                          .size
-                                          .width
-                                      : logic.textOverlays
-                                          .firstWhere(
-                                              (element) => element.id == t.id)
-                                          .size!
-                                          .width,
-                                  height: t.child is Image
-                                      ? logic.imageOverlays
-                                          .firstWhere(
-                                              (element) => element.id == t.id)
-                                          .size
-                                          .height
-                                      : logic.textOverlays
-                                          .firstWhere(
-                                              (element) => element.id == t.id)
-                                          .size!
-                                          .height,
-                                  // height: 100,
-                                  // color: t.color,
-
-                                  child: t.child,
-                                );
-                              }),
+                              child: t.child is Image
+                                  ? Obx(() {
+                                      return SizedBox(
+                                          width: logic.imageOverlays
+                                              .firstWhere((element) =>
+                                                  element.id == t.id)
+                                              .size
+                                              .width,
+                                          height: logic.imageOverlays
+                                              .firstWhere((element) =>
+                                                  element.id == t.id)
+                                              .size
+                                              .height,
+                                          child: t.child);
+                                    })
+                                  : t.child,
                             );
                             // }
 
@@ -608,28 +624,32 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                     ),
                                     Visibility(
                                       visible: !logic.pause.value,
-                                      replacement: OpacityTransition(
-                                        visible: logic.pause.value,
-                                        child: GestureDetector(
-                                            onTap: () {
-                                              logic.videoEditorController!.video
-                                                  .pause();
-                                              logic.pausePlayer();
-                                            },
-                                            child: const Icon(Icons.pause)),
-                                      ),
-                                      child: OpacityTransition(
-                                        visible: !logic.pause.value,
-                                        child: GestureDetector(
-                                            onTap: () {
-                                              logic.videoEditorController!.video
-                                                  .play();
-                                              logic.pausePlayer();
-                                            },
-                                            child: SvgPicture.asset(
-                                                ImageAssets.playVideo)),
-                                      ),
+                                      replacement:
+                                          // OpacityTransition(
+                                          //   visible: logic.pause.value,
+                                          // child:
+
+                                          GestureDetector(
+                                              onTap: () {
+                                                logic.videoEditorController!
+                                                    .video
+                                                    .pause();
+                                                logic.pausePlayer();
+                                              },
+                                              child: const Icon(Icons.pause)),
+                                      // ),
+                                      // child: OpacityTransition(
+                                      //   visible: !logic.pause.value,
+                                      child: GestureDetector(
+                                          onTap: () {
+                                            logic.videoEditorController!.video
+                                                .play();
+                                            logic.pausePlayer();
+                                          },
+                                          child: SvgPicture.asset(
+                                              ImageAssets.playVideo)),
                                     ),
+                                    // ),
                                     // GestureDetector(
                                     //     onTap: () => logic.playandPause2(),
                                     //     child: Visibility(
@@ -686,84 +706,84 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                               ),
 
                               /// [Audio] Row
-                              Expanded(
-                                child: logic.isLoadingAudio
-                                    ? Container(
-                                        height: AppSize.s50.h,
-                                        color: const Color(0xffE8E8E8),
-                                        alignment: Alignment.topCenter,
-                                        child: SizedBox(
-                                            height: 5.h,
-                                            child:
-                                                const LinearProgressIndicator(
-                                              backgroundColor:
-                                                  Color(0xffF15C89),
-                                            )))
-                                    : Visibility(
-                                        visible: !logic.progressVisibility,
-                                        replacement: trimmer.TrimViewer(
-                                          trimmer: logic.trimmer,
-                                          viewerHeight: 50.h,
-                                          maxAudioLength: logic.durationAudio,
-                                          viewerWidth: Get.width,
-                                          // durationStyle: DurationStyle.FORMAT_MM_SS,
-                                          backgroundColor:
-                                              const Color(0xffF15C89),
-                                          barColor: Colors.white,
-                                          durationTextStyle: TextStyle(
-                                              color: Theme.of(context)
-                                                  .primaryColor),
-                                          allowAudioSelection: true,
-                                          // editorProperties: TrimEditorProperties(
-                                          //   circleSize: 10,
-                                          //   borderPaintColor: Colors.pinkAccent,
-                                          //   borderWidth: 4,
-                                          //   borderRadius: 5,
-                                          //   circlePaintColor: Colors.pink.shade400,
-                                          // ),
-                                          // areaProperties: TrimAreaProperties.edgeBlur(
-                                          //     blurEdges: true, barFit: BoxFit.contain),
-                                          onChangeStart: (value) =>
-                                              logic.startValueAudio = value,
-                                          onChangeEnd: (value) =>
-                                              logic.endValueAudio = value,
-                                          onChangePlaybackState: (value) {
-                                            // if (mounted) {
-                                            // setState(() => _isPlaying = value);
-                                            // }
-                                          },
-                                        ),
-                                        child: Container(
-                                          height: AppSize.s50.h,
-                                          color: const Color(0xffE8E8E8),
-                                          // child: AudioFileWaveforms(
-                                          //   size: Size(
-                                          //       MediaQuery.of(context).size.width / 2, 70),
-                                          //   playerController: logic.playerController,
-                                          //   waveformType: WaveformType.fitWidth,
-                                          //   decoration: BoxDecoration(
-                                          //     color: Color(0xffF15C89),
-                                          //   ),
-                                          //   enableSeekGesture: true,
-                                          //   continuousWaveform: true,
-                                          //   animationDuration:
-                                          //       const Duration(milliseconds: 200),
-                                          //   playerWaveStyle: const PlayerWaveStyle(
-                                          //       scaleFactor: 90,
-                                          //       fixedWaveColor: Colors.black54,
-                                          //       liveWaveColor: Colors.white,
-                                          //       waveCap: StrokeCap.round,
-                                          //       spacing: 5,
-                                          //       showTop: true,
-                                          //       showSeekLine: true,
-                                          //       seekLineColor: Colors.yellow,
-                                          //       seekLineThickness: 5,
-                                          //       showBottom: true),
-                                          // ),
-                                        ),
-                                      ),
-                              )
                               // Expanded(
+                              //   child: logic.isLoadingAudio
+                              //       ? Container(
+                              //           height: AppSize.s50.h,
+                              //           color: const Color(0xffE8E8E8),
+                              //           alignment: Alignment.topCenter,
+                              //           child: SizedBox(
+                              //               height: 5.h,
+                              //               child:
+                              //                   const LinearProgressIndicator(
+                              //                 backgroundColor:
+                              //                     Color(0xffF15C89),
+                              //               )))
+                              //       : Visibility(
+                              //           visible: !logic.progressVisibility,
+                              //           replacement: trimmer.TrimViewer(
+                              //             trimmer: logic.trimmer,
+                              //             viewerHeight: 50.h,
+                              //             maxAudioLength: logic.durationAudio,
+                              //             viewerWidth: Get.width,
+                              //             // durationStyle: DurationStyle.FORMAT_MM_SS,
+                              //             backgroundColor:
+                              //                 const Color(0xffF15C89),
+                              //             barColor: Colors.white,
+                              //             durationTextStyle: TextStyle(
+                              //                 color: Theme.of(context)
+                              //                     .primaryColor),
+                              //             allowAudioSelection: true,
+                              //             // editorProperties: TrimEditorProperties(
+                              //             //   circleSize: 10,
+                              //             //   borderPaintColor: Colors.pinkAccent,
+                              //             //   borderWidth: 4,
+                              //             //   borderRadius: 5,
+                              //             //   circlePaintColor: Colors.pink.shade400,
+                              //             // ),
+                              //             // areaProperties: TrimAreaProperties.edgeBlur(
+                              //             //     blurEdges: true, barFit: BoxFit.contain),
+                              //             onChangeStart: (value) =>
+                              //                 logic.startValueAudio = value,
+                              //             onChangeEnd: (value) =>
+                              //                 logic.endValueAudio = value,
+                              //             onChangePlaybackState: (value) {
+                              //               // if (mounted) {
+                              //               // setState(() => _isPlaying = value);
+                              //               // }
+                              //             },
+                              //           ),
+                              //           child: Container(
+                              //             height: AppSize.s50.h,
+                              //             color: const Color(0xffE8E8E8),
+                              //             // child: AudioFileWaveforms(
+                              //             //   size: Size(
+                              //             //       MediaQuery.of(context).size.width / 2, 70),
+                              //             //   playerController: logic.playerController,
+                              //             //   waveformType: WaveformType.fitWidth,
+                              //             //   decoration: BoxDecoration(
+                              //             //     color: Color(0xffF15C89),
+                              //             //   ),
+                              //             //   enableSeekGesture: true,
+                              //             //   continuousWaveform: true,
+                              //             //   animationDuration:
+                              //             //       const Duration(milliseconds: 200),
+                              //             //   playerWaveStyle: const PlayerWaveStyle(
+                              //             //       scaleFactor: 90,
+                              //             //       fixedWaveColor: Colors.black54,
+                              //             //       liveWaveColor: Colors.white,
+                              //             //       waveCap: StrokeCap.round,
+                              //             //       spacing: 5,
+                              //             //       showTop: true,
+                              //             //       showSeekLine: true,
+                              //             //       seekLineColor: Colors.yellow,
+                              //             //       seekLineThickness: 5,
+                              //             //       showBottom: true),
+                              //             // ),
+                              //           ),
+                              //         ),
+                              // )
+                              // // Expanded(
                               //   child: WaveVisualizer(
                               //     audioUrl: _isPlaying ? _filePath : null,
                               //     isPlaying: _isPlaying,
