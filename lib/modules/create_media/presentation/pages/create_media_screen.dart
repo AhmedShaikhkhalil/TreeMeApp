@@ -177,11 +177,9 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
               ? logic.videoEditorController!.videoHeight / 300
               : .5;
 
-          print(
-              'video dimension ${logic.videoEditorController?.videoDimension}');
           return SafeArea(
             child: SingleChildScrollView(
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               primary: false,
               child: Column(
                 children: [
@@ -217,7 +215,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                         'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg?w=2000',
                                         height: AppSize.s261.h,
                                       )
-                                    : SizedBox(),
+                                    : const SizedBox(),
 
                         SizedBox(
 
@@ -245,12 +243,12 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                               },
                               onOffsetChanged: (offset) {
                                 print(offset);
-                              
 
-                                if (t.child is Image) {  Offset newOffset = Offset(
-                                    offset.dx / videoWidthRatio,
-                                    offset.dy * videoHieghtRatio);
-                                print(newOffset);
+                                if (t.child is Image) {
+                                  Offset newOffset = Offset(
+                                      offset.dx / videoWidthRatio,
+                                      offset.dy * videoHieghtRatio);
+                                  print(newOffset);
                                   int index = logic.imageOverlays
                                       .indexWhere((p0) => p0.id == t.id);
 
@@ -264,14 +262,13 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                   //   return imageOverlay;
                                   // });
                                 } else {
-
-                                    Offset newOffset = Offset(
-                                   offset.dx* videoWidthRatio,
-                                    offset.dy * videoHieghtRatio);
-                                    print(newOffset);
+                                  Offset newOffset = Offset(
+                                      offset.dx * videoWidthRatio,
+                                      offset.dy * videoHieghtRatio);
+                                  print(newOffset);
                                   int index = logic.textOverlays
                                       .indexWhere((p0) => p0.id == t.id);
-              
+
                                   logic.textOverlays[index] = logic
                                       .textOverlays[index]
                                     ..position = newOffset;
@@ -600,7 +597,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                           Padding(
                             padding: EdgeInsets.only(right: AppSize.s18.w),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 // Row(
                                 //   children: [
@@ -613,7 +610,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                 //         ImageAssets.forwardArrow),
                                 //   ],
                                 // ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 60.0,
                                 ),
                                 Row(
@@ -631,10 +628,14 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
 
                                           GestureDetector(
                                               onTap: () {
-                                                logic.videoEditorController!
-                                                    .video
-                                                    .pause();
-                                                logic.pausePlayer();
+                                                if (logic
+                                                        .videoEditorController !=
+                                                    null) {
+                                                  logic.videoEditorController!
+                                                      .video
+                                                      .pause();
+                                                  logic.pausePlayer();
+                                                }
                                               },
                                               child: const Icon(Icons.pause)),
                                       // ),
@@ -642,9 +643,12 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                       //   visible: !logic.pause.value,
                                       child: GestureDetector(
                                           onTap: () {
-                                            logic.videoEditorController!.video
-                                                .play();
-                                            logic.pausePlayer();
+                                            if (logic.videoEditorController !=
+                                                null) {
+                                              logic.videoEditorController!.video
+                                                  .play();
+                                              logic.pausePlayer();
+                                            }
                                           },
                                           child: SvgPicture.asset(
                                               ImageAssets.playVideo)),
@@ -666,7 +670,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                             ImageAssets.forwardVideo)),
                                   ],
                                 ),
-                                SvgPicture.asset(ImageAssets.zoomIcon),
+                                // SvgPicture.asset(ImageAssets.zoomIcon),
                               ],
                             ),
                           ),
@@ -674,147 +678,147 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                             height: AppSize.s20.h,
                           ),
 
-                          Row(
-                            children: [
-                              Stack(
-                                clipBehavior: Clip.hardEdge,
-                                fit: StackFit.loose,
-                                alignment: Alignment.bottomRight,
-                                // alignment: Alignment.bottomRight,
-                                children: [
-                                  SvgPicture.asset(
-                                    ImageAssets.music,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () => logic.pickFile(),
-                                    child: Container(
-                                      // margin: EdgeInsets.only(left: 5, top: 5),
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.white,
-                                      ),
-                                      child: Icon(
-                                        Icons.add,
-                                        size: 14.sp,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              SizedBox(
-                                width: AppSize.s14.w,
-                              ),
+                          // Row(
+                          //   children: [
+                          //     Stack(
+                          //       clipBehavior: Clip.hardEdge,
+                          //       fit: StackFit.loose,
+                          //       alignment: Alignment.bottomRight,
+                          //       // alignment: Alignment.bottomRight,
+                          //       children: [
+                          //         SvgPicture.asset(
+                          //           ImageAssets.music,
+                          //         ),
+                          //         GestureDetector(
+                          //           onTap: () => logic.pickFile(),
+                          //           child: Container(
+                          //             // margin: EdgeInsets.only(left: 5, top: 5),
+                          //             decoration: const BoxDecoration(
+                          //               shape: BoxShape.circle,
+                          //               color: Colors.white,
+                          //             ),
+                          //             child: Icon(
+                          //               Icons.add,
+                          //               size: 14.sp,
+                          //             ),
+                          //           ),
+                          //         )
+                          //       ],
+                          //     ),
+                          //     SizedBox(
+                          //       width: AppSize.s14.w,
+                          //     ),
 
-                              /// [Audio] Row
-                              // Expanded(
-                              //   child: logic.isLoadingAudio
-                              //       ? Container(
-                              //           height: AppSize.s50.h,
-                              //           color: const Color(0xffE8E8E8),
-                              //           alignment: Alignment.topCenter,
-                              //           child: SizedBox(
-                              //               height: 5.h,
-                              //               child:
-                              //                   const LinearProgressIndicator(
-                              //                 backgroundColor:
-                              //                     Color(0xffF15C89),
-                              //               )))
-                              //       : Visibility(
-                              //           visible: !logic.progressVisibility,
-                              //           replacement: trimmer.TrimViewer(
-                              //             trimmer: logic.trimmer,
-                              //             viewerHeight: 50.h,
-                              //             maxAudioLength: logic.durationAudio,
-                              //             viewerWidth: Get.width,
-                              //             // durationStyle: DurationStyle.FORMAT_MM_SS,
-                              //             backgroundColor:
-                              //                 const Color(0xffF15C89),
-                              //             barColor: Colors.white,
-                              //             durationTextStyle: TextStyle(
-                              //                 color: Theme.of(context)
-                              //                     .primaryColor),
-                              //             allowAudioSelection: true,
-                              //             // editorProperties: TrimEditorProperties(
-                              //             //   circleSize: 10,
-                              //             //   borderPaintColor: Colors.pinkAccent,
-                              //             //   borderWidth: 4,
-                              //             //   borderRadius: 5,
-                              //             //   circlePaintColor: Colors.pink.shade400,
-                              //             // ),
-                              //             // areaProperties: TrimAreaProperties.edgeBlur(
-                              //             //     blurEdges: true, barFit: BoxFit.contain),
-                              //             onChangeStart: (value) =>
-                              //                 logic.startValueAudio = value,
-                              //             onChangeEnd: (value) =>
-                              //                 logic.endValueAudio = value,
-                              //             onChangePlaybackState: (value) {
-                              //               // if (mounted) {
-                              //               // setState(() => _isPlaying = value);
-                              //               // }
-                              //             },
-                              //           ),
-                              //           child: Container(
-                              //             height: AppSize.s50.h,
-                              //             color: const Color(0xffE8E8E8),
-                              //             // child: AudioFileWaveforms(
-                              //             //   size: Size(
-                              //             //       MediaQuery.of(context).size.width / 2, 70),
-                              //             //   playerController: logic.playerController,
-                              //             //   waveformType: WaveformType.fitWidth,
-                              //             //   decoration: BoxDecoration(
-                              //             //     color: Color(0xffF15C89),
-                              //             //   ),
-                              //             //   enableSeekGesture: true,
-                              //             //   continuousWaveform: true,
-                              //             //   animationDuration:
-                              //             //       const Duration(milliseconds: 200),
-                              //             //   playerWaveStyle: const PlayerWaveStyle(
-                              //             //       scaleFactor: 90,
-                              //             //       fixedWaveColor: Colors.black54,
-                              //             //       liveWaveColor: Colors.white,
-                              //             //       waveCap: StrokeCap.round,
-                              //             //       spacing: 5,
-                              //             //       showTop: true,
-                              //             //       showSeekLine: true,
-                              //             //       seekLineColor: Colors.yellow,
-                              //             //       seekLineThickness: 5,
-                              //             //       showBottom: true),
-                              //             // ),
-                              //           ),
-                              //         ),
-                              // )
-                              // // Expanded(
-                              //   child: WaveVisualizer(
-                              //     audioUrl: _isPlaying ? _filePath : null,
-                              //     isPlaying: _isPlaying,
-                              //   ),
-                              // ),
-                              // Expanded(
-                              //     child: Container(
-                              //   height: AppSize.s50.h,
-                              //   color: Color(0xffF15C89),
-                              //   // child: AnimatedBuilder(
-                              //   //   animation: logic.animationController,
-                              //   //   builder: (context, child) {
-                              //   //     return Row(
-                              //   //       mainAxisAlignment: MainAxisAlignment.center,
-                              //   //       children: List.generate(
-                              //   //         logic.audioData.length,
-                              //   //         (int index) {
-                              //   //           return Container(
-                              //   //             width: 5,
-                              //   //             height: 30 + (logic.audioData[index] * 30),
-                              //   //             margin: EdgeInsets.symmetric(horizontal: 2),
-                              //   //             color: Colors.white,
-                              //   //           );
-                              //   //         },
-                              //   //       ),
-                              //   //     );
-                              //   //   },
-                              //   // ),
-                              // ))
-                            ],
-                          ),
+                          /// [Audio] Row
+                          // Expanded(
+                          //   child: logic.isLoadingAudio
+                          //       ? Container(
+                          //           height: AppSize.s50.h,
+                          //           color: const Color(0xffE8E8E8),
+                          //           alignment: Alignment.topCenter,
+                          //           child: SizedBox(
+                          //               height: 5.h,
+                          //               child:
+                          //                   const LinearProgressIndicator(
+                          //                 backgroundColor:
+                          //                     Color(0xffF15C89),
+                          //               )))
+                          //       : Visibility(
+                          //           visible: !logic.progressVisibility,
+                          //           replacement: trimmer.TrimViewer(
+                          //             trimmer: logic.trimmer,
+                          //             viewerHeight: 50.h,
+                          //             maxAudioLength: logic.durationAudio,
+                          //             viewerWidth: Get.width,
+                          //             // durationStyle: DurationStyle.FORMAT_MM_SS,
+                          //             backgroundColor:
+                          //                 const Color(0xffF15C89),
+                          //             barColor: Colors.white,
+                          //             durationTextStyle: TextStyle(
+                          //                 color: Theme.of(context)
+                          //                     .primaryColor),
+                          //             allowAudioSelection: true,
+                          //             // editorProperties: TrimEditorProperties(
+                          //             //   circleSize: 10,
+                          //             //   borderPaintColor: Colors.pinkAccent,
+                          //             //   borderWidth: 4,
+                          //             //   borderRadius: 5,
+                          //             //   circlePaintColor: Colors.pink.shade400,
+                          //             // ),
+                          //             // areaProperties: TrimAreaProperties.edgeBlur(
+                          //             //     blurEdges: true, barFit: BoxFit.contain),
+                          //             onChangeStart: (value) =>
+                          //                 logic.startValueAudio = value,
+                          //             onChangeEnd: (value) =>
+                          //                 logic.endValueAudio = value,
+                          //             onChangePlaybackState: (value) {
+                          //               // if (mounted) {
+                          //               // setState(() => _isPlaying = value);
+                          //               // }
+                          //             },
+                          //           ),
+                          //           child: Container(
+                          //             height: AppSize.s50.h,
+                          //             color: const Color(0xffE8E8E8),
+                          //             // child: AudioFileWaveforms(
+                          //             //   size: Size(
+                          //             //       MediaQuery.of(context).size.width / 2, 70),
+                          //             //   playerController: logic.playerController,
+                          //             //   waveformType: WaveformType.fitWidth,
+                          //             //   decoration: BoxDecoration(
+                          //             //     color: Color(0xffF15C89),
+                          //             //   ),
+                          //             //   enableSeekGesture: true,
+                          //             //   continuousWaveform: true,
+                          //             //   animationDuration:
+                          //             //       const Duration(milliseconds: 200),
+                          //             //   playerWaveStyle: const PlayerWaveStyle(
+                          //             //       scaleFactor: 90,
+                          //             //       fixedWaveColor: Colors.black54,
+                          //             //       liveWaveColor: Colors.white,
+                          //             //       waveCap: StrokeCap.round,
+                          //             //       spacing: 5,
+                          //             //       showTop: true,
+                          //             //       showSeekLine: true,
+                          //             //       seekLineColor: Colors.yellow,
+                          //             //       seekLineThickness: 5,
+                          //             //       showBottom: true),
+                          //             // ),
+                          //           ),
+                          //         ),
+                          // )
+                          // // Expanded(
+                          //   child: WaveVisualizer(
+                          //     audioUrl: _isPlaying ? _filePath : null,
+                          //     isPlaying: _isPlaying,
+                          //   ),
+                          // ),
+                          // Expanded(
+                          //     child: Container(
+                          //   height: AppSize.s50.h,
+                          //   color: Color(0xffF15C89),
+                          //   // child: AnimatedBuilder(
+                          //   //   animation: logic.animationController,
+                          //   //   builder: (context, child) {
+                          //   //     return Row(
+                          //   //       mainAxisAlignment: MainAxisAlignment.center,
+                          //   //       children: List.generate(
+                          //   //         logic.audioData.length,
+                          //   //         (int index) {
+                          //   //           return Container(
+                          //   //             width: 5,
+                          //   //             height: 30 + (logic.audioData[index] * 30),
+                          //   //             margin: EdgeInsets.symmetric(horizontal: 2),
+                          //   //             color: Colors.white,
+                          //   //           );
+                          //   //         },
+                          //   //       ),
+                          //   //     );
+                          //   //   },
+                          //   // ),
+                          // ))
+                          //   ],
+                          // ),
                           SizedBox(
                             height: AppSize.s10.h,
                           ),
