@@ -861,26 +861,27 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                         child: Container(
                                           color: const Color(0xffE8E8E8),
                                           // height: 60,
-                                          child: ReorderableListView.builder(
+                                          child: ListView.builder(
                                             shrinkWrap: true,
                                             itemCount:
                                                 logic.textOverlays.length,
                                             padding: EdgeInsets.zero,
-                                            onReorder: (oldIndex, newIndex) {
-                                              setState(() {
-                                                if (newIndex > oldIndex) {
-                                                  newIndex -= 1;
-                                                }
-                                                final item = logic.textOverlays
-                                                    .removeAt(oldIndex);
-                                                logic.textOverlays
-                                                    .insert(newIndex, item);
-                                              });
-                                            },
+                                            // onReorder: (oldIndex, newIndex) {
+                                            //   setState(() {
+                                            //     if (newIndex > oldIndex) {
+                                            //       newIndex -= 1;
+                                            //     }
+                                            //     final item = logic.textOverlays
+                                            //         .removeAt(oldIndex);
+                                            //     logic.textOverlays
+                                            //         .insert(newIndex, item);
+                                            //   });
+                                            // },
                                             scrollDirection: Axis.vertical,
                                             itemBuilder: (context, index) {
                                               return Container(
                                                 // width: Get.width * 0.5,
+
                                                 margin: EdgeInsets.symmetric(
                                                     vertical: 5.h),
                                                 key: Key(
@@ -915,7 +916,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                                             Colors.transparent,
                                                         heightWaveSlider: 60,
                                                         widthWaveSlider:
-                                                            Get.width,
+                                                            Get.width - 100,
                                                         sliderColor:
                                                             Colors.black,
                                                         duration: logic
@@ -987,97 +988,52 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                                                     width: 1)
                                                                 : null,
                                                           ),
-                                                          child: Stack(
-                                                            clipBehavior:
-                                                                Clip.none,
+                                                          child: Container(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    AppSize
+                                                                        .s8.h),
                                                             alignment: Alignment
                                                                 .center,
-                                                            children: [
-                                                              Container(
-                                                                padding:
-                                                                    EdgeInsets.all(
-                                                                        AppSize
-                                                                            .s8
-                                                                            .h),
-                                                                alignment:
-                                                                    Alignment
-                                                                        .center,
-                                                                child: Row(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .center,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child: SvgPicture
+                                                            child: Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Expanded(
+                                                                  child:
+                                                                      SvgPicture
                                                                           .asset(
-                                                                        ImageAssets
-                                                                            .text,
-                                                                        color: Colors
-                                                                            .white,
-                                                                      ),
-                                                                    ),
-                                                                    Expanded(
-                                                                      child:
-                                                                          Text(
-                                                                        logic
-                                                                            .textOverlays[index]
-                                                                            .text,
-                                                                        overflow:
-                                                                            TextOverflow.clip,
-                                                                        softWrap:
-                                                                            false,
-                                                                        style: const TextStyle(
-                                                                            color:
-                                                                                Colors.white),
-                                                                      ),
-                                                                    ),
-                                                                  ],
+                                                                    ImageAssets
+                                                                        .text,
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                              logic
-                                                                      .textOverlays[
-                                                                          index]
-                                                                      .isSelected
-                                                                  ? Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topRight,
-                                                                      child:
-                                                                          InkWell(
-                                                                        onTap: () =>
-                                                                            logic.removeTextOverlay(index),
-                                                                        child:
-                                                                            Container(
-                                                                          width:
-                                                                              20.w,
-                                                                          height:
-                                                                              20.h,
-                                                                          decoration:
-                                                                              const BoxDecoration(
-                                                                            shape:
-                                                                                BoxShape.circle,
-                                                                            color:
-                                                                                Colors.blue,
-                                                                          ),
-                                                                          child:
-                                                                              Icon(
-                                                                            Icons.close,
-                                                                            color:
-                                                                                Colors.white,
-                                                                            size:
-                                                                                10.sp,
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    )
-                                                                  : const SizedBox(),
-                                                            ],
+                                                                Expanded(
+                                                                  child: Text(
+                                                                    logic
+                                                                        .textOverlays[
+                                                                            index]
+                                                                        .text,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .clip,
+                                                                    softWrap:
+                                                                        false,
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .white),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
                                                       );
@@ -1332,6 +1288,298 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                           ),
                           SizedBox(
                             height: AppSize.s10.h,
+                          ),
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  logic.showCharacterOverlayDialog(context);
+                                },
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    Image.asset(
+                                      ImageAssets.character,
+                                      width: 25.0,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                        ),
+                                        child: Icon(
+                                          Icons.add,
+                                          size: 14.sp,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width: AppSize.s14.w,
+                              ),
+                              Obx(() {
+                                return logic.textOverlays.isNotEmpty == true
+                                    ? Expanded(
+                                        child: Container(
+                                          color: const Color(0xffE8E8E8),
+                                          // height: 60,
+                                          child: ReorderableListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount:
+                                                logic.textOverlays.length,
+                                            padding: EdgeInsets.zero,
+                                            onReorder: (oldIndex, newIndex) {
+                                              setState(() {
+                                                if (newIndex > oldIndex) {
+                                                  newIndex -= 1;
+                                                }
+                                                final item = logic.textOverlays
+                                                    .removeAt(oldIndex);
+                                                logic.textOverlays
+                                                    .insert(newIndex, item);
+                                              });
+                                            },
+                                            scrollDirection: Axis.vertical,
+                                            itemBuilder: (context, index) {
+                                              return Container(
+                                                // width: Get.width * 0.5,
+                                                margin: EdgeInsets.symmetric(
+                                                    vertical: 5.h),
+                                                key: Key(
+                                                    '$index-${logic.textOverlays[index]}'),
+                                                child: AnimatedBuilder(
+                                                    animation:
+                                                        Listenable.merge([
+                                                      logic
+                                                          .videoEditorController,
+                                                      logic
+                                                          .videoEditorController
+                                                          ?.video,
+                                                    ]),
+                                                    builder: (_, __) {
+                                                      final duration = logic
+                                                          .videoEditorController
+                                                          ?.videoDuration;
+                                                      if (logic
+                                                              .videoEditorController !=
+                                                          null) {
+                                                        final posSeconds = logic
+                                                                .videoEditorController!
+                                                                .trimPosition *
+                                                            duration!.inSeconds;
+                                                        final posMin = logic
+                                                                .videoEditorController!
+                                                                .trimPosition *
+                                                            duration.inMinutes;
+                                                      }
+                                                      return WaveSlider(
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        heightWaveSlider: 60,
+                                                        widthWaveSlider:
+                                                            Get.width,
+                                                        sliderColor:
+                                                            Colors.black,
+                                                        duration: logic
+                                                                    .videoEditorController !=
+                                                                null
+                                                            ? logic
+                                                                .videoEditorController!
+                                                                .videoDuration
+                                                                .inMilliseconds
+                                                                .toDouble()
+                                                            : 10,
+                                                        callbackStart:
+                                                            (duration) {
+                                                          logic
+                                                              .textOverlays[
+                                                                  index]
+                                                              .startTime;
+                                                          print(
+                                                              "Start $duration");
+                                                        },
+                                                        callbackEnd:
+                                                            (duration) {
+                                                          logic
+                                                              .textOverlays[
+                                                                  index]
+                                                              .endTime;
+                                                          print(
+                                                              "End $duration");
+                                                        },
+                                                        // minTrimDuration: 0.5,
+                                                        // start: logic
+                                                        //     .videoEditorController!
+                                                        //     .minTrim,
+                                                        // end: logic.videoEditorController!
+                                                        //     .minTrim,
+                                                        // onTrimUpdate: (start, end) {
+                                                        //   print("Start ${start * 100}");
+                                                        //   print("Start ${start}");
+                                                        //   // _start =
+                                                        //   //     start; // Assign the updated values to _start and _end
+                                                        //   // _end = end; // variables
+                                                        //   print('end ${end * 100}');
+                                                        // },
+                                                        child:
+                                                            AnimatedContainer(
+                                                          duration:
+                                                              const Duration(
+                                                                  milliseconds:
+                                                                      300),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: logic
+                                                                .textOverlays[
+                                                                    index]
+                                                                .textColor,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        AppSize
+                                                                            .s5
+                                                                            .r),
+                                                            border: logic
+                                                                    .textOverlays[
+                                                                        index]
+                                                                    .isSelected
+                                                                ? Border.all(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width: 1)
+                                                                : null,
+                                                          ),
+                                                          child: Stack(
+                                                            clipBehavior:
+                                                                Clip.none,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            children: [
+                                                              Container(
+                                                                padding:
+                                                                    EdgeInsets.all(
+                                                                        AppSize
+                                                                            .s8
+                                                                            .h),
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                child: Row(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .center,
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child: SvgPicture
+                                                                          .asset(
+                                                                        ImageAssets
+                                                                            .text,
+                                                                        color: Colors
+                                                                            .white,
+                                                                      ),
+                                                                    ),
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        logic
+                                                                            .textOverlays[index]
+                                                                            .text,
+                                                                        overflow:
+                                                                            TextOverflow.clip,
+                                                                        softWrap:
+                                                                            false,
+                                                                        style: const TextStyle(
+                                                                            color:
+                                                                                Colors.white),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              logic
+                                                                      .textOverlays[
+                                                                          index]
+                                                                      .isSelected
+                                                                  ? Align(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .topRight,
+                                                                      child:
+                                                                          InkWell(
+                                                                        onTap: () =>
+                                                                            logic.removeTextOverlay(index),
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              20.w,
+                                                                          height:
+                                                                              20.h,
+                                                                          decoration:
+                                                                              const BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.circle,
+                                                                            color:
+                                                                                Colors.blue,
+                                                                          ),
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.close,
+                                                                            color:
+                                                                                Colors.white,
+                                                                            size:
+                                                                                10.sp,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    )
+                                                                  : const SizedBox(),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      )
+                                    : Expanded(
+                                        child: Container(
+                                        height: AppSize.s50.h,
+                                        color: const Color(0xffE8E8E8),
+                                        // child: AnimatedBuilder(
+                                        //   animation: logic.animationController,
+                                        //   builder: (context, child) {
+                                        //     return Row(
+                                        //       mainAxisAlignment: MainAxisAlignment.center,
+                                        //       children: List.generate(
+                                        //         logic.audioData.length,
+                                        //         (int index) {
+                                        //           return Container(
+                                        //             width: 5,
+                                        //             height: 30 + (logic.audioData[index] * 30),
+                                        //             margin: EdgeInsets.symmetric(horizontal: 2),
+                                        //             color: Colors.white,
+                                        //           );
+                                        //         },
+                                        //       ),
+                                        //     );
+                                        //   },
+                                        // ),
+                                      ));
+                              })
+                            ],
                           ),
                           // Container(
                           //   height: 50,

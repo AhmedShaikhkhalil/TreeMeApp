@@ -4,6 +4,7 @@ import 'package:treeme/core/bindings/forgot_passwod_bindings.dart';
 import 'package:treeme/core/bindings/my_contact_bindings.dart';
 import 'package:treeme/modules/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:treeme/modules/chat/presentation/pages/chat_screen.dart';
+import 'package:treeme/modules/create_event/presentation/pages/characters_screen.dart';
 import 'package:treeme/modules/create_event/presentation/pages/create_event_screen.dart';
 import 'package:treeme/modules/create_event/presentation/pages/select_contact_owner_screen.dart';
 import 'package:treeme/modules/create_event/presentation/pages/select_contacts_screen.dart';
@@ -97,6 +98,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.editProfile,
       page: () => EditProfileScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.selectCharacter,
+      page: () => SelectCharacterScreen(),
     ),
   ];
 }

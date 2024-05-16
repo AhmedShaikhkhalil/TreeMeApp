@@ -33,7 +33,7 @@ class CreateEventScreen extends GetView<CreateEventController> {
             background: Container(
               decoration: BoxDecoration(
                 gradient: ColorManager().gradientFloating,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   bottomRight: Radius.elliptical(125, 35),
                   bottomLeft: Radius.elliptical(125, 35),
                 ),
@@ -112,10 +112,10 @@ class CreateEventScreen extends GetView<CreateEventController> {
                   boxShadow: [
                     BoxShadow(
                         color: ColorManager.black.withOpacity(0.03),
-                        offset: Offset(0, 7),
+                        offset: const Offset(0, 7),
                         blurRadius: 10)
                   ]),
-              child: Icon(Icons.arrow_back),
+              child: const Icon(Icons.arrow_back),
             ),
           ),
           leadingWidth: 75.w,
@@ -146,7 +146,7 @@ class CreateEventScreen extends GetView<CreateEventController> {
                         height: 360.h,
                         padding: EdgeInsets.symmetric(
                             horizontal: AppSize.s30.w, vertical: AppSize.s15.h),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: ColorManager.white,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.elliptical(125, 35),
@@ -247,7 +247,7 @@ class CreateEventScreen extends GetView<CreateEventController> {
                     // height: 487.h,
                     padding: EdgeInsets.symmetric(
                         horizontal: AppSize.s30.w, vertical: AppSize.s15.h),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: ColorManager.white,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.elliptical(125, 35),

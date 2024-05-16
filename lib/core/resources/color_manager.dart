@@ -25,6 +25,7 @@ class ColorManager {
   static const Color activeIcon = Color(0xffFEAA46);
   static const Color subTitleCreateEvent = Color(0xff8D96A5);
   static const Color moveColor = Color.fromRGBO(234, 68, 60, 1.0);
+  static const Color moveSmoothColor = Color(0xffFB84A7);
 
   LinearGradient gradient1 = const LinearGradient(
       colors: [mainColor, gradiantSplash],

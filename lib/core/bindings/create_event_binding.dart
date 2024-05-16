@@ -16,6 +16,6 @@ class CreateEventBindings implements Bindings {
 
     Get.lazyPut(() =>
         CreateEventController(Get.find<ICreateEventDataSource>(), Get.find()));
-    Get.lazyPut(() => CreateMediaController());
+    Get.lazyPut(() => CreateMediaController(createEventController:Get.find<CreateEventController>()));
   }
 }

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:get/get_rx/get_rx.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:audioplayers/audioplayers.dart' hide PlayerState;
@@ -26,16 +28,22 @@ import 'package:get/get.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:stack_board/stack_board.dart';
-import 'package:treeme/core/helpers/audio_trimm/src/trimmer.dart';
+import 'package:treeme/modules/create_event/data/models/character_model.dart';
 import 'package:treeme/modules/create_media/domain/entities/image_overlay.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_editor/video_editor.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../core/helpers/constants.dart';
+import '../../../../core/resources/color_manager.dart';
+import '../../../../core/resources/values_manager.dart';
+import '../../../create_event/presentation/manager/create_event_controller.dart';
 import '../../domain/entities/text_overlay.dart';
 
 class CreateMediaController extends GetxController
     with GetSingleTickerProviderStateMixin {
+  CreateMediaController({required this.createEventController});
+
   static CreateMediaController get to => Get.find();
 
   StackBoardController boardController = StackBoardController();
@@ -54,6 +62,8 @@ class CreateMediaController extends GetxController
   RxBool deleteText = false.obs;
   RxList<TextOverlay> textOverlays = <TextOverlay>[].obs;
   RxList<ImageOverly> imageOverlays = <ImageOverly>[].obs;
+
+  RxList<ImageOverly> characters = <ImageOverly>[].obs;
   String text = '';
   double fontSize = 24.0;
   Color textColor = Colors.white;
@@ -83,6 +93,11 @@ class CreateMediaController extends GetxController
   bool isLoadingAudio = false;
   Duration durationAudio = const Duration(seconds: 0);
   int idCounter = 0;
+  final CreateEventController createEventController;
+
+  Rx<CharacterModel> selectedCharacter = CharacterModel().obs;
+  void setRxselectedCharacter(CharacterModel value) =>
+      selectedCharacter.value = value;
   @override
   void onInit() {
     super.onInit();
@@ -127,6 +142,25 @@ class CreateMediaController extends GetxController
   void findOverlay(int id) {}
   void addImageOverlay(ImageOverly imageOverlay) {
     imageOverlays.add(imageOverlay);
+    boardController.add(StackBoardItem(
+      id: imageOverlay.id,
+      child: Image.file(
+        File(imageOverlay.selectedImage ?? ''),
+        scale: 2,
+        fit: BoxFit.fill,
+        width: imageOverlay.size.width + 100,
+        height: imageOverlay.size.height + 100,
+      ),
+      // onDel: () {
+      //   print('deleted');
+      //   return Future.value(imageOverlays.remove(imageOverlay));
+      // },
+    ));
+    update();
+  }
+
+  void addCharacterOverlay(ImageOverly imageOverlay) {
+    characters.add(imageOverlay);
     boardController.add(StackBoardItem(
       id: imageOverlay.id,
       child: Image.file(
@@ -709,11 +743,79 @@ class CreateMediaController extends GetxController
   //   }
   // }
 
+  // Future<void> initializeVideoPlayer() async {
+  //   String inputVideoPath = videoFilePath;
+  //   Directory tempDir = await getApplicationDocumentsDirectory();
+  //   String outputDir = tempDir.path;
+  //   String outputVideoPath = path.join(outputDir, 'output1.mp4');
+
+  //   // Check if the video file exists
+  //   if (!await File(inputVideoPath).exists()) {
+  //     print("Video file does not exist.");
+  //     return;
+  //   }
+
+  //   // Initialize the FFmpeg command with the input video
+  //   String ffmpegCommand = "-i $inputVideoPath";
+
+  //   // Adding multiple image overlays
+  //   int index = 0;
+  //   String filterComplex = "";
+  //   for (var overlay in imageOverlays) {
+  //     ffmpegCommand += " -i ${overlay.selectedImage}";
+  //     filterComplex +=
+  //         "[${index + 1}:v]scale=${overlay.size.width}:${overlay.size.height} [img$index];";
+  //     filterComplex +=
+  //         "[0:v][img$index]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,${1},${10})'[v$index];";
+  //     index++;
+  //   }
+
+  //   // Set the last video output from overlays as the input for texts
+  //   String lastVideo = "[v${index - 1}]";
+
+  //   // Adding multiple text overlays
+  //   for (var textOverlay in textOverlays) {
+  //     filterComplex +=
+  //         "$lastVideo drawtext=text='${textOverlay.text}':x=${textOverlay.position!.dx - 200}:y=${textOverlay.position!.dy + 200}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,${1},${10})'[v$index];";
+  //     lastVideo = "[v$index]";
+  //     index++;
+  //   }
+
+  //   // Remove the last semicolon
+  //   if (filterComplex.isNotEmpty) {
+  //     filterComplex = filterComplex.substring(0, filterComplex.length - 1);
+  //   }
+
+  //   // Complete the FFmpeg command
+  //   ffmpegCommand +=
+  //       " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -codec:a copy -y $outputVideoPath";
+
+  //   // Execute FFmpeg
+  //   await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+  //     final returnCode = await session.getReturnCode();
+  //     if (returnCode!.isValueSuccess()) {
+  //       print("FFmpeg process successful, video saved to $outputVideoPath");
+  //       await initializeVideoPlayerController(outputVideoPath);
+  //     } else {
+  //       print(
+  //           "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+  //     }
+  //   }, (Log log) {
+  //     print(log.getMessage());
+  //   }, (Statistics statistics) {
+  //     print("Current frame rate: ${statistics.getVideoFps()}");
+  //   });
+  // }
+
   Future<void> initializeVideoPlayer() async {
     String inputVideoPath = videoFilePath;
     Directory tempDir = await getApplicationDocumentsDirectory();
     String outputDir = tempDir.path;
     String outputVideoPath = path.join(outputDir, 'output1.mp4');
+
+    // Define start time and duration for trimming
+    String startTime = "00:00:10"; // Start at 10 seconds
+    String duration = "00:00:30"; // Duration of 30 seconds
 
     // Check if the video file exists
     if (!await File(inputVideoPath).exists()) {
@@ -721,8 +823,8 @@ class CreateMediaController extends GetxController
       return;
     }
 
-    // Initialize the FFmpeg command with the input video
-    String ffmpegCommand = "-i $inputVideoPath";
+    // Initialize the FFmpeg command with the input video and trimming
+    String ffmpegCommand = "-ss $startTime -t $duration -i $inputVideoPath";
 
     // Adding multiple image overlays
     int index = 0;
@@ -732,17 +834,17 @@ class CreateMediaController extends GetxController
       filterComplex +=
           "[${index + 1}:v]scale=${overlay.size.width}:${overlay.size.height} [img$index];";
       filterComplex +=
-          "[0:v][img$index]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,${1},${10})'[v$index];";
+          "[0:v][img$index]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,${0},${10})'[v$index];";
       index++;
     }
 
     // Set the last video output from overlays as the input for texts
-    String lastVideo = "[v${index - 1}]";
+    String lastVideo = index > 0 ? "[v${index - 1}]" : "[0:v]";
 
     // Adding multiple text overlays
     for (var textOverlay in textOverlays) {
       filterComplex +=
-          "$lastVideo drawtext=text='${textOverlay.text}':x=${textOverlay.position!.dx - 200}:y=${textOverlay.position!.dy + 200}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,${1},${10})'[v$index];";
+          "$lastVideo drawtext=text='${textOverlay.text}':x=${textOverlay.position!.dx - 200}:y=${textOverlay.position!.dy + 200}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,${0},${10})'[v$index];";
       lastVideo = "[v$index]";
       index++;
     }
@@ -754,7 +856,7 @@ class CreateMediaController extends GetxController
 
     // Complete the FFmpeg command
     ffmpegCommand +=
-        " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -codec:a copy -y $outputVideoPath";
+        " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -map 0:a -c:v libx264 -c:a aac -y $outputVideoPath";
 
     // Execute FFmpeg
     await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
@@ -890,11 +992,10 @@ class CreateMediaController extends GetxController
           videoEditorController?.video,
         ]),
         builder: (_, __) {
-          final duration = videoEditorController?.videoDuration.inSeconds;
-          final pos = videoEditorController!.trimPosition * duration!;
+          // final duration = videoEditorController?.videoDuration.inSeconds;
+          // final pos = videoEditorController!.trimPosition * duration!;
           // final width =
-          posVideo.value = pos;
-          print(videoEditorController?.videoDuration);
+          // posVideo.value = pos;
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 60 / 4),
             child: Row(children: [
@@ -952,6 +1053,218 @@ class CreateMediaController extends GetxController
   void udpateOffset(int? id, Offset offset) {}
   String toHexString(Color color) {
     return '${color.red.toRadixString(16).padLeft(2, '0')}${color.green.toRadixString(16).padLeft(2, '0')}${color.blue.toRadixString(16).padLeft(2, '0')}';
+  }
+
+  void showCharacterOverlayDialog(BuildContext context) {
+    Get.defaultDialog(
+      title: 'Add Character Overlay',
+      titlePadding: EdgeInsets.all(20),
+      content: GetBuilder<CreateMediaController>(builder: (logic) {
+        switch (createEventController.contactController.rxRequestStatus.value) {
+          case RequestStatus.LOADING:
+            return const Center(
+              child: CircularProgressIndicator.adaptive(),
+            );
+          case RequestStatus.SUCESS:
+            return SizedBox(
+              height: MediaQuery.of(context).size.height - 300,
+              width: MediaQuery.of(context).size.width,
+              child: GridView.builder(
+                padding: const EdgeInsets.all(20),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 20.0,
+                    mainAxisExtent: 172),
+                itemCount: createEventController.rxEventCharactersModel.length,
+                itemBuilder: (context, int index) => InkWell(
+                  onTap: () {
+                    setRxselectedCharacter(
+                        createEventController.rxEventCharactersModel[index]);
+                  },
+                  child: Obx(() {
+                    return Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            border: createEventController
+                                        .rxEventCharactersModel[index].id ==
+                                    selectedCharacter.value.id
+                                ? Border.all(color: Colors.red)
+                                : null),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              height: 18,
+                            ),
+                            SizedBox(
+                              height: 100,
+                              width: AppSize.s265,
+                              child: Image.network(
+                                createEventController
+                                    .rxEventCharactersModel[index].image!,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(right: 8.0, left: 20),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        '\$${createEventController.rxEventCharactersModel[index].price!}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10,
+                                            color:
+                                                ColorManager.moveSmoothColor),
+                                      ),
+                                      Text(
+                                        createEventController
+                                            .rxEventCharactersModel[index]
+                                            .title!,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                            color: ColorManager.goodMorning),
+                                      ),
+                                    ],
+                                  ),
+                                  // Container(
+                                  //   width: 40,
+                                  //   decoration: const BoxDecoration(
+                                  //       color: ColorManager.moveSmoothColor,
+                                  //       shape: BoxShape.circle),
+                                  //   child: IconButton(
+                                  //       onPressed: () {},
+                                  //       color: ColorManager.white,
+                                  //       icon: const Icon(Icons.add)),
+                                  // )
+                                ],
+                              ),
+                            )
+                          ],
+                        ));
+                  }),
+                ),
+              ),
+
+              // child: Column(
+              //   children: createEventController.rxEventCharactersModel
+              //       .map((element) => SizedBox(child: Obx(() {
+              //             return Container(
+              //                 decoration: BoxDecoration(
+              //                     color: Colors.white,
+              //                     borderRadius: BorderRadius.circular(24),
+              //                     border:
+              //                         createEventController.isSelected(element)
+              //                             ? Border.all(color: Colors.red)
+              //                             : null),
+              //                 child: Column(
+              //                   crossAxisAlignment: CrossAxisAlignment.start,
+              //                   children: [
+              //                     const SizedBox(
+              //                       height: 18,
+              //                     ),
+              //                     SizedBox(
+              //                       height: 160,
+              //                       width: AppSize.s265,
+              //                       child: Image.network(
+              //                         element.image!,
+              //                         fit: BoxFit.cover,
+              //                       ),
+              //                     ),
+              //                     const SizedBox(height: 4),
+              //                     Padding(
+              //                       padding: const EdgeInsets.only(
+              //                           right: 8.0, left: 20),
+              //                       child: Row(
+              //                         mainAxisAlignment:
+              //                             MainAxisAlignment.spaceBetween,
+              //                         children: [
+              //                           Column(
+              //                             children: [
+              //                               Text(
+              //                                 '\$${element.price!}',
+              //                                 style: const TextStyle(
+              //                                     fontWeight: FontWeight.bold,
+              //                                     color: ColorManager
+              //                                         .moveSmoothColor),
+              //                               ),
+              //                               Text(
+              //                                 element.title!,
+              //                                 style: const TextStyle(
+              //                                     fontWeight: FontWeight.bold,
+              //                                     fontSize: 12,
+              //                                     color:
+              //                                         ColorManager.goodMorning),
+              //                               ),
+              //                             ],
+              //                           ),
+              //                           Container(
+              //                             width: 40,
+              //                             decoration: const BoxDecoration(
+              //                                 color:
+              //                                     ColorManager.moveSmoothColor,
+              //                                 shape: BoxShape.circle),
+              //                             child: IconButton(
+              //                                 onPressed: () {},
+              //                                 color: ColorManager.white,
+              //                                 icon: const Icon(Icons.add)),
+              //                           )
+              //                         ],
+              //                       ),
+              //                     )
+              //                   ],
+              //                 ));
+              //           })))
+              //       .toList(),
+              // ),
+            );
+
+          case RequestStatus.ERROR:
+            return const Center(
+              child: Text('NO Data'),
+            );
+
+          default:
+            return Container();
+        }
+      }),
+      cancel: TextButton(
+        onPressed: () => Get.back(),
+        child: const Text('Cancel'),
+      ),
+      confirm: TextButton(
+        onPressed: () async {
+          String characterFile = await downloadImage(selectedCharacter.value);
+          addImageOverlay(ImageOverly(characterFile, 50, 50, 1,
+              const Offset(0, 0), 1, false, idCounter++));
+
+          Get.back();
+        },
+        child: const Text('Add'),
+      ),
+    );
+  }
+
+  Future<String> downloadImage(CharacterModel characterModel) async {
+    final response = await http.get(Uri.parse(characterModel.image!));
+    if (response.statusCode == 200) {
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath =
+          '${directory.path}/${characterModel.image!.split('/').last}';
+      final file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filePath;
+    } else {
+      throw Exception('Failed to download image');
+    }
   }
 }
 // import 'package:get/get.dart';

@@ -10,6 +10,7 @@ import 'package:treeme/core/routes/app_routes.dart';
 import 'package:treeme/core/utils/error_toast.dart';
 import 'package:treeme/core/utils/services/storage.dart';
 import 'package:treeme/modules/contacts/presentation/manager/my_contact_controller.dart';
+import 'package:treeme/modules/create_event/data/models/character_model.dart';
 import 'package:treeme/modules/create_event/data/models/event_type_model.dart';
 
 import '../../../../core/config/apis/config_api.dart';
@@ -39,8 +40,16 @@ class CreateEventController extends GetxController {
   final rxRequestStatus = RequestStatus.LOADING.obs;
   void setRxRequestStatus(RequestStatus value) => rxRequestStatus.value = value;
 
+  Rx<CharacterModel> selectedCharacter = CharacterModel().obs;
+  void setRxselectedCharacter(CharacterModel value) =>
+      selectedCharacter.value = value;
+
   final Rx<EventTypeModel> rxEventTypeModel = EventTypeModel().obs;
   void setRxEventType(EventTypeModel value) => rxEventTypeModel.value = value;
+
+  final RxList<CharacterModel> rxEventCharactersModel = <CharacterModel>[].obs;
+  void setRxCharacteres(List<CharacterModel> value) =>
+      rxEventCharactersModel.value = value;
 
   final rxNewEventModelRequestStatus = RequestStatus.LOADING.obs;
   void setRxNewEventModelRequestStatus(RequestStatus value) =>
@@ -56,6 +65,7 @@ class CreateEventController extends GetxController {
   void onInit() {
     super.onInit();
     getTypeEvent();
+    getCharacterEvent();
   }
 
   Future<void> getTypeEvent() async {
@@ -75,6 +85,30 @@ class CreateEventController extends GetxController {
       // r.data = contact.value;
       setRxEventType(r);
       setRxRequestStatus(RequestStatus.SUCESS);
+      update();
+      // update(['myContact']);
+      // print(_myContactModel.toString());
+    });
+  }
+
+  Future<void> getCharacterEvent() async {
+    // setRxRequestStatus(RequestStatus.LOADING);
+
+    final Either<Failure, List<CharacterModel>> typeEvent =
+        await _createEventDataSource.getCharacters();
+    typeEvent.fold((l) {
+      // setRxRequestStatus(RequestStatus.ERROR);
+
+      log(l.message.toString());
+      log(l.code.toString());
+      // errorToast(l.message);
+    }, (r) {
+      log(r.toString());
+      log('have characters ${r.length}');
+      // r = _myContactModel.value;
+      // r.data = contact.value;
+      setRxCharacteres(r);
+      // setRxRequestStatus(RequestStatus.SUCESS);
       update();
       // update(['myContact']);
       // print(_myContactModel.toString());
@@ -256,8 +290,28 @@ class CreateEventController extends GetxController {
     // if (OwnerID.value == 0) {
     //   errorToast('You Should Select the Owner ');
     // } else {
-      Get.toNamed(AppRoutes.selectContactScreen);
+    Get.toNamed(AppRoutes.selectContactScreen);
     // }
+  }
+
+  void selectCharacter(CharacterModel rxEventCharactersModel) {
+    setRxselectedCharacter(rxEventCharactersModel);
+    // update();
+  }
+
+  bool isSelected(CharacterModel rxEventCharactersModel) {
+    if (selectedCharacter.value.id == rxEventCharactersModel.id) {
+      return true;
+    }
+    return false;
+  }
+
+  validateSelectCharacter() {
+    if (selectedCharacter.value.id != null) {
+      Get.toNamed(AppRoutes.createMedia);
+    } else {
+      errorToast('Select Character');
+    }
   }
 
   // getRoom(String docs) async {

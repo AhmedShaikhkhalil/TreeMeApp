@@ -9,8 +9,8 @@ class TextOverlay {
   String fontFamily;
   bool isSelected;
   Offset? position = const Offset(0.0, 0);
-  double? startTime;
-  double? endTime;
+  double startTime = 0;
+  double endTime = 10;
   Size? size;
   TextOverlay(
       {required this.text,

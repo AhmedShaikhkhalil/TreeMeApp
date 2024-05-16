@@ -10,6 +10,7 @@ class API {
   static const contactTest = '/contactTest';
   static const getContact = '/getContact';
   static const eventApp = '/eventApp';
+  static const characters = '/getAllCharacters';
   static const newEventApp = '/NewEventApp';
   static const getHome = '/getPeerConv';
   static const getCalendar = '/getGroupConv';

@@ -207,7 +207,7 @@ class SelectContactsScreen extends GetView<CreateEventController> {
               title: 'NEXT',
               onPressed: () async {
                 // controller.getRoom();
-                Get.toNamed(AppRoutes.createMedia);
+                Get.toNamed(AppRoutes.selectCharacter);
 
                 // controller.createNewEvent();
               },

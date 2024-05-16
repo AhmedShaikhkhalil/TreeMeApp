@@ -6,8 +6,8 @@ class ImageOverly {
   double imagePositionX = 0.0;
   double imagePositionY = 0.0;
   double imageScale = 1.0;
-  double startRange = 10;
-  double endRange = 50;
+  double startRange = 0;
+  double endRange = 30;
   Offset position = const Offset(0, 0);
   double scale = 1;
   Size size;
