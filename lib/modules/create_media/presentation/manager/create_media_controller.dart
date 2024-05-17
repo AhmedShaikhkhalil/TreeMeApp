@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:audio_waveforms/audio_waveforms.dart';
@@ -908,11 +909,18 @@ class CreateMediaController extends GetxController
     await videoPlayerController!.initialize();
     chewieController = ChewieController(
       videoPlayerController: videoPlayerController!,
-      autoPlay: true,
+      autoPlay: false,
       looping: true,
     );
 
     await Gal.putVideo(videoPath).then((value) {});
+
+    // String? url = await uploadVideoToFirebase(videoPath);
+
+    // if (url != null) {
+    createEventController.urlMedia.value = videoPath;
+    createEventController.createNewEvent();
+    // }
     update();
   }
 
@@ -1425,6 +1433,31 @@ class CreateMediaController extends GetxController
         child: const Text('Add'),
       ),
     );
+  }
+
+  Future<String?> uploadVideoToFirebase(String path) async {
+    // Get the file
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File videoFile = File(path);
+
+    // Create a reference to the Firebase Storage
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child('videos/${path.split('/').last}');
+
+    try {
+      // Upload the file
+      UploadTask uploadTask = ref.putFile(videoFile);
+
+      // Wait for the upload to complete
+      await uploadTask;
+
+      // Get the download URL
+      String downloadURL = await ref.getDownloadURL();
+      return downloadURL;
+      print('Video uploaded successfully. Download URL: $downloadURL');
+    } catch (e) {
+      print('Failed to upload video: $e');
+    }
   }
 }
 // import 'package:get/get.dart';

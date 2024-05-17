@@ -29,6 +29,7 @@ import 'package:treeme/core/helpers/constants.dart';
 import 'package:treeme/core/resources/resource.dart';
 import 'package:treeme/core/utils/services/storage.dart';
 import 'package:treeme/modules/chat/presentation/widgets/input_custom_widget.dart';
+import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../../core/netwrok/web_connection.dart';
@@ -200,8 +201,12 @@ class _ChatPageState extends State<ChatPage> {
       if (result != null) {
         _setAttachmentUploading(true);
         final size = result.lengthSync();
-        final bytes = await result.readAsBytes();
-        final image = await decodeImageFromList(bytes);
+        // final bytes = await result.readAsBytes();
+        // final image = await decodeImageFromList(bytes);
+
+        final videoFile = File(widget.urlPinMassage!);
+        VideoPlayerController controller =
+            VideoPlayerController.file(videoFile);
         final name = result.uri.pathSegments.last;
 
         UploadTask uploadTask;
@@ -212,12 +217,12 @@ class _ChatPageState extends State<ChatPage> {
           uploadTask = reference.putData(await result.readAsBytes());
           final uri = await (await uploadTask).ref.getDownloadURL();
 
-          final message = types.PartialImage(
-            height: image.height.toDouble(),
+          final message = types.PartialVideo(
+            height: controller.value.size.height,
             name: name,
             size: size,
             uri: uri,
-            width: image.width.toDouble(),
+            width: controller.value.size.width,
           );
 
           sendMessage(message, widget.room.id, true);
