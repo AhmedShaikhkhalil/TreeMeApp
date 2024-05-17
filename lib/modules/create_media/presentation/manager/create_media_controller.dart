@@ -102,7 +102,7 @@ class CreateMediaController extends GetxController
     selectedAudio.value.localPath = audioFile;
     downloadedAudio.add(selectedAudio.value);
     playerController.value.preparePlayer(path: audioFile);
-    update();      
+    update();
   }
 
   RxList<AudioModel> downloadedAudio = <AudioModel>[].obs;
@@ -817,7 +817,6 @@ class CreateMediaController extends GetxController
   //     print("Current frame rate: ${statistics.getVideoFps()}");
   //   });
   // }
-
   Future<void> initializeVideoPlayer() async {
     String inputVideoPath = videoFilePath;
     Directory tempDir = await getApplicationDocumentsDirectory();
@@ -837,37 +836,55 @@ class CreateMediaController extends GetxController
     // Initialize the FFmpeg command with the input video and trimming
     String ffmpegCommand = "-ss $startTime -t $duration -i $inputVideoPath";
 
+    // Index for additional inputs
+    int inputIndex = 1;
+
+    // Add the new audio input if provided
+    if (selectedAudio.value.id != null &&
+        await File(selectedAudio.value.localPath!).exists()) {
+      ffmpegCommand += " -i ${selectedAudio.value.localPath!}";
+      inputIndex++; // Increment input index for additional inputs
+    }
+
     // Adding multiple image overlays
-    int index = 0;
     String filterComplex = "";
     for (var overlay in imageOverlays) {
       ffmpegCommand += " -i ${overlay.selectedImage}";
       filterComplex +=
-          "[${index + 1}:v]scale=${overlay.size.width}:${overlay.size.height} [img$index];";
+          "[$inputIndex:v]scale=${overlay.size.width}:${overlay.size.height}[img$inputIndex];";
       filterComplex +=
-          "[0:v][img$index]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,${0},${10})'[v$index];";
-      index++;
+          "[0:v][img$inputIndex]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,${0},${10})'[v$inputIndex];";
+      inputIndex++;
     }
 
     // Set the last video output from overlays as the input for texts
-    String lastVideo = index > 0 ? "[v${index - 1}]" : "[0:v]";
+    String lastVideo = "[0:v]";
+    if (inputIndex > 1) {
+      lastVideo = "[v${inputIndex - 1}]";
+    }
 
     // Adding multiple text overlays
     for (var textOverlay in textOverlays) {
       filterComplex +=
-          "$lastVideo drawtext=text='${textOverlay.text}':x=${textOverlay.position!.dx - 200}:y=${textOverlay.position!.dy + 200}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,${0},${10})'[v$index];";
-      lastVideo = "[v$index]";
-      index++;
+          "$lastVideo drawtext=text='${textOverlay.text}':x=${textOverlay.position!.dx - 200}:y=${textOverlay.position!.dy + 200}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,${0},${10})'[v$inputIndex];";
+      lastVideo = "[v$inputIndex]";
+      inputIndex++;
     }
 
-    // Remove the last semicolon
-    if (filterComplex.isNotEmpty) {
+    // Remove the last semicolon if present
+    if (filterComplex.isNotEmpty && filterComplex.endsWith(';')) {
       filterComplex = filterComplex.substring(0, filterComplex.length - 1);
     }
 
     // Complete the FFmpeg command
-    ffmpegCommand +=
-        " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -map 0:a -c:v libx264 -c:a aac -y $outputVideoPath";
+    if (selectedAudio.value.id != null &&
+        await File(selectedAudio.value.localPath!).exists()) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -map 0:a -c:v libx264 -c:a aac -y $outputVideoPath";
+    }
 
     // Execute FFmpeg
     await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
