@@ -14,6 +14,7 @@ import '../../../../core/utils/connectivity_check/i_connectivity_checker.dart';
 abstract class ICreateEventDataSource {
   Future<Either<Failure, EventTypeModel>> getTypeEvent();
   Future<Either<Failure, List<CharacterModel>>> getCharacters();
+  Future<Either<Failure, List<AudioModel>>> getAudios();
   Future<Either<Failure, NewEventModel>> newEvent(String title, String date,
       String time, String event, String ownerId, String participants);
 }
@@ -80,16 +81,48 @@ class CreateEventDataSource implements ICreateEventDataSource {
 
         switch (response.statusCode) {
           case 200:
-          
-           
-              List<CharacterModel> characters = [];
-              for (var element in response.data['characters']['data']) {
-                characters.add(CharacterModel.fromJson(element));
-              }
+            List<CharacterModel> characters = [];
+            for (var element in response.data['characters']['data']) {
+              characters.add(CharacterModel.fromJson(element));
+            }
 
-              return Right(characters);
-            
-            
+            return Right(characters);
+
+          default:
+            // 3.
+
+            return Left(Failure(response.statusCode ?? ResponseCode.DEFAULT,
+                response.statusMessage ?? ResponseMessage.DEFAULT));
+        }
+
+        // return registerModel;
+      } catch (error) {
+        return Left(ErrorHandler.handle(error).failure);
+      }
+    } else {
+      return Left(DataSource.NO_INTERNET_CONNECTION.getFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<AudioModel>>> getAudios() async {
+    bool isConnected = await _connectivityChecker.isConnected();
+    if (isConnected) {
+      try {
+        Response response = await _webServiceConnections.getRequest(
+          path: API.getAudios,
+          showLoader: false,
+          useMyPath: false,
+        );
+
+        switch (response.statusCode) {
+          case 200:
+            List<AudioModel> audios = [];
+            for (var element in response.data['audios']['data']) {
+              audios.add(AudioModel.fromJson(element));
+            }
+
+            return Right(audios);
 
           default:
             // 3.

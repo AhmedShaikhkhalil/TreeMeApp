@@ -9,6 +9,7 @@ import 'package:treeme/modules/create_event/presentation/pages/create_event_scre
 import 'package:treeme/modules/create_event/presentation/pages/select_contact_owner_screen.dart';
 import 'package:treeme/modules/create_event/presentation/pages/select_contacts_screen.dart';
 import 'package:treeme/modules/create_event/presentation/pages/type_with_theme_screen.dart';
+import 'package:treeme/modules/create_media/presentation/pages/add_audio_screen.dart';
 import 'package:treeme/modules/my_profile/presentation/pages/edit_profile_screen.dart';
 import 'package:treeme/modules/nav_bar/presentation/pages/nav_bar_screen.dart';
 import 'package:treeme/modules/profile/presentation/pages/profile_screen.dart';
@@ -35,7 +36,7 @@ class AppPages {
         // binding: MainBinding(),c
         curve: Curves.easeInOutQuart,
         transition: Transition.cupertino,
-        transitionDuration: Duration(milliseconds: 2000)),
+        transitionDuration: const Duration(milliseconds: 2000)),
     GetPage(
       name: AppRoutes.login,
       page: () => LoginScreen(),
@@ -87,21 +88,25 @@ class AppPages {
         binding: ChatBindings()),
     GetPage(
       name: AppRoutes.createMedia,
-      page: () => CreateMediaScreen(),
+      page: () => const CreateMediaScreen(),
       binding: CreateEventBindings(),
       // binding: CreateMediaBindings()
     ),
     GetPage(
         name: AppRoutes.forgotPassword,
-        page: () => ForgotPasswordScreen(),
+        page: () => const ForgotPasswordScreen(),
         binding: ForgotPasswordBindings()),
     GetPage(
       name: AppRoutes.editProfile,
-      page: () => EditProfileScreen(),
+      page: () => const EditProfileScreen(),
     ),
     GetPage(
       name: AppRoutes.selectCharacter,
-      page: () => SelectCharacterScreen(),
+      page: () => const SelectCharacterScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.addAudio,
+      page: () => const AddAudioScreen(),
     ),
   ];
 }

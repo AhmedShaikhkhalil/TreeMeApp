@@ -9,6 +9,7 @@ class API {
   static const verifyOtpAndResetPassword = '/verifyOtpAndResetPassword';
   static const contactTest = '/contactTest';
   static const getContact = '/getContact';
+  static const getAudios = '/getAllAudios';
   static const eventApp = '/eventApp';
   static const characters = '/getAllCharacters';
   static const newEventApp = '/NewEventApp';

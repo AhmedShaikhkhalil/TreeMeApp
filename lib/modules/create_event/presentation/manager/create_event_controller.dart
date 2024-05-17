@@ -51,6 +51,14 @@ class CreateEventController extends GetxController {
   void setRxCharacteres(List<CharacterModel> value) =>
       rxEventCharactersModel.value = value;
 
+
+
+  final RxList<AudioModel> rxEventAudiosModel = <AudioModel>[].obs;
+  void setRxAudiosModel(List<AudioModel> value) =>
+      rxEventAudiosModel.value = value;
+
+
+
   final rxNewEventModelRequestStatus = RequestStatus.LOADING.obs;
   void setRxNewEventModelRequestStatus(RequestStatus value) =>
       rxRequestStatus.value = value;
@@ -66,6 +74,7 @@ class CreateEventController extends GetxController {
     super.onInit();
     getTypeEvent();
     getCharacterEvent();
+    getAudiosEvent();
   }
 
   Future<void> getTypeEvent() async {
@@ -108,6 +117,33 @@ class CreateEventController extends GetxController {
       // r = _myContactModel.value;
       // r.data = contact.value;
       setRxCharacteres(r);
+      // setRxRequestStatus(RequestStatus.SUCESS);
+      update();
+      // update(['myContact']);
+      // print(_myContactModel.toString());
+    });
+  }
+
+
+
+
+  Future<void> getAudiosEvent() async {
+    // setRxRequestStatus(RequestStatus.LOADING);
+
+    final Either<Failure, List<AudioModel>> typeEvent =
+        await _createEventDataSource.getAudios();
+    typeEvent.fold((l) {
+      // setRxRequestStatus(RequestStatus.ERROR);
+
+      log(l.message.toString());
+      log(l.code.toString());
+      // errorToast(l.message);
+    }, (r) {
+      log(r.toString());
+      log('have characters ${r.length}');
+      // r = _myContactModel.value;
+      // r.data = contact.value;
+      setRxAudiosModel(r);
       // setRxRequestStatus(RequestStatus.SUCESS);
       update();
       // update(['myContact']);

@@ -3,14 +3,17 @@ import 'dart:io';
 // import 'package:easy_audio_trimmer/easy_audio_trimmer.dart' as trimmer;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 // import 'package:helpers/helpers.dart';
 // import 'package:helpers/helpers/transition.dart';
 import 'package:stack_board/stack_board.dart';
 import 'package:sticker_view/stickerview.dart';
 import 'package:treeme/core/resources/resource.dart';
+import 'package:treeme/core/routes/app_routes.dart';
 import 'package:treeme/modules/create_media/domain/entities/image_overlay.dart';
 import 'package:treeme/modules/create_media/presentation/manager/create_media_controller.dart';
 import 'package:video_editor/video_editor.dart';
+import 'package:audio_waveforms/audio_waveforms.dart';
 
 // import 'package:video_editor/ui/crop/crop_grid.dart';
 
@@ -179,8 +182,8 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
 
           return SafeArea(
             child: SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              primary: false,
+              // physics: const NeverScrollableScrollPhysics(),
+              // primary: false,
               child: Column(
                 children: [
                   Container(
@@ -594,6 +597,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                   : const SizedBox(),
                             ],
                           ),
+
                           Padding(
                             padding: EdgeInsets.only(right: AppSize.s18.w),
                             child: Row(
@@ -677,7 +681,132 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                           SizedBox(
                             height: AppSize.s20.h,
                           ),
+                          Row(
+                            // shrinkWrap: true,
+                            // scrollDirection: Axis.horizontal,
 
+                            // direction: Axis.horizontal,
+                            // mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () => Get.toNamed(AppRoutes.addAudio),
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    SvgPicture.asset(ImageAssets.music),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                        ),
+                                        child: Icon(
+                                          Icons.add,
+                                          size: 14.sp,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width: AppSize.s14.w,
+                              ),
+                              // (logic.selectedAudio.value != null)
+                              // ?
+                              //     ? Expanded(child: LayoutBuilder(
+                              //         builder: (context, boxConstraints) {
+                              //         return Column(
+                              //           mainAxisAlignment:
+                              //               MainAxisAlignment.center,
+                              //           children: logic.trimSlider(context),
+                              //         );
+                              //       }))
+
+                              logic.selectedAudio.value.id != null
+                                  ? Obx(() {
+                                      return SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                60,
+                                        height: 80,
+                                        child: WaveSlider(
+                                          duration: logic.playerController.value
+                                              .maxDuration
+                                              .toDouble(),
+                                          wavActiveColor:
+                                              ColorManager.subTitleCreateEvent,
+                                          callbackEnd: (pd) {
+                                            print(pd);
+                                          },
+                                          callbackStart: (ps) {
+                                            print(ps);
+                                          },
+                                          child: AudioFileWaveforms(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10.0, vertical: 5),
+                                            size: Size(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    1.23,
+                                                40),
+                                            playerController:
+                                                logic.playerController.value,
+                                            // enableSeekGesture: true,
+                                            continuousWaveform: false,
+                                            decoration: BoxDecoration(
+                                                color: const Color(0xffF15C89),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            playerWaveStyle:
+                                                const PlayerWaveStyle(
+                                                    fixedWaveColor:
+                                                        Colors.white,
+                                                    liveWaveColor: Colors.blue,
+                                                    backgroundColor:
+                                                        ColorManager
+                                                            .moveSmoothColor),
+                                            waveformData: logic.playerController
+                                                .value.waveformData,
+                                            waveformType: WaveformType.long,
+                                          ),
+                                        ),
+                                      );
+                                    })
+                                  : Expanded(
+                                      child: Container(
+                                      height: AppSize.s50.h,
+                                      color: const Color(0xffE8E8E8),
+                                      // child: AnimatedBuilder(
+                                      //   animation: logic.animationController,
+                                      //   builder: (context, child) {
+                                      //     return Row(
+                                      //       mainAxisAlignment: MainAxisAlignment.center,
+                                      //       children: List.generate(
+                                      //         logic.audioData.length,
+                                      //         (int index) {
+                                      //           return Container(
+                                      //             width: 5,
+                                      //             height: 30 + (logic.audioData[index] * 30),
+                                      //             margin: EdgeInsets.symmetric(horizontal: 2),
+                                      //             color: Colors.white,
+                                      //           );
+                                      //         },
+                                      //       ),
+                                      //     );
+                                      //   },
+                                      // ),
+                                    )),
+                            ],
+                          ),
+                          // SizedBox(
+                          //   height: AppSize.s10.h,
+                          // ),
                           // Row(
                           //   children: [
                           //     Stack(
@@ -714,7 +843,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                           //   child: logic.isLoadingAudio
                           //       ? Container(
                           //           height: AppSize.s50.h,
-                          //           color: const Color(0xffE8E8E8),
+                          //           color: const Color(0xffE8E8E8),ƒ
                           //           alignment: Alignment.topCenter,
                           //           child: SizedBox(
                           //               height: 5.h,

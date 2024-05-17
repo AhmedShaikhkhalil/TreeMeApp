@@ -34,3 +34,33 @@ class CharacterModel {
     return data;
   }
 }
+
+class AudioModel {
+  int? id;
+  String? name;
+  String? audio;
+  String? localPath;
+  String? image;
+  String? length;
+
+  AudioModel({
+    this.id,
+    this.name,
+  });
+
+  AudioModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    audio = json['audio'];
+    length = json['length'];
+    image = json['image'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    data['audio'] = audio;
+    return data;
+  }
+}

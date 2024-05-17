@@ -15,6 +15,7 @@ class AppRoutes {
   static const createMedia = '/create_media';
   static const editProfile = '/edit_profile';
   static const selectCharacter = '/select_character';
+  static const addAudio = '/add_audio';
 
   // static const
 }

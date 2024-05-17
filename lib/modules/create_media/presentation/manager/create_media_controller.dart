@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:audio_waveforms/audio_waveforms.dart';
@@ -24,10 +23,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gal/gal.dart';
 import 'package:get/get.dart';
-// import 'package:helpers/helpers.dart' show OpacityTransition;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:stack_board/stack_board.dart';
+import 'package:treeme/core/resources/resource.dart';
 import 'package:treeme/modules/create_event/data/models/character_model.dart';
 import 'package:treeme/modules/create_media/domain/entities/image_overlay.dart';
 import 'package:uuid/uuid.dart';
@@ -35,8 +34,6 @@ import 'package:video_editor/video_editor.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/helpers/constants.dart';
-import '../../../../core/resources/color_manager.dart';
-import '../../../../core/resources/values_manager.dart';
 import '../../../create_event/presentation/manager/create_event_controller.dart';
 import '../../domain/entities/text_overlay.dart';
 
@@ -52,7 +49,7 @@ class CreateMediaController extends GetxController
   AudioPlayer audioPlayer = AudioPlayer();
   PlayerState playerState = PlayerState.stopped;
   PlayerState playerState2 = PlayerState.stopped;
-  late final PlayerController playerController;
+  late Rx<PlayerController> playerController;
   late final PlayerController playerController2;
   VideoEditorController? videoEditorController;
   RxList<Uint8List> videoFrames = <Uint8List>[].obs;
@@ -71,7 +68,6 @@ class CreateMediaController extends GetxController
   bool selectedText = false;
   // String _filePath;
   String? filePath;
-  bool _isPlaying = false;
   final FFmpegKit _ffmpeg = FFmpegKit();
   String videoFilePath = '';
   String imageFilePath = '';
@@ -98,12 +94,27 @@ class CreateMediaController extends GetxController
   Rx<CharacterModel> selectedCharacter = CharacterModel().obs;
   void setRxselectedCharacter(CharacterModel value) =>
       selectedCharacter.value = value;
+
+  Rx<AudioModel> selectedAudio = AudioModel().obs;
+  void setRxselectedAudio(AudioModel value) async {
+    selectedAudio.value = value;
+    String audioFile = await downloadAudio(selectedAudio.value);
+    selectedAudio.value.localPath = audioFile;
+    downloadedAudio.add(selectedAudio.value);
+    playerController.value.preparePlayer(path: audioFile);
+    update();      
+  }
+
+  RxList<AudioModel> downloadedAudio = <AudioModel>[].obs;
+
+  final player = AudioPlayer();
+
   @override
   void onInit() {
     super.onInit();
     videoPlayerController?.dispose();
     chewieController?.dispose();
-    playerController = PlayerController();
+    playerController = PlayerController().obs;
     playerController2 = PlayerController();
     animationController = AnimationController(
       vsync: this,
@@ -129,7 +140,7 @@ class CreateMediaController extends GetxController
           color: textOverlay.textColor,
         ),
       ),
-      caseStyle: CaseStyle(iconSize: 30),
+      caseStyle: const CaseStyle(iconSize: 30),
       // onDel: () {
       //   // print('deleted');
       //   // return Future.value(textOverlays.remove(textOverlay));
@@ -428,7 +439,7 @@ class CreateMediaController extends GetxController
   }
 
   void playandPause() async {
-    playerController.playerState == PlayerState.playing
+    playerController.value.playerState == PlayerState.playing
         ? await pauseplayer()
         : await playplayer();
   }
@@ -1058,7 +1069,7 @@ class CreateMediaController extends GetxController
   void showCharacterOverlayDialog(BuildContext context) {
     Get.defaultDialog(
       title: 'Add Character Overlay',
-      titlePadding: EdgeInsets.all(20),
+      titlePadding: const EdgeInsets.all(20),
       content: GetBuilder<CreateMediaController>(builder: (logic) {
         switch (createEventController.contactController.rxRequestStatus.value) {
           case RequestStatus.LOADING:
@@ -1265,6 +1276,138 @@ class CreateMediaController extends GetxController
     } else {
       throw Exception('Failed to download image');
     }
+  }
+
+  Future<String> downloadAudio(AudioModel audioModel) async {
+    final response = await http.get(Uri.parse(audioModel.audio!));
+    if (response.statusCode == 200) {
+      final directory = await getApplicationDocumentsDirectory();
+      final filePath = '${directory.path}/${audioModel.audio!.split('/').last}';
+      final file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filePath;
+    } else {
+      throw Exception('Failed to download image');
+    }
+  }
+
+  void showAudioOverlayDialog(BuildContext context) {
+    Get.defaultDialog(
+      title: 'Add Audio',
+      titlePadding: const EdgeInsets.all(20),
+      content: GetBuilder<CreateMediaController>(builder: (logic) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height - 300,
+          width: MediaQuery.of(context).size.width,
+          child: ListView.builder(
+            padding: const EdgeInsets.all(20),
+            // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            //     crossAxisCount: 2, crossAxisSpacing: 20.0, mainAxisExtent: 172),
+            itemCount: createEventController.rxEventAudiosModel.length,
+            itemBuilder: (context, int index) => InkWell(
+              onTap: () {
+                setRxselectedAudio(
+                    createEventController.rxEventAudiosModel[index]);
+              },
+              child: Obx(() {
+                return Container(
+                    height: 50.0,
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: createEventController
+                                    .rxEventAudiosModel[index].id ==
+                                selectedAudio.value.id
+                            ? Border.all(color: Colors.red)
+                            : null),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 18,
+                        ),
+                        // SizedBox(
+                        //   height: 100,
+                        //   width: AppSize.s265,
+                        //   child: Image.network(
+                        //     createEventController
+                        //         .rxEventAudiosModel[index],
+                        //     fit: BoxFit.cover,
+                        //   ),
+                        // ),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0, left: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                    createEventController
+                                        .rxEventAudiosModel[index].name!,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        color: ColorManager.goodMorning),
+                                  ),
+                                ],
+                              ),
+                              InkWell(
+                                onTap: () async {
+                                  print(player.state);
+                                  // if (player.state != PlayerState.playing) {
+                                  if (downloadedAudio.contains(
+                                      createEventController
+                                          .rxEventAudiosModel[index])) {
+                                    await player.play(DeviceFileSource(
+                                        downloadedAudio[index].localPath!));
+                                  } else {
+                                    await player.play(UrlSource(
+                                        createEventController
+                                            .rxEventAudiosModel[index].audio!));
+                                  }
+
+                                  // }
+                                  // player.pause();
+                                },
+                                child: SvgPicture.asset(
+                                  player.state.name !=
+                                          PlayerState.playing.toString()
+                                      ? ImageAssets.playVideo
+                                      : ImageAssets.appleLogo,
+                                  width: 15,
+                                  height: 15,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ));
+              }),
+            ),
+          ),
+        );
+      }),
+      cancel: TextButton(
+        onPressed: () => Get.back(),
+        child: const Text('Cancel'),
+      ),
+      confirm: TextButton(
+        onPressed: () async {
+          String audioFile = await downloadAudio(selectedAudio.value);
+          selectedAudio.value.localPath = audioFile;
+          downloadedAudio.add(selectedAudio.value);
+          // addImageOverlay(ImageOverly(characterFile, 50, 50, 1,
+          //     const Offset(0, 0), 1, false, idCounter++));
+
+          Get.back();
+        },
+        child: const Text('Add'),
+      ),
+    );
   }
 }
 // import 'package:get/get.dart';
