@@ -35,6 +35,7 @@ import 'package:video_editor/video_editor.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/helpers/constants.dart';
+import '../../../../core/utils/error_toast.dart';
 import '../../../create_event/presentation/manager/create_event_controller.dart';
 import '../../domain/entities/text_overlay.dart';
 
@@ -110,6 +111,9 @@ class CreateMediaController extends GetxController
 
   final player = AudioPlayer();
 
+  Rx<CreateVideoStatus> createVideoStatus = CreateVideoStatus.INITIAL.obs;
+  void setRxCreateVideoStatus(CreateVideoStatus _value) =>
+      createVideoStatus.value = _value;
   @override
   void onInit() {
     super.onInit();
@@ -160,8 +164,8 @@ class CreateMediaController extends GetxController
         File(imageOverlay.selectedImage ?? ''),
         scale: 2,
         fit: BoxFit.fill,
-        width: imageOverlay.size.width + 100,
-        height: imageOverlay.size.height + 100,
+        width: imageOverlay.size.width,
+        height: imageOverlay.size.height,
       ),
       // onDel: () {
       //   print('deleted');
@@ -669,7 +673,6 @@ class CreateMediaController extends GetxController
           // if (returnCode == 0) {
           videoFilePath = outputVideoPath;
           addTextResult = 'Text added successfully!';
-          print(returnCode);
           await Gal.putVideo(outputVideoPath).then((value) {});
           // } else {
           //   addTextResult =
@@ -819,6 +822,8 @@ class CreateMediaController extends GetxController
   //   });
   // }
   Future<void> initializeVideoPlayer() async {
+    setRxCreateVideoStatus(CreateVideoStatus.LOADING);
+
     String inputVideoPath = videoFilePath;
     Directory tempDir = await getApplicationDocumentsDirectory();
     String outputDir = tempDir.path;
@@ -830,7 +835,9 @@ class CreateMediaController extends GetxController
 
     // Check if the video file exists
     if (!await File(inputVideoPath).exists()) {
-      print("Video file does not exist.");
+      errorToast("Video file does not exist.");
+
+      setRxCreateVideoStatus(CreateVideoStatus.ERROR);
       return;
     }
 
@@ -892,10 +899,13 @@ class CreateMediaController extends GetxController
       final returnCode = await session.getReturnCode();
       if (returnCode!.isValueSuccess()) {
         print("FFmpeg process successful, video saved to $outputVideoPath");
+
+        setRxCreateVideoStatus(CreateVideoStatus.SUCESS);
         await initializeVideoPlayerController(outputVideoPath);
       } else {
-        print(
+        errorToast(
             "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+        setRxCreateVideoStatus(CreateVideoStatus.ERROR);
       }
     }, (Log log) {
       print(log.getMessage());

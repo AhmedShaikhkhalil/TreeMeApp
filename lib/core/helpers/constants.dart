@@ -21,6 +21,8 @@ class AppConfig {
 
 enum RequestStatus { LOADING, SUCESS, ERROR }
 
+enum CreateVideoStatus { LOADING, SUCESS, ERROR, INITIAL }
+
 extension HexColor on Color {
   static Color fromHex(String hexString) {
     final StringBuffer buffer = StringBuffer();

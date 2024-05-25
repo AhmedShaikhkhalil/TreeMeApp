@@ -2,14 +2,17 @@ import 'dart:io';
 
 // import 'package:easy_audio_trimmer/easy_audio_trimmer.dart' as trimmer;
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 // import 'package:helpers/helpers.dart';
 // import 'package:helpers/helpers/transition.dart';
 import 'package:stack_board/stack_board.dart';
 import 'package:sticker_view/stickerview.dart';
+import 'package:treeme/core/helpers/constants.dart';
 import 'package:treeme/core/resources/resource.dart';
 import 'package:treeme/core/routes/app_routes.dart';
+import 'package:treeme/modules/create_event/data/models/character_model.dart';
 import 'package:treeme/modules/create_media/domain/entities/image_overlay.dart';
 import 'package:treeme/modules/create_media/presentation/manager/create_media_controller.dart';
 import 'package:video_editor/video_editor.dart';
@@ -184,1412 +187,998 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
             child: SingleChildScrollView(
               // physics: const NeverScrollableScrollPhysics(),
               // primary: false,
-              child: Column(
+              child: Stack(
                 children: [
-                  Container(
-                    // margin: EdgeInsets.only(top: 160),
-                    // width: 150,
-                    // height: 300,
-                    height: 300,
-                    width: double.infinity,
-                    alignment: Alignment.center,
+                  Column(
+                    children: [
+                      Container(
+                        // margin: EdgeInsets.only(top: 160),
+                        // width: 150,
+                        // height: 300,
+                        height: 300,
+                        width: double.infinity,
+                        alignment: Alignment.center,
 
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        (logic.videoEditorController != null &&
-                                logic.videoEditorController!.initialized)
-                            ? FittedBox(
-                                fit: BoxFit.cover,
-                                // aspectRatio: logic.videoEditorController!
-                                //     .preferredCropAspectRatio!,
-                                child: SizedBox(
-                                  height: 300,
-                                  width: 150,
-                                  child: CropGridViewer.preview(
-                                      controller: logic.videoEditorController!),
-                                ),
-                              )
-                            : (logic.videoPlayerController != null &&
-                                    logic.videoPlayerController!.value.hasError)
-                                ? const Text('Error loading video')
-                                : logic.imageOverlays.isEmpty
-                                    ? Image.network(
-                                        'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg?w=2000',
-                                        height: AppSize.s261.h,
-                                      )
-                                    : const SizedBox(),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            (logic.videoEditorController != null &&
+                                    logic.videoEditorController!.initialized)
+                                ? FittedBox(
+                                    fit: BoxFit.cover,
+                                    // aspectRatio: logic.videoEditorController!
+                                    //     .preferredCropAspectRatio!,
+                                    child: SizedBox(
+                                      height: 300,
+                                      width: 150,
+                                      child: CropGridViewer.preview(
+                                          controller:
+                                              logic.videoEditorController!),
+                                    ),
+                                  )
+                                : (logic.videoPlayerController != null &&
+                                        logic.videoPlayerController!.value
+                                            .hasError)
+                                    ? const Text('Error loading video')
+                                    : logic.imageOverlays.isEmpty
+                                        ? Image.network(
+                                            'https://img.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg?w=2000',
+                                            height: AppSize.s261.h,
+                                          )
+                                        : const SizedBox(),
 
-                        SizedBox(
+                            SizedBox(
 
-                            // height: 300,
-                            // width: 150,
-                            child: StackBoard(
-                          controller: logic.boardController,
-                          caseStyle: const CaseStyle(
-                            borderColor: Colors.grey,
-                            iconColor: Colors.white,
-                          ),
-                          background:
-                              const ColoredBox(color: Colors.transparent),
-                          customBuilder: (StackBoardItem t) {
-                            // if (t is CustomItem) {
-                            return ItemCase(
-                              key: Key('StackBoardItem${t.id}'),
-                              // <==== must
-                              isCenter: true,
-                              onDel: () {
-                                logic.boardController.remove(t.id);
-                              },
-                              onTap: () {
-                                // logic.boardController.moveItemToTop(t.id);
-                              },
-                              onOffsetChanged: (offset) {
-                                print(offset);
-
-                                if (t.child is Image) {
-                                  Offset newOffset = Offset(
-                                      offset.dx / videoWidthRatio,
-                                      offset.dy * videoHieghtRatio);
-                                  print(newOffset);
-                                  int index = logic.imageOverlays
-                                      .indexWhere((p0) => p0.id == t.id);
-
-                                  logic.imageOverlays[index] = logic
-                                      .imageOverlays[index]
-                                    ..position = newOffset;
-
-                                  // replaceWhere(
-                                  //     (p0) => p0.id == t.id, (imageOverlay) {
-                                  //   imageOverlay.position = newOffset;
-                                  //   return imageOverlay;
-                                  // });
-                                } else {
-                                  Offset newOffset = Offset(
-                                      offset.dx * videoWidthRatio,
-                                      offset.dy * videoHieghtRatio);
-                                  print(newOffset);
-                                  int index = logic.textOverlays
-                                      .indexWhere((p0) => p0.id == t.id);
-
-                                  logic.textOverlays[index] = logic
-                                      .textOverlays[index]
-                                    ..position = newOffset;
-                                  // logic.textOverlays.replaceWhere(
-                                  //     (p0) => p0.id == t.id, (textOverlay) {
-                                  //   textOverlay.position = newOffset;
-                                  //   return textOverlay;
-                                  // });
-                                }
-                                // return false;
-                              },
-                              onSizeChanged: (size) {
-                                Size newSize = Size(
-                                    size.width * videoWidthRatio,
-                                    size.height * videoHieghtRatio);
-                                if (t.child is Image) {
-                                  int index = logic.imageOverlays
-                                      .indexWhere((p0) => p0.id == t.id);
-                                  setState(() {
-                                    logic.imageOverlays[index] = logic
-                                        .imageOverlays[index]
-                                      ..size = newSize;
-                                    // logic.imageOverlays.replaceWhere(
-                                    //     (p0) => p0.id == t.id, (imageOverlays) {
-                                    //   imageOverlays.size = newSize;
-                                    //   return imageOverlays;
-                                    // });
-                                  });
-                                } else {
-                                  int index = logic.textOverlays
-                                      .indexWhere((p0) => p0.id == t.id);
-                                  logic.textOverlays[index] =
-                                      logic.textOverlays[index]..size = newSize;
-                                  // logic.textOverlays.replaceWhere(
-                                  //     (p0) => p0.id == t.id,
-                                  //     (textOverlay) {
-                                  //   textOverlay.position = offset;
-                                  //   return textOverlay;
-                                  // });
-
-                                  return false;
-                                }
-                              },
+                                // height: 300,
+                                // width: 150,
+                                child: StackBoard(
+                              controller: logic.boardController,
                               caseStyle: const CaseStyle(
                                 borderColor: Colors.grey,
                                 iconColor: Colors.white,
                               ),
-                              child: t.child is Image
-                                  ? Obx(() {
-                                      return SizedBox(
-                                          width: logic.imageOverlays
-                                              .firstWhere((element) =>
-                                                  element.id == t.id)
-                                              .size
-                                              .width,
-                                          height: logic.imageOverlays
-                                              .firstWhere((element) =>
-                                                  element.id == t.id)
-                                              .size
-                                              .height,
-                                          child: t.child);
-                                    })
-                                  : t.child,
-                            );
-                            // }
+                              background:
+                                  const ColoredBox(color: Colors.transparent),
+                              customBuilder: (StackBoardItem t) {
+                                // if (t is CustomItem) {
+                                return ItemCase(
+                                  key: Key('StackBoardItem${t.id}'),
+                                  // <==== must
+                                  isCenter: true,
+                                  onDel: () {
+                                    logic.boardController.remove(t.id);
+                                  },
+                                  onTap: () {
+                                    // logic.boardController.moveItemToTop(t.id);
+                                  },
+                                  onOffsetChanged: (offset) {
+                                    print(offset);
 
-                            // return null;
-                          },
-                        )),
+                                    if (t.child is Image) {
+                                      Offset newOffset = Offset(
+                                          offset.dx / videoWidthRatio,
+                                          offset.dy * videoHieghtRatio);
+                                      print(newOffset);
+                                      int index = logic.imageOverlays
+                                          .indexWhere((p0) => p0.id == t.id);
 
-                        // Stack(
-                        //     children: logic.imageOverlays
-                        //         .map<Widget>((element) => ItemCase(
-                        //               key: Key('StackBoardItem${element.id}'),
-                        //               //             // <==== must
-                        //               isCenter: true,
-                        //               onDel: () {
-                        //                 // logic.boardController.remove(t.id);
-                        //               },
-                        //               onTap: () {
-                        //                 print('taped');
-                        //                 // logic.boardController
-                        //                 //     .moveItemToTop(t.id);
-                        //               },
-                        //               onOffsetChanged: (offset) {
-                        //                 print(offset);
-                        //                 // findOverlay(t.id);
-                        //               },
-                        //               onSizeChanged: (size) {
-                        //                 print(size);
-                        //               },
-                        //               caseStyle: const CaseStyle(
-                        //                 borderColor: Colors.grey,
-                        //                 iconColor: Colors.white,
-                        //               ),
-                        //               child: Image.file(
-                        //                 File(element.selectedImage ?? ''),
-                        //                 scale: .1,
-                        //                 height: 20.0,
-                        //                 width: 20.0,
-                        //               ),
-                        //             ))
-                        //         .toList())
+                                      logic.imageOverlays[index] = logic
+                                          .imageOverlays[index]
+                                        ..position = newOffset;
 
-                        // Obx(() {
-                        // return StickerView(
-                        //   // List of Stickers
-                        //   // width: 20,
-                        //     height: 300.h,
-                        //     stickerList:
-                        //     // for (var item in logic.imageOverlays)
+                                      // replaceWhere(
+                                      //     (p0) => p0.id == t.id, (imageOverlay) {
+                                      //   imageOverlay.position = newOffset;
+                                      //   return imageOverlay;
+                                      // });
+                                    } else {
+                                      Offset newOffset = Offset(
+                                          offset.dx * videoWidthRatio,
+                                          offset.dy * videoHieghtRatio);
+                                      print(newOffset);
+                                      int index = logic.textOverlays
+                                          .indexWhere((p0) => p0.id == t.id);
 
-                        //     logic.textOverlays
-                        //         .map((e) => Sticker(
-                        //       id: e.id ?? '',
-                        //       isText: true,
-                        //       child: Text(
-                        //         e.text,
-                        //         style: TextStyle(
-                        //             color: Colors
-                        //                 .yellow,
-                        //             fontSize: 50,
-                        //             fontWeight:
-                        //             FontWeight
-                        //                 .w900),
-                        //       ),
-                        //     ))
-                        //         .toList()
+                                      logic.textOverlays[index] = logic
+                                          .textOverlays[index]
+                                        ..position = newOffset;
+                                      // logic.textOverlays.replaceWhere(
+                                      //     (p0) => p0.id == t.id, (textOverlay) {
+                                      //   textOverlay.position = newOffset;
+                                      //   return textOverlay;
+                                      // });
+                                    }
+                                    // return false;
+                                  },
+                                  onSizeChanged: (size) {
+                                    Size newSize = Size(
+                                        size.width * videoWidthRatio,
+                                        size.height * videoHieghtRatio);
+                                    if (t.child is Image) {
+                                      int index = logic.imageOverlays
+                                          .indexWhere((p0) => p0.id == t.id);
+                                      setState(() {
+                                        logic.imageOverlays[index] = logic
+                                            .imageOverlays[index]
+                                          ..size = newSize;
+                                        // logic.imageOverlays.replaceWhere(
+                                        //     (p0) => p0.id == t.id, (imageOverlays) {
+                                        //   imageOverlays.size = newSize;
+                                        //   return imageOverlays;
+                                        // });
+                                      });
+                                    } else {
+                                      int index = logic.textOverlays
+                                          .indexWhere((p0) => p0.id == t.id);
+                                      logic.textOverlays[index] = logic
+                                          .textOverlays[index]
+                                        ..size = newSize;
+                                      // logic.textOverlays.replaceWhere(
+                                      //     (p0) => p0.id == t.id,
+                                      //     (textOverlay) {
+                                      //   textOverlay.position = offset;
+                                      //   return textOverlay;
+                                      // });
 
-                        //   Sticker(
-                        //     id: "uniqueId_sas111",
-                        //     child: Image.network(
-                        //         "https://images.unsplash.com/photo-1640113292801-785c4c678e1e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=736&q=80"),
-                        //   ),
-                        // ],
-                        // );
-                        // }),
-                        // for (var item in logic.imageOverlays)
-                        // Visibility(
-                        //   visible:
-                        //       logic.imageOverlays.isNotEmpty &&
-                        //           item.isSelected,
-                        //   child: Container(
-                        //     child: DragScaleImage(
-                        //       imageOverly: item,
-                        //       controller: logic,
-                        //     ),
-                        //   ),
-                        // child: Positioned(
-                        //   left: item.position.dx,
-                        //   top: item.position.dy,
-                        //   child: GestureDetector(
-                        //     onScaleStart: (details) {
-                        //       _previousScale = _scale;
-                        //     },
-                        //     onScaleUpdate: (details) {
-                        //       setState(() {
-                        //         _scale = _previousScale *
-                        //             details.scale;
-                        //       });
-                        //       print(details.scale);
-                        //     },
-                        //     onScaleEnd: (_) {
-                        //       _previousScale = 1.0;
-                        //     },
-                        //     child: Draggable(
-                        //       child: Image.file(
-                        //         File(
-                        //           item.selectedImage!,
-                        //         ),
-                        //         scale: _scale,
-                        //       ),
-                        //       feedback: Image.file(
-                        //         File(
-                        //           item.selectedImage!,
-                        //         ),
-                        //         scale: _scale,
-                        //       ),
-                        //       childWhenDragging: Container(),
-                        //       onDraggableCanceled: (_, __) {},
-                        //       hitTestBehavior:
-                        //           HitTestBehavior.opaque,
-                        //       onDragEnd: (details) {
-                        //         setState(() {
-                        //           item.position =
-                        //               details.offset;
-                        //         });
-                        //       },
-                        //     ),
-                        //   ),
-                        //
-                        //   // child: GestureDetector(
-                        //   //   onScaleUpdate: (details) {
-                        //   //     setState(() {
-                        //   //       item.position +=
-                        //   //           details.focalPoint -
-                        //   //               details.localFocalPoint;
-                        //   //       item.scale = details.scale;
-                        //   //     });
-                        //   //   },
-                        //   //   child: Transform.scale(
-                        //   //     scale: item.scale,
-                        //   //     child: Image.file(File(
-                        //   //       item.selectedImage!,
-                        //   //     )),
-                        //   //   ),
-                        //   // ),
-                        // ),
-                        // ),
-                        // for (var item in logic.textOverlays)
-                        //   StickerView(
-                        //     height: 50,
-                        //     width: 50,
-                        //     stickerList: [
-                        //       Sticker(
-                        //         child:  Text(item.text),
-                        //         id: "uniqueId_222",
-                        //         isText: true,
-                        //       ),
-                        //     ],
-                        //   ),
-                        // Positioned(
-                        //   left: item.position?.dx,
-                        //   top: item.position?.dy,
-                        //   child: Container(
-                        //     alignment: Alignment.center,
-                        //     width: 150,
-                        //     height: 300,
-                        //     // color: Colors.white,
-                        //     child: GestureDetector(
-                        //       onPanUpdate: (details) {
-                        //         setState(() {
-                        //           item.position = Offset(
-                        //               (item.position?.dx ?? 0) +
-                        //                   details.delta.dx,
-                        //               (item.position?.dy ?? 0) +
-                        //                   details.delta.dy);
-                        //         });
-                        //       },
-                        //       child: Padding(
-                        //         padding:
-                        //             const EdgeInsets.all(8.0),
-                        //         child: Center(
-                        //           child: Text(item.text,
-                        //               textAlign: TextAlign.center,
-                        //               style: TextStyle(
-                        //                   fontSize: item.fontSize,
-                        //                   color: item.textColor)),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // )
-                      ],
-                    ),
-                  ),
-                  // DraggableScrollableSheet(
-                  //     initialChildSize: .3,
-                  //     minChildSize: .15,
-                  //     builder: (context, scrollController) {
-                  //       return
+                                      return false;
+                                    }
+                                  },
+                                  caseStyle: const CaseStyle(
+                                    borderColor: Colors.grey,
+                                    iconColor: Colors.white,
+                                  ),
+                                  child: t.child is Image
+                                      ? Obx(() {
+                                          return SizedBox(
+                                              width: logic.imageOverlays
+                                                  .firstWhere((element) =>
+                                                      element.id == t.id)
+                                                  .size
+                                                  .width,
+                                              height: logic.imageOverlays
+                                                  .firstWhere((element) =>
+                                                      element.id == t.id)
+                                                  .size
+                                                  .height,
+                                              child: t.child);
+                                        })
+                                      : t.child,
+                                );
+                                // }
 
-                  SingleChildScrollView(
-                    child: Container(
-                      color: ColorManager.white,
-                      padding: const EdgeInsets.only(
-                          left: 10.0, top: 20, right: 10.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                                // return null;
+                              },
+                            )),
+
+                            // Stack(
+                            //     children: logic.imageOverlays
+                            //         .map<Widget>((element) => ItemCase(
+                            //               key: Key('StackBoardItem${element.id}'),
+                            //               //             // <==== must
+                            //               isCenter: true,
+                            //               onDel: () {
+                            //                 // logic.boardController.remove(t.id);
+                            //               },
+                            //               onTap: () {
+                            //                 print('taped');
+                            //                 // logic.boardController
+                            //                 //     .moveItemToTop(t.id);
+                            //               },
+                            //               onOffsetChanged: (offset) {
+                            //                 print(offset);
+                            //                 // findOverlay(t.id);
+                            //               },
+                            //               onSizeChanged: (size) {
+                            //                 print(size);
+                            //               },
+                            //               caseStyle: const CaseStyle(
+                            //                 borderColor: Colors.grey,
+                            //                 iconColor: Colors.white,
+                            //               ),
+                            //               child: Image.file(
+                            //                 File(element.selectedImage ?? ''),
+                            //                 scale: .1,
+                            //                 height: 20.0,
+                            //                 width: 20.0,
+                            //               ),
+                            //             ))
+                            //         .toList())
+
+                            // Obx(() {
+                            // return StickerView(
+                            //   // List of Stickers
+                            //   // width: 20,
+                            //     height: 300.h,
+                            //     stickerList:
+                            //     // for (var item in logic.imageOverlays)
+
+                            //     logic.textOverlays
+                            //         .map((e) => Sticker(
+                            //       id: e.id ?? '',
+                            //       isText: true,
+                            //       child: Text(
+                            //         e.text,
+                            //         style: TextStyle(
+                            //             color: Colors
+                            //                 .yellow,
+                            //             fontSize: 50,
+                            //             fontWeight:
+                            //             FontWeight
+                            //                 .w900),
+                            //       ),
+                            //     ))
+                            //         .toList()
+
+                            //   Sticker(
+                            //     id: "uniqueId_sas111",
+                            //     child: Image.network(
+                            //         "https://images.unsplash.com/photo-1640113292801-785c4c678e1e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=736&q=80"),
+                            //   ),
+                            // ],
+                            // );
+                            // }),
+                            // for (var item in logic.imageOverlays)
+                            // Visibility(
+                            //   visible:
+                            //       logic.imageOverlays.isNotEmpty &&
+                            //           item.isSelected,
+                            //   child: Container(
+                            //     child: DragScaleImage(
+                            //       imageOverly: item,
+                            //       controller: logic,
+                            //     ),
+                            //   ),
+                            // child: Positioned(
+                            //   left: item.position.dx,
+                            //   top: item.position.dy,
+                            //   child: GestureDetector(
+                            //     onScaleStart: (details) {
+                            //       _previousScale = _scale;
+                            //     },
+                            //     onScaleUpdate: (details) {
+                            //       setState(() {
+                            //         _scale = _previousScale *
+                            //             details.scale;
+                            //       });
+                            //       print(details.scale);
+                            //     },
+                            //     onScaleEnd: (_) {
+                            //       _previousScale = 1.0;
+                            //     },
+                            //     child: Draggable(
+                            //       child: Image.file(
+                            //         File(
+                            //           item.selectedImage!,
+                            //         ),
+                            //         scale: _scale,
+                            //       ),
+                            //       feedback: Image.file(
+                            //         File(
+                            //           item.selectedImage!,
+                            //         ),
+                            //         scale: _scale,
+                            //       ),
+                            //       childWhenDragging: Container(),
+                            //       onDraggableCanceled: (_, __) {},
+                            //       hitTestBehavior:
+                            //           HitTestBehavior.opaque,
+                            //       onDragEnd: (details) {
+                            //         setState(() {
+                            //           item.position =
+                            //               details.offset;
+                            //         });
+                            //       },
+                            //     ),
+                            //   ),
+                            //
+                            //   // child: GestureDetector(
+                            //   //   onScaleUpdate: (details) {
+                            //   //     setState(() {
+                            //   //       item.position +=
+                            //   //           details.focalPoint -
+                            //   //               details.localFocalPoint;
+                            //   //       item.scale = details.scale;
+                            //   //     });
+                            //   //   },
+                            //   //   child: Transform.scale(
+                            //   //     scale: item.scale,
+                            //   //     child: Image.file(File(
+                            //   //       item.selectedImage!,
+                            //   //     )),
+                            //   //   ),
+                            //   // ),
+                            // ),
+                            // ),
+                            // for (var item in logic.textOverlays)
+                            //   StickerView(
+                            //     height: 50,
+                            //     width: 50,
+                            //     stickerList: [
+                            //       Sticker(
+                            //         child:  Text(item.text),
+                            //         id: "uniqueId_222",
+                            //         isText: true,
+                            //       ),
+                            //     ],
+                            //   ),
+                            // Positioned(
+                            //   left: item.position?.dx,
+                            //   top: item.position?.dy,
+                            //   child: Container(
+                            //     alignment: Alignment.center,
+                            //     width: 150,
+                            //     height: 300,
+                            //     // color: Colors.white,
+                            //     child: GestureDetector(
+                            //       onPanUpdate: (details) {
+                            //         setState(() {
+                            //           item.position = Offset(
+                            //               (item.position?.dx ?? 0) +
+                            //                   details.delta.dx,
+                            //               (item.position?.dy ?? 0) +
+                            //                   details.delta.dy);
+                            //         });
+                            //       },
+                            //       child: Padding(
+                            //         padding:
+                            //             const EdgeInsets.all(8.0),
+                            //         child: Center(
+                            //           child: Text(item.text,
+                            //               textAlign: TextAlign.center,
+                            //               style: TextStyle(
+                            //                   fontSize: item.fontSize,
+                            //                   color: item.textColor)),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // )
+                          ],
+                        ),
+                      ),
+                      // DraggableScrollableSheet(
+                      //     initialChildSize: .3,
+                      //     minChildSize: .15,
+                      //     builder: (context, scrollController) {
+                      //       return
+
+                      SingleChildScrollView(
+                        child: Container(
+                          color: ColorManager.white,
+                          padding: const EdgeInsets.only(
+                              left: 10.0, top: 20, right: 10.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
                             children: [
-                              (logic.videoEditorController != null &&
-                                      logic.videoEditorController!.initialized)
-                                  ? AnimatedBuilder(
-                                      animation: Listenable.merge([
-                                        logic.videoEditorController,
-                                        logic.videoEditorController?.video,
-                                      ]),
-                                      builder: (_, __) {
-                                        final duration = logic
-                                            .videoEditorController
-                                            ?.videoDuration;
-                                        final posSeconds = logic
-                                                .videoEditorController!
-                                                .trimPosition *
-                                            duration!.inSeconds;
-                                        final posMin = logic
-                                                .videoEditorController!
-                                                .trimPosition *
-                                            duration!.inMinutes;
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  (logic.videoEditorController != null &&
+                                          logic.videoEditorController!
+                                              .initialized)
+                                      ? AnimatedBuilder(
+                                          animation: Listenable.merge([
+                                            logic.videoEditorController,
+                                            logic.videoEditorController?.video,
+                                          ]),
+                                          builder: (_, __) {
+                                            final duration = logic
+                                                .videoEditorController
+                                                ?.videoDuration;
+                                            final posSeconds = logic
+                                                    .videoEditorController!
+                                                    .trimPosition *
+                                                duration!.inSeconds;
+                                            final posMin = logic
+                                                    .videoEditorController!
+                                                    .trimPosition *
+                                                duration!.inMinutes;
 
-                                        return Text(
-                                          logic.formatter(Duration(
-                                              seconds: posSeconds.toInt(),
-                                              minutes: posMin.toInt())),
+                                            return Text(
+                                              logic.formatter(Duration(
+                                                  seconds: posSeconds.toInt(),
+                                                  minutes: posMin.toInt())),
+                                              style: getBoldStyle(
+                                                  color:
+                                                      ColorManager.goodMorning,
+                                                  fontSize: FontSize.s12.sp),
+                                            );
+                                          })
+                                      : const SizedBox(),
+                                  (logic.videoEditorController != null &&
+                                          logic.videoEditorController!
+                                              .initialized)
+                                      ? Text(
+                                          '/',
+                                          style: getBoldStyle(
+                                              color: const Color(0xffBDBDC1),
+                                              fontSize: FontSize.s12.sp),
+                                        )
+                                      : const SizedBox(),
+                                  (logic.videoEditorController != null &&
+                                          logic.videoEditorController!
+                                              .initialized)
+                                      ? Text(
+                                          logic.formatter(logic
+                                              .videoEditorController!
+                                              .videoDuration),
                                           style: getBoldStyle(
                                               color: ColorManager.goodMorning,
                                               fontSize: FontSize.s12.sp),
-                                        );
-                                      })
-                                  : const SizedBox(),
-                              (logic.videoEditorController != null &&
-                                      logic.videoEditorController!.initialized)
-                                  ? Text(
-                                      '/',
-                                      style: getBoldStyle(
-                                          color: const Color(0xffBDBDC1),
-                                          fontSize: FontSize.s12.sp),
-                                    )
-                                  : const SizedBox(),
-                              (logic.videoEditorController != null &&
-                                      logic.videoEditorController!.initialized)
-                                  ? Text(
-                                      logic.formatter(logic
-                                          .videoEditorController!
-                                          .videoDuration),
-                                      style: getBoldStyle(
-                                          color: ColorManager.goodMorning,
-                                          fontSize: FontSize.s12.sp),
-                                    )
-                                  : const SizedBox(),
-                            ],
-                          ),
+                                        )
+                                      : const SizedBox(),
+                                ],
+                              ),
 
-                          Padding(
-                            padding: EdgeInsets.only(right: AppSize.s18.w),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Row(
-                                //   children: [
-                                //     SvgPicture.asset(
-                                //         ImageAssets.backwordArrow),
-                                //     SizedBox(
-                                //       width: AppSize.s12.w,
-                                //     ),
-                                //     SvgPicture.asset(
-                                //         ImageAssets.forwardArrow),
-                                //   ],
-                                // ),
-                                const SizedBox(
-                                  width: 60.0,
-                                ),
-                                Row(
+                              Padding(
+                                padding: EdgeInsets.only(right: AppSize.s18.w),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    SvgPicture.asset(ImageAssets.backVideo),
-                                    SizedBox(
-                                      width: AppSize.s20.w,
+                                    // Row(
+                                    //   children: [
+                                    //     SvgPicture.asset(
+                                    //         ImageAssets.backwordArrow),
+                                    //     SizedBox(
+                                    //       width: AppSize.s12.w,
+                                    //     ),
+                                    //     SvgPicture.asset(
+                                    //         ImageAssets.forwardArrow),
+                                    //   ],
+                                    // ),
+                                    const SizedBox(
+                                      width: 60.0,
                                     ),
-                                    Visibility(
-                                      visible: !logic.pause.value,
-                                      replacement:
-                                          // OpacityTransition(
-                                          //   visible: logic.pause.value,
-                                          // child:
+                                    Row(
+                                      children: [
+                                        SvgPicture.asset(ImageAssets.backVideo),
+                                        SizedBox(
+                                          width: AppSize.s20.w,
+                                        ),
+                                        Visibility(
+                                          visible: !logic.pause.value,
+                                          replacement:
+                                              // OpacityTransition(
+                                              //   visible: logic.pause.value,
+                                              // child:
 
-                                          GestureDetector(
+                                              GestureDetector(
+                                                  onTap: () {
+                                                    if (logic
+                                                            .videoEditorController !=
+                                                        null) {
+                                                      logic
+                                                          .videoEditorController!
+                                                          .video
+                                                          .pause();
+                                                      logic.pausePlayer();
+                                                    }
+                                                  },
+                                                  child:
+                                                      const Icon(Icons.pause)),
+                                          // ),
+                                          // child: OpacityTransition(
+                                          //   visible: !logic.pause.value,
+                                          child: GestureDetector(
                                               onTap: () {
                                                 if (logic
                                                         .videoEditorController !=
                                                     null) {
                                                   logic.videoEditorController!
                                                       .video
-                                                      .pause();
+                                                      .play();
                                                   logic.pausePlayer();
                                                 }
                                               },
-                                              child: const Icon(Icons.pause)),
-                                      // ),
-                                      // child: OpacityTransition(
-                                      //   visible: !logic.pause.value,
-                                      child: GestureDetector(
-                                          onTap: () {
-                                            if (logic.videoEditorController !=
-                                                null) {
-                                              logic.videoEditorController!.video
-                                                  .play();
-                                              logic.pausePlayer();
-                                            }
-                                          },
-                                          child: SvgPicture.asset(
-                                              ImageAssets.playVideo)),
-                                    ),
-                                    // ),
-                                    // GestureDetector(
-                                    //     onTap: () => logic.playandPause2(),
-                                    //     child: Visibility(
-                                    //         visible: !logic.pause.value,
-                                    //         replacement: Icon(Icons.pause),
-                                    //         child: SvgPicture.asset(
-                                    //             ImageAssets.playVideo))),
-                                    SizedBox(
-                                      width: AppSize.s20.w,
-                                    ),
-                                    GestureDetector(
-                                        // onTap: () => Get.to(() => CapCutEditor()),
-                                        child: SvgPicture.asset(
-                                            ImageAssets.forwardVideo)),
-                                  ],
-                                ),
-                                // SvgPicture.asset(ImageAssets.zoomIcon),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: AppSize.s20.h,
-                          ),
-                          Row(
-                            // shrinkWrap: true,
-                            // scrollDirection: Axis.horizontal,
-
-                            // direction: Axis.horizontal,
-                            // mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () => Get.toNamed(AppRoutes.addAudio),
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    SvgPicture.asset(ImageAssets.music),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
+                                              child: SvgPicture.asset(
+                                                  ImageAssets.playVideo)),
                                         ),
-                                        child: Icon(
-                                          Icons.add,
-                                          size: 14.sp,
+                                        // ),
+                                        // GestureDetector(
+                                        //     onTap: () => logic.playandPause2(),
+                                        //     child: Visibility(
+                                        //         visible: !logic.pause.value,
+                                        //         replacement: Icon(Icons.pause),
+                                        //         child: SvgPicture.asset(
+                                        //             ImageAssets.playVideo))),
+                                        SizedBox(
+                                          width: AppSize.s20.w,
                                         ),
-                                      ),
-                                    )
+                                        GestureDetector(
+                                            // onTap: () => Get.to(() => CapCutEditor()),
+                                            child: SvgPicture.asset(
+                                                ImageAssets.forwardVideo)),
+                                      ],
+                                    ),
+                                    // SvgPicture.asset(ImageAssets.zoomIcon),
                                   ],
                                 ),
                               ),
                               SizedBox(
-                                width: AppSize.s14.w,
+                                height: AppSize.s20.h,
                               ),
-                              // (logic.selectedAudio.value != null)
-                              // ?
-                              //     ? Expanded(child: LayoutBuilder(
-                              //         builder: (context, boxConstraints) {
-                              //         return Column(
-                              //           mainAxisAlignment:
-                              //               MainAxisAlignment.center,
-                              //           children: logic.trimSlider(context),
-                              //         );
-                              //       }))
+                              Row(
+                                // shrinkWrap: true,
+                                // scrollDirection: Axis.horizontal,
 
-                              logic.selectedAudio.value.id != null
-                                  ? Obx(() {
-                                      return SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width -
-                                                60,
-                                        height: 80,
-                                        child: WaveSlider(
-                                          duration: logic.playerController.value
-                                              .maxDuration
-                                              .toDouble(),
-                                          wavActiveColor:
-                                              ColorManager.subTitleCreateEvent,
-                                          callbackEnd: (pd) {
-                                            print(pd);
-                                          },
-                                          callbackStart: (ps) {
-                                            print(ps);
-                                          },
-                                          child: AudioFileWaveforms(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10.0, vertical: 5),
-                                            size: Size(
-                                                MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    1.23,
-                                                40),
-                                            playerController:
-                                                logic.playerController.value,
-                                            // enableSeekGesture: true,
-                                            continuousWaveform: false,
-                                            decoration: BoxDecoration(
-                                                color: const Color(0xffF15C89),
-                                                borderRadius:
-                                                    BorderRadius.circular(5)),
-                                            playerWaveStyle:
-                                                const PlayerWaveStyle(
-                                                    fixedWaveColor:
-                                                        Colors.white,
-                                                    liveWaveColor: Colors.blue,
-                                                    backgroundColor:
-                                                        ColorManager
-                                                            .moveSmoothColor),
-                                            waveformData: logic.playerController
-                                                .value.waveformData,
-                                            waveformType: WaveformType.long,
+                                // direction: Axis.horizontal,
+                                // mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () =>
+                                        Get.toNamed(AppRoutes.addAudio),
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.bottomRight,
+                                      children: [
+                                        SvgPicture.asset(ImageAssets.music),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white,
+                                            ),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 14.sp,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    })
-                                  : Expanded(
-                                      child: Container(
-                                      height: AppSize.s50.h,
-                                      color: const Color(0xffE8E8E8),
-                                      // child: AnimatedBuilder(
-                                      //   animation: logic.animationController,
-                                      //   builder: (context, child) {
-                                      //     return Row(
-                                      //       mainAxisAlignment: MainAxisAlignment.center,
-                                      //       children: List.generate(
-                                      //         logic.audioData.length,
-                                      //         (int index) {
-                                      //           return Container(
-                                      //             width: 5,
-                                      //             height: 30 + (logic.audioData[index] * 30),
-                                      //             margin: EdgeInsets.symmetric(horizontal: 2),
-                                      //             color: Colors.white,
-                                      //           );
-                                      //         },
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      // ),
-                                    )),
-                            ],
-                          ),
-                          // SizedBox(
-                          //   height: AppSize.s10.h,
-                          // ),
-                          // Row(
-                          //   children: [
-                          //     Stack(
-                          //       clipBehavior: Clip.hardEdge,
-                          //       fit: StackFit.loose,
-                          //       alignment: Alignment.bottomRight,
-                          //       // alignment: Alignment.bottomRight,
-                          //       children: [
-                          //         SvgPicture.asset(
-                          //           ImageAssets.music,
-                          //         ),
-                          //         GestureDetector(
-                          //           onTap: () => logic.pickFile(),
-                          //           child: Container(
-                          //             // margin: EdgeInsets.only(left: 5, top: 5),
-                          //             decoration: const BoxDecoration(
-                          //               shape: BoxShape.circle,
-                          //               color: Colors.white,
-                          //             ),
-                          //             child: Icon(
-                          //               Icons.add,
-                          //               size: 14.sp,
-                          //             ),
-                          //           ),
-                          //         )
-                          //       ],
-                          //     ),
-                          //     SizedBox(
-                          //       width: AppSize.s14.w,
-                          //     ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: AppSize.s14.w,
+                                  ),
+                                  // (logic.selectedAudio.value != null)
+                                  // ?
+                                  //     ? Expanded(child: LayoutBuilder(
+                                  //         builder: (context, boxConstraints) {
+                                  //         return Column(
+                                  //           mainAxisAlignment:
+                                  //               MainAxisAlignment.center,
+                                  //           children: logic.trimSlider(context),
+                                  //         );
+                                  //       }))
 
-                          /// [Audio] Row
-                          // Expanded(
-                          //   child: logic.isLoadingAudio
-                          //       ? Container(
-                          //           height: AppSize.s50.h,
-                          //           color: const Color(0xffE8E8E8),ƒ
-                          //           alignment: Alignment.topCenter,
-                          //           child: SizedBox(
-                          //               height: 5.h,
-                          //               child:
-                          //                   const LinearProgressIndicator(
-                          //                 backgroundColor:
-                          //                     Color(0xffF15C89),
-                          //               )))
-                          //       : Visibility(
-                          //           visible: !logic.progressVisibility,
-                          //           replacement: trimmer.TrimViewer(
-                          //             trimmer: logic.trimmer,
-                          //             viewerHeight: 50.h,
-                          //             maxAudioLength: logic.durationAudio,
-                          //             viewerWidth: Get.width,
-                          //             // durationStyle: DurationStyle.FORMAT_MM_SS,
-                          //             backgroundColor:
-                          //                 const Color(0xffF15C89),
-                          //             barColor: Colors.white,
-                          //             durationTextStyle: TextStyle(
-                          //                 color: Theme.of(context)
-                          //                     .primaryColor),
-                          //             allowAudioSelection: true,
-                          //             // editorProperties: TrimEditorProperties(
-                          //             //   circleSize: 10,
-                          //             //   borderPaintColor: Colors.pinkAccent,
-                          //             //   borderWidth: 4,
-                          //             //   borderRadius: 5,
-                          //             //   circlePaintColor: Colors.pink.shade400,
-                          //             // ),
-                          //             // areaProperties: TrimAreaProperties.edgeBlur(
-                          //             //     blurEdges: true, barFit: BoxFit.contain),
-                          //             onChangeStart: (value) =>
-                          //                 logic.startValueAudio = value,
-                          //             onChangeEnd: (value) =>
-                          //                 logic.endValueAudio = value,
-                          //             onChangePlaybackState: (value) {
-                          //               // if (mounted) {
-                          //               // setState(() => _isPlaying = value);
-                          //               // }
-                          //             },
-                          //           ),
-                          //           child: Container(
-                          //             height: AppSize.s50.h,
-                          //             color: const Color(0xffE8E8E8),
-                          //             // child: AudioFileWaveforms(
-                          //             //   size: Size(
-                          //             //       MediaQuery.of(context).size.width / 2, 70),
-                          //             //   playerController: logic.playerController,
-                          //             //   waveformType: WaveformType.fitWidth,
-                          //             //   decoration: BoxDecoration(
-                          //             //     color: Color(0xffF15C89),
-                          //             //   ),
-                          //             //   enableSeekGesture: true,
-                          //             //   continuousWaveform: true,
-                          //             //   animationDuration:
-                          //             //       const Duration(milliseconds: 200),
-                          //             //   playerWaveStyle: const PlayerWaveStyle(
-                          //             //       scaleFactor: 90,
-                          //             //       fixedWaveColor: Colors.black54,
-                          //             //       liveWaveColor: Colors.white,
-                          //             //       waveCap: StrokeCap.round,
-                          //             //       spacing: 5,
-                          //             //       showTop: true,
-                          //             //       showSeekLine: true,
-                          //             //       seekLineColor: Colors.yellow,
-                          //             //       seekLineThickness: 5,
-                          //             //       showBottom: true),
-                          //             // ),
-                          //           ),
-                          //         ),
-                          // )
-                          // // Expanded(
-                          //   child: WaveVisualizer(
-                          //     audioUrl: _isPlaying ? _filePath : null,
-                          //     isPlaying: _isPlaying,
-                          //   ),
-                          // ),
-                          // Expanded(
-                          //     child: Container(
-                          //   height: AppSize.s50.h,
-                          //   color: Color(0xffF15C89),
-                          //   // child: AnimatedBuilder(
-                          //   //   animation: logic.animationController,
-                          //   //   builder: (context, child) {
-                          //   //     return Row(
-                          //   //       mainAxisAlignment: MainAxisAlignment.center,
-                          //   //       children: List.generate(
-                          //   //         logic.audioData.length,
-                          //   //         (int index) {
-                          //   //           return Container(
-                          //   //             width: 5,
-                          //   //             height: 30 + (logic.audioData[index] * 30),
-                          //   //             margin: EdgeInsets.symmetric(horizontal: 2),
-                          //   //             color: Colors.white,
-                          //   //           );
-                          //   //         },
-                          //   //       ),
-                          //   //     );
-                          //   //   },
-                          //   // ),
-                          // ))
-                          //   ],
-                          // ),
-                          SizedBox(
-                            height: AppSize.s10.h,
-                          ),
-
-                          /// [Text] Row
-
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  logic.showTextOverlayDialog(context);
-                                },
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    SvgPicture.asset(ImageAssets.text),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
-                                        ),
-                                        child: Icon(
-                                          Icons.add,
-                                          size: 14.sp,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: AppSize.s14.w,
-                              ),
-                              Obx(() {
-                                return logic.textOverlays.isNotEmpty == true
-                                    ? Expanded(
-                                        child: Container(
+                                  logic.selectedAudio.value.id != null
+                                      ? Obx(() {
+                                          return Stack(
+                                            children: [
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width -
+                                                    60,
+                                                height: 80,
+                                                child: WaveSlider(
+                                                  duration: logic
+                                                      .playerController
+                                                      .value
+                                                      .maxDuration
+                                                      .toDouble(),
+                                                  wavActiveColor: ColorManager
+                                                      .subTitleCreateEvent,
+                                                  callbackEnd: (pd) {
+                                                    print(pd);
+                                                  },
+                                                  callbackStart: (ps) {
+                                                    print(ps);
+                                                  },
+                                                  child: AudioFileWaveforms(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 10.0,
+                                                        vertical: 5),
+                                                    size: Size(
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width /
+                                                            1.23,
+                                                        40),
+                                                    playerController: logic
+                                                        .playerController.value,
+                                                    // enableSeekGesture: true,
+                                                    continuousWaveform: false,
+                                                    decoration: BoxDecoration(
+                                                        color: const Color(
+                                                            0xffF15C89),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5)),
+                                                    playerWaveStyle:
+                                                        const PlayerWaveStyle(
+                                                            fixedWaveColor:
+                                                                Colors.white,
+                                                            liveWaveColor:
+                                                                Colors.blue,
+                                                            backgroundColor:
+                                                                ColorManager
+                                                                    .moveSmoothColor),
+                                                    waveformData: logic
+                                                        .playerController
+                                                        .value
+                                                        .waveformData,
+                                                    waveformType:
+                                                        WaveformType.long,
+                                                  ),
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: 35.0,
+                                                right: 5.0,
+                                                child: InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        logic.selectedAudio
+                                                                .value =
+                                                            AudioModel();
+                                                      });
+                                                    },
+                                                    child: Container(
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        color: ColorManager
+                                                            .moveSmoothColor,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: const Icon(
+                                                        Icons.close,
+                                                        size: 20,
+                                                      ),
+                                                    )),
+                                              )
+                                            ],
+                                          );
+                                        })
+                                      : Expanded(
+                                          child: Container(
+                                          height: AppSize.s50.h,
                                           color: const Color(0xffE8E8E8),
-                                          // height: 60,
-                                          child: ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount:
-                                                logic.textOverlays.length,
-                                            padding: EdgeInsets.zero,
-                                            // onReorder: (oldIndex, newIndex) {
-                                            //   setState(() {
-                                            //     if (newIndex > oldIndex) {
-                                            //       newIndex -= 1;
-                                            //     }
-                                            //     final item = logic.textOverlays
-                                            //         .removeAt(oldIndex);
-                                            //     logic.textOverlays
-                                            //         .insert(newIndex, item);
-                                            //   });
-                                            // },
-                                            scrollDirection: Axis.vertical,
-                                            itemBuilder: (context, index) {
-                                              return Container(
-                                                // width: Get.width * 0.5,
+                                          // child: AnimatedBuilder(
+                                          //   animation: logic.animationController,
+                                          //   builder: (context, child) {
+                                          //     return Row(
+                                          //       mainAxisAlignment: MainAxisAlignment.center,
+                                          //       children: List.generate(
+                                          //         logic.audioData.length,
+                                          //         (int index) {
+                                          //           return Container(
+                                          //             width: 5,
+                                          //             height: 30 + (logic.audioData[index] * 30),
+                                          //             margin: EdgeInsets.symmetric(horizontal: 2),
+                                          //             color: Colors.white,
+                                          //           );
+                                          //         },
+                                          //       ),
+                                          //     );
+                                          //   },
+                                          // ),
+                                        )),
+                                ],
+                              ),
+                              // SizedBox(
+                              //   height: AppSize.s10.h,
+                              // ),
+                              // Row(
+                              //   children: [
+                              //     Stack(
+                              //       clipBehavior: Clip.hardEdge,
+                              //       fit: StackFit.loose,
+                              //       alignment: Alignment.bottomRight,
+                              //       // alignment: Alignment.bottomRight,
+                              //       children: [
+                              //         SvgPicture.asset(
+                              //           ImageAssets.music,
+                              //         ),
+                              //         GestureDetector(
+                              //           onTap: () => logic.pickFile(),
+                              //           child: Container(
+                              //             // margin: EdgeInsets.only(left: 5, top: 5),
+                              //             decoration: const BoxDecoration(
+                              //               shape: BoxShape.circle,
+                              //               color: Colors.white,
+                              //             ),
+                              //             child: Icon(
+                              //               Icons.add,
+                              //               size: 14.sp,
+                              //             ),
+                              //           ),
+                              //         )
+                              //       ],
+                              //     ),
+                              //     SizedBox(
+                              //       width: AppSize.s14.w,
+                              //     ),
 
-                                                margin: EdgeInsets.symmetric(
-                                                    vertical: 5.h),
-                                                key: Key(
-                                                    '$index-${logic.textOverlays[index]}'),
-                                                child: AnimatedBuilder(
-                                                    animation:
-                                                        Listenable.merge([
-                                                      logic
-                                                          .videoEditorController,
-                                                      logic
-                                                          .videoEditorController
-                                                          ?.video,
-                                                    ]),
-                                                    builder: (_, __) {
-                                                      final duration = logic
-                                                          .videoEditorController
-                                                          ?.videoDuration;
-                                                      if (logic
-                                                              .videoEditorController !=
-                                                          null) {
-                                                        final posSeconds = logic
-                                                                .videoEditorController!
-                                                                .trimPosition *
-                                                            duration!.inSeconds;
-                                                        final posMin = logic
-                                                                .videoEditorController!
-                                                                .trimPosition *
-                                                            duration.inMinutes;
-                                                      }
-                                                      return WaveSlider(
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        heightWaveSlider: 60,
-                                                        widthWaveSlider:
-                                                            Get.width - 100,
-                                                        sliderColor:
-                                                            Colors.black,
-                                                        duration: logic
-                                                                    .videoEditorController !=
-                                                                null
-                                                            ? logic
-                                                                .videoEditorController!
-                                                                .videoDuration
-                                                                .inMilliseconds
-                                                                .toDouble()
-                                                            : 10,
-                                                        callbackStart:
-                                                            (duration) {
+                              /// [Audio] Row
+                              // Expanded(
+                              //   child: logic.isLoadingAudio
+                              //       ? Container(
+                              //           height: AppSize.s50.h,
+                              //           color: const Color(0xffE8E8E8),ƒ
+                              //           alignment: Alignment.topCenter,
+                              //           child: SizedBox(
+                              //               height: 5.h,
+                              //               child:
+                              //                   const LinearProgressIndicator(
+                              //                 backgroundColor:
+                              //                     Color(0xffF15C89),
+                              //               )))
+                              //       : Visibility(
+                              //           visible: !logic.progressVisibility,
+                              //           replacement: trimmer.TrimViewer(
+                              //             trimmer: logic.trimmer,
+                              //             viewerHeight: 50.h,
+                              //             maxAudioLength: logic.durationAudio,
+                              //             viewerWidth: Get.width,
+                              //             // durationStyle: DurationStyle.FORMAT_MM_SS,
+                              //             backgroundColor:
+                              //                 const Color(0xffF15C89),
+                              //             barColor: Colors.white,
+                              //             durationTextStyle: TextStyle(
+                              //                 color: Theme.of(context)
+                              //                     .primaryColor),
+                              //             allowAudioSelection: true,
+                              //             // editorProperties: TrimEditorProperties(
+                              //             //   circleSize: 10,
+                              //             //   borderPaintColor: Colors.pinkAccent,
+                              //             //   borderWidth: 4,
+                              //             //   borderRadius: 5,
+                              //             //   circlePaintColor: Colors.pink.shade400,
+                              //             // ),
+                              //             // areaProperties: TrimAreaProperties.edgeBlur(
+                              //             //     blurEdges: true, barFit: BoxFit.contain),
+                              //             onChangeStart: (value) =>
+                              //                 logic.startValueAudio = value,
+                              //             onChangeEnd: (value) =>
+                              //                 logic.endValueAudio = value,
+                              //             onChangePlaybackState: (value) {
+                              //               // if (mounted) {
+                              //               // setState(() => _isPlaying = value);
+                              //               // }
+                              //             },
+                              //           ),
+                              //           child: Container(
+                              //             height: AppSize.s50.h,
+                              //             color: const Color(0xffE8E8E8),
+                              //             // child: AudioFileWaveforms(
+                              //             //   size: Size(
+                              //             //       MediaQuery.of(context).size.width / 2, 70),
+                              //             //   playerController: logic.playerController,
+                              //             //   waveformType: WaveformType.fitWidth,
+                              //             //   decoration: BoxDecoration(
+                              //             //     color: Color(0xffF15C89),
+                              //             //   ),
+                              //             //   enableSeekGesture: true,
+                              //             //   continuousWaveform: true,
+                              //             //   animationDuration:
+                              //             //       const Duration(milliseconds: 200),
+                              //             //   playerWaveStyle: const PlayerWaveStyle(
+                              //             //       scaleFactor: 90,
+                              //             //       fixedWaveColor: Colors.black54,
+                              //             //       liveWaveColor: Colors.white,
+                              //             //       waveCap: StrokeCap.round,
+                              //             //       spacing: 5,
+                              //             //       showTop: true,
+                              //             //       showSeekLine: true,
+                              //             //       seekLineColor: Colors.yellow,
+                              //             //       seekLineThickness: 5,
+                              //             //       showBottom: true),
+                              //             // ),
+                              //           ),
+                              //         ),
+                              // )
+                              // // Expanded(
+                              //   child: WaveVisualizer(
+                              //     audioUrl: _isPlaying ? _filePath : null,
+                              //     isPlaying: _isPlaying,
+                              //   ),
+                              // ),
+                              // Expanded(
+                              //     child: Container(
+                              //   height: AppSize.s50.h,
+                              //   color: Color(0xffF15C89),
+                              //   // child: AnimatedBuilder(
+                              //   //   animation: logic.animationController,
+                              //   //   builder: (context, child) {
+                              //   //     return Row(
+                              //   //       mainAxisAlignment: MainAxisAlignment.center,
+                              //   //       children: List.generate(
+                              //   //         logic.audioData.length,
+                              //   //         (int index) {
+                              //   //           return Container(
+                              //   //             width: 5,
+                              //   //             height: 30 + (logic.audioData[index] * 30),
+                              //   //             margin: EdgeInsets.symmetric(horizontal: 2),
+                              //   //             color: Colors.white,
+                              //   //           );
+                              //   //         },
+                              //   //       ),
+                              //   //     );
+                              //   //   },
+                              //   // ),
+                              // ))
+                              //   ],
+                              // ),
+                              SizedBox(
+                                height: AppSize.s10.h,
+                              ),
+
+                              /// [Text] Row
+
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      logic.showTextOverlayDialog(context);
+                                    },
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.bottomRight,
+                                      children: [
+                                        SvgPicture.asset(ImageAssets.text),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white,
+                                            ),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 14.sp,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: AppSize.s14.w,
+                                  ),
+                                  Obx(() {
+                                    return logic.textOverlays.isNotEmpty == true
+                                        ? Expanded(
+                                            child: Container(
+                                              color: const Color(0xffE8E8E8),
+                                              // height: 60,
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount:
+                                                    logic.textOverlays.length,
+                                                padding: EdgeInsets.zero,
+                                                // onReorder: (oldIndex, newIndex) {
+                                                //   setState(() {
+                                                //     if (newIndex > oldIndex) {
+                                                //       newIndex -= 1;
+                                                //     }
+                                                //     final item = logic.textOverlays
+                                                //         .removeAt(oldIndex);
+                                                //     logic.textOverlays
+                                                //         .insert(newIndex, item);
+                                                //   });
+                                                // },
+                                                scrollDirection: Axis.vertical,
+                                                itemBuilder: (context, index) {
+                                                  return Container(
+                                                    // width: Get.width * 0.5,
+
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 5.h),
+                                                    key: Key(
+                                                        '$index-${logic.textOverlays[index]}'),
+                                                    child: AnimatedBuilder(
+                                                        animation:
+                                                            Listenable.merge([
                                                           logic
-                                                              .textOverlays[
-                                                                  index]
-                                                              .startTime;
-                                                          print(
-                                                              "Start $duration");
-                                                        },
-                                                        callbackEnd:
-                                                            (duration) {
+                                                              .videoEditorController,
                                                           logic
-                                                              .textOverlays[
-                                                                  index]
-                                                              .endTime;
-                                                          print(
-                                                              "End $duration");
-                                                        },
-                                                        // minTrimDuration: 0.5,
-                                                        // start: logic
-                                                        //     .videoEditorController!
-                                                        //     .minTrim,
-                                                        // end: logic.videoEditorController!
-                                                        //     .minTrim,
-                                                        // onTrimUpdate: (start, end) {
-                                                        //   print("Start ${start * 100}");
-                                                        //   print("Start ${start}");
-                                                        //   // _start =
-                                                        //   //     start; // Assign the updated values to _start and _end
-                                                        //   // _end = end; // variables
-                                                        //   print('end ${end * 100}');
-                                                        // },
-                                                        child:
-                                                            AnimatedContainer(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      300),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: logic
-                                                                .textOverlays[
-                                                                    index]
-                                                                .textColor,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        AppSize
-                                                                            .s5
-                                                                            .r),
-                                                            border: logic
+                                                              .videoEditorController
+                                                              ?.video,
+                                                        ]),
+                                                        builder: (_, __) {
+                                                          final duration = logic
+                                                              .videoEditorController
+                                                              ?.videoDuration;
+                                                          if (logic
+                                                                  .videoEditorController !=
+                                                              null) {
+                                                            final posSeconds = logic
+                                                                    .videoEditorController!
+                                                                    .trimPosition *
+                                                                duration!
+                                                                    .inSeconds;
+                                                            final posMin = logic
+                                                                    .videoEditorController!
+                                                                    .trimPosition *
+                                                                duration
+                                                                    .inMinutes;
+                                                          }
+                                                          return WaveSlider(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            heightWaveSlider:
+                                                                60,
+                                                            widthWaveSlider:
+                                                                Get.width - 100,
+                                                            sliderColor:
+                                                                Colors.black,
+                                                            duration: logic
+                                                                        .videoEditorController !=
+                                                                    null
+                                                                ? logic
+                                                                    .videoEditorController!
+                                                                    .videoDuration
+                                                                    .inMilliseconds
+                                                                    .toDouble()
+                                                                : 10,
+                                                            callbackStart:
+                                                                (duration) {
+                                                              logic
+                                                                  .textOverlays[
+                                                                      index]
+                                                                  .startTime;
+                                                              print(
+                                                                  "Start $duration");
+                                                            },
+                                                            callbackEnd:
+                                                                (duration) {
+                                                              logic
+                                                                  .textOverlays[
+                                                                      index]
+                                                                  .endTime;
+                                                              print(
+                                                                  "End $duration");
+                                                            },
+                                                            // minTrimDuration: 0.5,
+                                                            // start: logic
+                                                            //     .videoEditorController!
+                                                            //     .minTrim,
+                                                            // end: logic.videoEditorController!
+                                                            //     .minTrim,
+                                                            // onTrimUpdate: (start, end) {
+                                                            //   print("Start ${start * 100}");
+                                                            //   print("Start ${start}");
+                                                            //   // _start =
+                                                            //   //     start; // Assign the updated values to _start and _end
+                                                            //   // _end = end; // variables
+                                                            //   print('end ${end * 100}');
+                                                            // },
+                                                            child:
+                                                                AnimatedContainer(
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          300),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: logic
                                                                     .textOverlays[
                                                                         index]
-                                                                    .isSelected
-                                                                ? Border.all(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    width: 1)
-                                                                : null,
-                                                          ),
-                                                          child: Container(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    AppSize
-                                                                        .s8.h),
-                                                            alignment: Alignment
-                                                                .center,
-                                                            child: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .center,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Expanded(
-                                                                  child:
-                                                                      SvgPicture
-                                                                          .asset(
-                                                                    ImageAssets
-                                                                        .text,
-                                                                    color: Colors
-                                                                        .white,
-                                                                  ),
-                                                                ),
-                                                                Expanded(
-                                                                  child: Text(
-                                                                    logic
+                                                                    .textColor,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(AppSize
+                                                                            .s5
+                                                                            .r),
+                                                                border: logic
                                                                         .textOverlays[
                                                                             index]
-                                                                        .text,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .clip,
-                                                                    softWrap:
-                                                                        false,
-                                                                    style: const TextStyle(
+                                                                        .isSelected
+                                                                    ? Border.all(
                                                                         color: Colors
-                                                                            .white),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      )
-                                    : Expanded(
-                                        child: Container(
-                                        height: AppSize.s50.h,
-                                        color: const Color(0xffE8E8E8),
-                                        // child: AnimatedBuilder(
-                                        //   animation: logic.animationController,
-                                        //   builder: (context, child) {
-                                        //     return Row(
-                                        //       mainAxisAlignment: MainAxisAlignment.center,
-                                        //       children: List.generate(
-                                        //         logic.audioData.length,
-                                        //         (int index) {
-                                        //           return Container(
-                                        //             width: 5,
-                                        //             height: 30 + (logic.audioData[index] * 30),
-                                        //             margin: EdgeInsets.symmetric(horizontal: 2),
-                                        //             color: Colors.white,
-                                        //           );
-                                        //         },
-                                        //       ),
-                                        //     );
-                                        //   },
-                                        // ),
-                                      ));
-                              })
-                            ],
-                          ),
-                          SizedBox(
-                            height: AppSize.s10.h,
-                          ),
-
-                          /// [Image] Row
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  logic.pickFileImage();
-                                },
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    SvgPicture.asset(ImageAssets.image),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
-                                        ),
-                                        child: Icon(
-                                          Icons.add,
-                                          size: 14.sp,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: AppSize.s14.w,
-                              ),
-                              Obx(() {
-                                return logic.imageOverlays.isNotEmpty == true
-                                    ? Expanded(
-                                        child: Container(
-                                          color: const Color(0xffE8E8E8),
-                                          height: 50.h,
-                                          child: ReorderableListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount:
-                                                logic.imageOverlays.length,
-                                            padding: EdgeInsets.zero,
-                                            onReorder: (oldIndex, newIndex) {
-                                              setState(() {
-                                                if (newIndex > oldIndex)
-                                                  newIndex -= 1;
-                                                final item = logic.imageOverlays
-                                                    .removeAt(oldIndex);
-                                                logic.imageOverlays
-                                                    .insert(newIndex, item);
-                                              });
-                                            },
-                                            scrollDirection: Axis.horizontal,
-                                            itemBuilder: (context, index) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  logic.selectedImage(logic
-                                                      .imageOverlays[index]);
-                                                },
-                                                key: Key(
-                                                    '$index-${logic.imageOverlays[index]}'),
-                                                child: WaveSlider(
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  heightWaveSlider: 60,
-                                                  widthWaveSlider: Get.width,
-                                                  sliderColor: Colors.black,
-                                                  duration: logic
-                                                              .videoEditorController !=
-                                                          null
-                                                      ? logic
-                                                          .videoEditorController!
-                                                          .videoDuration
-                                                          .inMilliseconds
-                                                          .toDouble()
-                                                      : 14,
-                                                  callbackStart: (duration) {
-                                                    logic.imageOverlays[index]
-                                                        .startRange = duration;
-                                                    print("Start $duration");
-                                                  },
-                                                  callbackEnd: (duration) {
-                                                    logic.imageOverlays[index]
-                                                        .endRange = duration;
-
-                                                    print("End $duration");
-                                                  },
-                                                  child: Image.file(File(logic
-                                                      .imageOverlays[index]
-                                                      .selectedImage!)),
-                                                ),
-                                                // child: Stack(
-                                                //   alignment: Alignment.center,
-                                                //   children: [
-                                                //     Image.file(File(logic
-                                                //         .imageOverlays[index]
-                                                //         .selectedImage!)),
-                                                //     WidthRangeSliderScreen(
-                                                //         values: SfRangeValues(
-                                                //             logic.imageOverlays[index]
-                                                //                 .startRange,
-                                                //             logic.imageOverlays[index]
-                                                //                 .endRange)),
-                                                //   ],
-                                                // ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      )
-                                    : Expanded(
-                                        child: Container(
-                                        height: AppSize.s50.h,
-                                        color: const Color(0xffE8E8E8),
-
-                                        // child: AnimatedBuilder(
-                                        //   animation: logic.animationController,
-                                        //   builder: (context, child) {
-                                        //     return Row(
-                                        //       mainAxisAlignment: MainAxisAlignment.center,
-                                        //       children: List.generate(
-                                        //         logic.audioData.length,
-                                        //         (int index) {
-                                        //           return Container(
-                                        //             width: 5,
-                                        //             height: 30 + (logic.audioData[index] * 30),
-                                        //             margin: EdgeInsets.symmetric(horizontal: 2),
-                                        //             color: Colors.white,
-                                        //           );
-                                        //         },
-                                        //       ),
-                                        //     );
-                                        //   },
-                                        // ),
-                                      ));
-                              })
-                            ],
-                          ),
-                          SizedBox(
-                            height: AppSize.s10.h,
-                          ),
-                          Row(
-                            // shrinkWrap: true,
-                            // scrollDirection: Axis.horizontal,
-
-                            // direction: Axis.horizontal,
-                            // mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () => logic.pickFileVideo(context),
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    SvgPicture.asset(ImageAssets.video),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
-                                        ),
-                                        child: Icon(
-                                          Icons.add,
-                                          size: 14.sp,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: AppSize.s14.w,
-                              ),
-                              (logic.videoEditorController != null &&
-                                      logic.videoEditorController!.initialized)
-                                  ? Expanded(child: LayoutBuilder(
-                                      builder: (context, boxConstraints) {
-                                      return Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: logic.trimSlider(context),
-                                      );
-                                    }))
-                                  : Expanded(
-                                      child: Container(
-                                      height: AppSize.s50.h,
-                                      color: const Color(0xffE8E8E8),
-                                      // child: AnimatedBuilder(
-                                      //   animation: logic.animationController,
-                                      //   builder: (context, child) {
-                                      //     return Row(
-                                      //       mainAxisAlignment: MainAxisAlignment.center,
-                                      //       children: List.generate(
-                                      //         logic.audioData.length,
-                                      //         (int index) {
-                                      //           return Container(
-                                      //             width: 5,
-                                      //             height: 30 + (logic.audioData[index] * 30),
-                                      //             margin: EdgeInsets.symmetric(horizontal: 2),
-                                      //             color: Colors.white,
-                                      //           );
-                                      //         },
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      // ),
-                                    )),
-                            ],
-                          ),
-                          SizedBox(
-                            height: AppSize.s10.h,
-                          ),
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  logic.showCharacterOverlayDialog(context);
-                                },
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  alignment: Alignment.bottomRight,
-                                  children: [
-                                    Image.asset(
-                                      ImageAssets.character,
-                                      width: 25.0,
-                                    ),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
-                                        ),
-                                        child: Icon(
-                                          Icons.add,
-                                          size: 14.sp,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: AppSize.s14.w,
-                              ),
-                              Obx(() {
-                                return logic.textOverlays.isNotEmpty == true
-                                    ? Expanded(
-                                        child: Container(
-                                          color: const Color(0xffE8E8E8),
-                                          // height: 60,
-                                          child: ReorderableListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount:
-                                                logic.textOverlays.length,
-                                            padding: EdgeInsets.zero,
-                                            onReorder: (oldIndex, newIndex) {
-                                              setState(() {
-                                                if (newIndex > oldIndex) {
-                                                  newIndex -= 1;
-                                                }
-                                                final item = logic.textOverlays
-                                                    .removeAt(oldIndex);
-                                                logic.textOverlays
-                                                    .insert(newIndex, item);
-                                              });
-                                            },
-                                            scrollDirection: Axis.vertical,
-                                            itemBuilder: (context, index) {
-                                              return Container(
-                                                // width: Get.width * 0.5,
-                                                margin: EdgeInsets.symmetric(
-                                                    vertical: 5.h),
-                                                key: Key(
-                                                    '$index-${logic.textOverlays[index]}'),
-                                                child: AnimatedBuilder(
-                                                    animation:
-                                                        Listenable.merge([
-                                                      logic
-                                                          .videoEditorController,
-                                                      logic
-                                                          .videoEditorController
-                                                          ?.video,
-                                                    ]),
-                                                    builder: (_, __) {
-                                                      final duration = logic
-                                                          .videoEditorController
-                                                          ?.videoDuration;
-                                                      if (logic
-                                                              .videoEditorController !=
-                                                          null) {
-                                                        final posSeconds = logic
-                                                                .videoEditorController!
-                                                                .trimPosition *
-                                                            duration!.inSeconds;
-                                                        final posMin = logic
-                                                                .videoEditorController!
-                                                                .trimPosition *
-                                                            duration.inMinutes;
-                                                      }
-                                                      return WaveSlider(
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        heightWaveSlider: 60,
-                                                        widthWaveSlider:
-                                                            Get.width,
-                                                        sliderColor:
-                                                            Colors.black,
-                                                        duration: logic
-                                                                    .videoEditorController !=
-                                                                null
-                                                            ? logic
-                                                                .videoEditorController!
-                                                                .videoDuration
-                                                                .inMilliseconds
-                                                                .toDouble()
-                                                            : 10,
-                                                        callbackStart:
-                                                            (duration) {
-                                                          logic
-                                                              .textOverlays[
-                                                                  index]
-                                                              .startTime;
-                                                          print(
-                                                              "Start $duration");
-                                                        },
-                                                        callbackEnd:
-                                                            (duration) {
-                                                          logic
-                                                              .textOverlays[
-                                                                  index]
-                                                              .endTime;
-                                                          print(
-                                                              "End $duration");
-                                                        },
-                                                        // minTrimDuration: 0.5,
-                                                        // start: logic
-                                                        //     .videoEditorController!
-                                                        //     .minTrim,
-                                                        // end: logic.videoEditorController!
-                                                        //     .minTrim,
-                                                        // onTrimUpdate: (start, end) {
-                                                        //   print("Start ${start * 100}");
-                                                        //   print("Start ${start}");
-                                                        //   // _start =
-                                                        //   //     start; // Assign the updated values to _start and _end
-                                                        //   // _end = end; // variables
-                                                        //   print('end ${end * 100}');
-                                                        // },
-                                                        child:
-                                                            AnimatedContainer(
-                                                          duration:
-                                                              const Duration(
-                                                                  milliseconds:
-                                                                      300),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: logic
-                                                                .textOverlays[
-                                                                    index]
-                                                                .textColor,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        AppSize
-                                                                            .s5
-                                                                            .r),
-                                                            border: logic
-                                                                    .textOverlays[
-                                                                        index]
-                                                                    .isSelected
-                                                                ? Border.all(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    width: 1)
-                                                                : null,
-                                                          ),
-                                                          child: Stack(
-                                                            clipBehavior:
-                                                                Clip.none,
-                                                            alignment: Alignment
-                                                                .center,
-                                                            children: [
-                                                              Container(
+                                                                            .black,
+                                                                        width:
+                                                                            1)
+                                                                    : null,
+                                                              ),
+                                                              child: Container(
                                                                 padding:
                                                                     EdgeInsets.all(
                                                                         AppSize
@@ -1636,217 +1225,711 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                                                   ],
                                                                 ),
                                                               ),
+                                                            ),
+                                                          );
+                                                        }),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          )
+                                        : Expanded(
+                                            child: Container(
+                                            height: AppSize.s50.h,
+                                            color: const Color(0xffE8E8E8),
+                                            // child: AnimatedBuilder(
+                                            //   animation: logic.animationController,
+                                            //   builder: (context, child) {
+                                            //     return Row(
+                                            //       mainAxisAlignment: MainAxisAlignment.center,
+                                            //       children: List.generate(
+                                            //         logic.audioData.length,
+                                            //         (int index) {
+                                            //           return Container(
+                                            //             width: 5,
+                                            //             height: 30 + (logic.audioData[index] * 30),
+                                            //             margin: EdgeInsets.symmetric(horizontal: 2),
+                                            //             color: Colors.white,
+                                            //           );
+                                            //         },
+                                            //       ),
+                                            //     );
+                                            //   },
+                                            // ),
+                                          ));
+                                  })
+                                ],
+                              ),
+                              SizedBox(
+                                height: AppSize.s10.h,
+                              ),
+
+                              /// [Image] Row
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      logic.pickFileImage();
+                                    },
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.bottomRight,
+                                      children: [
+                                        SvgPicture.asset(ImageAssets.image),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white,
+                                            ),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 14.sp,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: AppSize.s14.w,
+                                  ),
+                                  Obx(() {
+                                    return logic.imageOverlays.isNotEmpty ==
+                                            true
+                                        ? Expanded(
+                                            child: Container(
+                                              color: const Color(0xffE8E8E8),
+                                              height: 50.h,
+                                              child:
+                                                  ReorderableListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount:
+                                                    logic.imageOverlays.length,
+                                                padding: EdgeInsets.zero,
+                                                onReorder:
+                                                    (oldIndex, newIndex) {
+                                                  setState(() {
+                                                    if (newIndex > oldIndex)
+                                                      newIndex -= 1;
+                                                    final item = logic
+                                                        .imageOverlays
+                                                        .removeAt(oldIndex);
+                                                    logic.imageOverlays
+                                                        .insert(newIndex, item);
+                                                  });
+                                                },
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemBuilder: (context, index) {
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      logic.selectedImage(
+                                                          logic.imageOverlays[
+                                                              index]);
+                                                    },
+                                                    key: Key(
+                                                        '$index-${logic.imageOverlays[index]}'),
+                                                    child: WaveSlider(
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      heightWaveSlider: 60,
+                                                      widthWaveSlider:
+                                                          Get.width,
+                                                      sliderColor: Colors.black,
+                                                      duration: logic
+                                                                  .videoEditorController !=
+                                                              null
+                                                          ? logic
+                                                              .videoEditorController!
+                                                              .videoDuration
+                                                              .inMilliseconds
+                                                              .toDouble()
+                                                          : 14,
+                                                      callbackStart:
+                                                          (duration) {
+                                                        logic
+                                                                .imageOverlays[
+                                                                    index]
+                                                                .startRange =
+                                                            duration;
+                                                        print(
+                                                            "Start $duration");
+                                                      },
+                                                      callbackEnd: (duration) {
+                                                        logic
+                                                                .imageOverlays[
+                                                                    index]
+                                                                .endRange =
+                                                            duration;
+
+                                                        print("End $duration");
+                                                      },
+                                                      child: Image.file(File(
+                                                          logic
+                                                              .imageOverlays[
+                                                                  index]
+                                                              .selectedImage!)),
+                                                    ),
+                                                    // child: Stack(
+                                                    //   alignment: Alignment.center,
+                                                    //   children: [
+                                                    //     Image.file(File(logic
+                                                    //         .imageOverlays[index]
+                                                    //         .selectedImage!)),
+                                                    //     WidthRangeSliderScreen(
+                                                    //         values: SfRangeValues(
+                                                    //             logic.imageOverlays[index]
+                                                    //                 .startRange,
+                                                    //             logic.imageOverlays[index]
+                                                    //                 .endRange)),
+                                                    //   ],
+                                                    // ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          )
+                                        : Expanded(
+                                            child: Container(
+                                            height: AppSize.s50.h,
+                                            color: const Color(0xffE8E8E8),
+
+                                            // child: AnimatedBuilder(
+                                            //   animation: logic.animationController,
+                                            //   builder: (context, child) {
+                                            //     return Row(
+                                            //       mainAxisAlignment: MainAxisAlignment.center,
+                                            //       children: List.generate(
+                                            //         logic.audioData.length,
+                                            //         (int index) {
+                                            //           return Container(
+                                            //             width: 5,
+                                            //             height: 30 + (logic.audioData[index] * 30),
+                                            //             margin: EdgeInsets.symmetric(horizontal: 2),
+                                            //             color: Colors.white,
+                                            //           );
+                                            //         },
+                                            //       ),
+                                            //     );
+                                            //   },
+                                            // ),
+                                          ));
+                                  })
+                                ],
+                              ),
+                              SizedBox(
+                                height: AppSize.s10.h,
+                              ),
+                              Row(
+                                // shrinkWrap: true,
+                                // scrollDirection: Axis.horizontal,
+
+                                // direction: Axis.horizontal,
+                                // mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => logic.pickFileVideo(context),
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.bottomRight,
+                                      children: [
+                                        SvgPicture.asset(ImageAssets.video),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white,
+                                            ),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 14.sp,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: AppSize.s14.w,
+                                  ),
+                                  (logic.videoEditorController != null &&
+                                          logic.videoEditorController!
+                                              .initialized)
+                                      ? Expanded(child: LayoutBuilder(
+                                          builder: (context, boxConstraints) {
+                                          return Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: logic.trimSlider(context),
+                                          );
+                                        }))
+                                      : Expanded(
+                                          child: Container(
+                                          height: AppSize.s50.h,
+                                          color: const Color(0xffE8E8E8),
+                                          // child: AnimatedBuilder(
+                                          //   animation: logic.animationController,
+                                          //   builder: (context, child) {
+                                          //     return Row(
+                                          //       mainAxisAlignment: MainAxisAlignment.center,
+                                          //       children: List.generate(
+                                          //         logic.audioData.length,
+                                          //         (int index) {
+                                          //           return Container(
+                                          //             width: 5,
+                                          //             height: 30 + (logic.audioData[index] * 30),
+                                          //             margin: EdgeInsets.symmetric(horizontal: 2),
+                                          //             color: Colors.white,
+                                          //           );
+                                          //         },
+                                          //       ),
+                                          //     );
+                                          //   },
+                                          // ),
+                                        )),
+                                ],
+                              ),
+                              SizedBox(
+                                height: AppSize.s10.h,
+                              ),
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      logic.showCharacterOverlayDialog(context);
+                                    },
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.bottomRight,
+                                      children: [
+                                        Image.asset(
+                                          ImageAssets.character,
+                                          width: 25.0,
+                                        ),
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white,
+                                            ),
+                                            child: Icon(
+                                              Icons.add,
+                                              size: 14.sp,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: AppSize.s14.w,
+                                  ),
+                                  Obx(() {
+                                    return logic.textOverlays.isNotEmpty == true
+                                        ? Expanded(
+                                            child: Container(
+                                              color: const Color(0xffE8E8E8),
+                                              // height: 60,
+                                              child:
+                                                  ReorderableListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount:
+                                                    logic.textOverlays.length,
+                                                padding: EdgeInsets.zero,
+                                                onReorder:
+                                                    (oldIndex, newIndex) {
+                                                  setState(() {
+                                                    if (newIndex > oldIndex) {
+                                                      newIndex -= 1;
+                                                    }
+                                                    final item = logic
+                                                        .textOverlays
+                                                        .removeAt(oldIndex);
+                                                    logic.textOverlays
+                                                        .insert(newIndex, item);
+                                                  });
+                                                },
+                                                scrollDirection: Axis.vertical,
+                                                itemBuilder: (context, index) {
+                                                  return Container(
+                                                    // width: Get.width * 0.5,
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 5.h),
+                                                    key: Key(
+                                                        '$index-${logic.textOverlays[index]}'),
+                                                    child: AnimatedBuilder(
+                                                        animation:
+                                                            Listenable.merge([
+                                                          logic
+                                                              .videoEditorController,
+                                                          logic
+                                                              .videoEditorController
+                                                              ?.video,
+                                                        ]),
+                                                        builder: (_, __) {
+                                                          final duration = logic
+                                                              .videoEditorController
+                                                              ?.videoDuration;
+                                                          if (logic
+                                                                  .videoEditorController !=
+                                                              null) {
+                                                            final posSeconds = logic
+                                                                    .videoEditorController!
+                                                                    .trimPosition *
+                                                                duration!
+                                                                    .inSeconds;
+                                                            final posMin = logic
+                                                                    .videoEditorController!
+                                                                    .trimPosition *
+                                                                duration
+                                                                    .inMinutes;
+                                                          }
+                                                          return WaveSlider(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            heightWaveSlider:
+                                                                60,
+                                                            widthWaveSlider:
+                                                                Get.width,
+                                                            sliderColor:
+                                                                Colors.black,
+                                                            duration: logic
+                                                                        .videoEditorController !=
+                                                                    null
+                                                                ? logic
+                                                                    .videoEditorController!
+                                                                    .videoDuration
+                                                                    .inMilliseconds
+                                                                    .toDouble()
+                                                                : 10,
+                                                            callbackStart:
+                                                                (duration) {
                                                               logic
-                                                                      .textOverlays[
-                                                                          index]
-                                                                      .isSelected
-                                                                  ? Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topRight,
-                                                                      child:
-                                                                          InkWell(
-                                                                        onTap: () =>
-                                                                            logic.removeTextOverlay(index),
-                                                                        child:
-                                                                            Container(
-                                                                          width:
-                                                                              20.w,
-                                                                          height:
-                                                                              20.h,
-                                                                          decoration:
-                                                                              const BoxDecoration(
-                                                                            shape:
-                                                                                BoxShape.circle,
-                                                                            color:
-                                                                                Colors.blue,
-                                                                          ),
+                                                                  .textOverlays[
+                                                                      index]
+                                                                  .startTime;
+                                                              print(
+                                                                  "Start $duration");
+                                                            },
+                                                            callbackEnd:
+                                                                (duration) {
+                                                              logic
+                                                                  .textOverlays[
+                                                                      index]
+                                                                  .endTime;
+                                                              print(
+                                                                  "End $duration");
+                                                            },
+                                                            // minTrimDuration: 0.5,
+                                                            // start: logic
+                                                            //     .videoEditorController!
+                                                            //     .minTrim,
+                                                            // end: logic.videoEditorController!
+                                                            //     .minTrim,
+                                                            // onTrimUpdate: (start, end) {
+                                                            //   print("Start ${start * 100}");
+                                                            //   print("Start ${start}");
+                                                            //   // _start =
+                                                            //   //     start; // Assign the updated values to _start and _end
+                                                            //   // _end = end; // variables
+                                                            //   print('end ${end * 100}');
+                                                            // },
+                                                            child:
+                                                                AnimatedContainer(
+                                                              duration:
+                                                                  const Duration(
+                                                                      milliseconds:
+                                                                          300),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: logic
+                                                                    .textOverlays[
+                                                                        index]
+                                                                    .textColor,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(AppSize
+                                                                            .s5
+                                                                            .r),
+                                                                border: logic
+                                                                        .textOverlays[
+                                                                            index]
+                                                                        .isSelected
+                                                                    ? Border.all(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        width:
+                                                                            1)
+                                                                    : null,
+                                                              ),
+                                                              child: Stack(
+                                                                clipBehavior:
+                                                                    Clip.none,
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                children: [
+                                                                  Container(
+                                                                    padding: EdgeInsets
+                                                                        .all(AppSize
+                                                                            .s8
+                                                                            .h),
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .center,
+                                                                    child: Row(
+                                                                      mainAxisSize:
+                                                                          MainAxisSize
+                                                                              .min,
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .center,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        Expanded(
                                                                           child:
-                                                                              Icon(
-                                                                            Icons.close,
+                                                                              SvgPicture.asset(
+                                                                            ImageAssets.text,
                                                                             color:
                                                                                 Colors.white,
-                                                                            size:
-                                                                                10.sp,
                                                                           ),
                                                                         ),
-                                                                      ),
-                                                                    )
-                                                                  : const SizedBox(),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      )
-                                    : Expanded(
-                                        child: Container(
-                                        height: AppSize.s50.h,
-                                        color: const Color(0xffE8E8E8),
-                                        // child: AnimatedBuilder(
-                                        //   animation: logic.animationController,
-                                        //   builder: (context, child) {
-                                        //     return Row(
-                                        //       mainAxisAlignment: MainAxisAlignment.center,
-                                        //       children: List.generate(
-                                        //         logic.audioData.length,
-                                        //         (int index) {
-                                        //           return Container(
-                                        //             width: 5,
-                                        //             height: 30 + (logic.audioData[index] * 30),
-                                        //             margin: EdgeInsets.symmetric(horizontal: 2),
-                                        //             color: Colors.white,
-                                        //           );
-                                        //         },
-                                        //       ),
-                                        //     );
-                                        //   },
-                                        // ),
-                                      ));
-                              })
+                                                                        Expanded(
+                                                                          child:
+                                                                              Text(
+                                                                            logic.textOverlays[index].text,
+                                                                            overflow:
+                                                                                TextOverflow.clip,
+                                                                            softWrap:
+                                                                                false,
+                                                                            style:
+                                                                                const TextStyle(color: Colors.white),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  logic.textOverlays[index]
+                                                                          .isSelected
+                                                                      ? Align(
+                                                                          alignment:
+                                                                              Alignment.topRight,
+                                                                          child:
+                                                                              InkWell(
+                                                                            onTap: () =>
+                                                                                logic.removeTextOverlay(index),
+                                                                            child:
+                                                                                Container(
+                                                                              width: 20.w,
+                                                                              height: 20.h,
+                                                                              decoration: const BoxDecoration(
+                                                                                shape: BoxShape.circle,
+                                                                                color: Colors.blue,
+                                                                              ),
+                                                                              child: Icon(
+                                                                                Icons.close,
+                                                                                color: Colors.white,
+                                                                                size: 10.sp,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                      : const SizedBox(),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        }),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          )
+                                        : Expanded(
+                                            child: Container(
+                                            height: AppSize.s50.h,
+                                            color: const Color(0xffE8E8E8),
+                                            // child: AnimatedBuilder(
+                                            //   animation: logic.animationController,
+                                            //   builder: (context, child) {
+                                            //     return Row(
+                                            //       mainAxisAlignment: MainAxisAlignment.center,
+                                            //       children: List.generate(
+                                            //         logic.audioData.length,
+                                            //         (int index) {
+                                            //           return Container(
+                                            //             width: 5,
+                                            //             height: 30 + (logic.audioData[index] * 30),
+                                            //             margin: EdgeInsets.symmetric(horizontal: 2),
+                                            //             color: Colors.white,
+                                            //           );
+                                            //         },
+                                            //       ),
+                                            //     );
+                                            //   },
+                                            // ),
+                                          ));
+                                  })
+                                ],
+                              ),
+                              // Container(
+                              //   height: 50,
+                              //   alignment: Alignment.centerLeft,
+                              //   child: Row(
+                              //     // shrinkWrap: true,
+                              //
+                              //     // scrollDirection: Axis.horizontal,
+                              //     // physics: AlwaysScrollableScrollPhysics(),
+                              //     // direction: Axis.horizontal,
+                              //     // mainAxisSize: MainAxisSize.max,
+                              //     // mainAxisAlignment: MainAxisAlignment.start,
+                              //     // crossAxisAlignment: CrossAxisAlignment.start,
+                              //     children: [
+                              //       Stack(
+                              //         clipBehavior: Clip.none,
+                              //         alignment: Alignment.bottomRight,
+                              //         children: [
+                              //           SvgPicture.asset(ImageAssets.sound),
+                              //           Align(
+                              //             alignment: Alignment.bottomRight,
+                              //             child: Container(
+                              //               decoration: BoxDecoration(
+                              //                 shape: BoxShape.circle,
+                              //                 color: Colors.white,
+                              //               ),
+                              //               child: Icon(
+                              //                 Icons.add,
+                              //                 size: 14.sp,
+                              //               ),
+                              //             ),
+                              //           )
+                              //         ],
+                              //       ),
+                              //       SizedBox(
+                              //         width: AppSize.s14.w,
+                              //       ),
+                              //       // if (logic.videoFilePath.isNotEmpty)
+                              //       //   AudioFileWaveforms(
+                              //       //     size: Size(Get.width * 0.89, 70),
+                              //       //     playerController: logic.playerController2,
+                              //       //     waveformType: WaveformType.long,
+                              //       //     padding: EdgeInsets.only(
+                              //       //         top: 5, bottom: 5, right: 5, left: 5),
+                              //       //     decoration: BoxDecoration(
+                              //       //       color: Color(0xffF15C89),
+                              //       //     ),
+                              //       //     enableSeekGesture: true,
+                              //       //     continuousWaveform: true,
+                              //       //     animationDuration:
+                              //       //         const Duration(milliseconds: 200),
+                              //       //     playerWaveStyle: const PlayerWaveStyle(
+                              //       //         scaleFactor: 90,
+                              //       //         fixedWaveColor: Colors.black54,
+                              //       //         liveWaveColor: Colors.white,
+                              //       //         waveCap: StrokeCap.round,
+                              //       //         spacing: 5,
+                              //       //         showTop: true,
+                              //       //         showSeekLine: true,
+                              //       //         seekLineColor: Colors.yellow,
+                              //       //         seekLineThickness: 5,
+                              //       //         showBottom: true),
+                              //       //   ),
+                              //     ],
+                              //   ),
+                              // ),
+                              // Row(
+                              //   children: [
+                              //     Stack(
+                              //       clipBehavior: Clip.none,
+                              //       alignment: Alignment.bottomRight,
+                              //       children: [
+                              //         SvgPicture.asset(ImageAssets.sound),
+                              //         Align(
+                              //           alignment: Alignment.bottomRight,
+                              //           child: Container(
+                              //             decoration: BoxDecoration(
+                              //               shape: BoxShape.circle,
+                              //               color: Colors.white,
+                              //             ),
+                              //             child: Icon(
+                              //               Icons.add,
+                              //               size: 14.sp,
+                              //             ),
+                              //           ),
+                              //         )
+                              //       ],
+                              //     ),
+                              //     SizedBox(
+                              //       width: AppSize.s14.w,
+                              //     ),
+                              //     Container(
+                              //       height: AppSize.s50.h,
+                              //       child: AudioFileWaveforms(
+                              //         size:
+                              //             Size(MediaQuery.of(context).size.width / 2, 70),
+                              //         playerController: logic.playerController2,
+                              //         waveformType: WaveformType.fitWidth,
+                              //         decoration: BoxDecoration(
+                              //           color: Color(0xffF15C89),
+                              //         ),
+                              //         enableSeekGesture: true,
+                              //         continuousWaveform: true,
+                              //         animationDuration:
+                              //             const Duration(milliseconds: 200),
+                              //         playerWaveStyle: const PlayerWaveStyle(
+                              //             scaleFactor: 90,
+                              //             fixedWaveColor: Colors.black54,
+                              //             liveWaveColor: Colors.white,
+                              //             waveCap: StrokeCap.round,
+                              //             spacing: 5,
+                              //             showTop: true,
+                              //             showSeekLine: true,
+                              //             seekLineColor: Colors.yellow,
+                              //             seekLineThickness: 5,
+                              //             showBottom: true),
+                              //       ),
+                              //     )
+                              //   ],
+                              // ),
+
+                              //
+                              // (logic.videoEditorController != null &&
+                              //         logic.videoEditorController!.initialized)
+                              //     ? Container(
+                              //         width: Get.width,
+                              //         margin: EdgeInsets.symmetric(vertical: 60 / 4),
+                              //         child: TrimTimeline(
+                              //           controller: logic.videoEditorController!,
+                              //           padding: const EdgeInsets.only(top: 10),
+                              //         ),
+                              //       )
+                              //     : SizedBox(),
                             ],
                           ),
-                          // Container(
-                          //   height: 50,
-                          //   alignment: Alignment.centerLeft,
-                          //   child: Row(
-                          //     // shrinkWrap: true,
-                          //
-                          //     // scrollDirection: Axis.horizontal,
-                          //     // physics: AlwaysScrollableScrollPhysics(),
-                          //     // direction: Axis.horizontal,
-                          //     // mainAxisSize: MainAxisSize.max,
-                          //     // mainAxisAlignment: MainAxisAlignment.start,
-                          //     // crossAxisAlignment: CrossAxisAlignment.start,
-                          //     children: [
-                          //       Stack(
-                          //         clipBehavior: Clip.none,
-                          //         alignment: Alignment.bottomRight,
-                          //         children: [
-                          //           SvgPicture.asset(ImageAssets.sound),
-                          //           Align(
-                          //             alignment: Alignment.bottomRight,
-                          //             child: Container(
-                          //               decoration: BoxDecoration(
-                          //                 shape: BoxShape.circle,
-                          //                 color: Colors.white,
-                          //               ),
-                          //               child: Icon(
-                          //                 Icons.add,
-                          //                 size: 14.sp,
-                          //               ),
-                          //             ),
-                          //           )
-                          //         ],
-                          //       ),
-                          //       SizedBox(
-                          //         width: AppSize.s14.w,
-                          //       ),
-                          //       // if (logic.videoFilePath.isNotEmpty)
-                          //       //   AudioFileWaveforms(
-                          //       //     size: Size(Get.width * 0.89, 70),
-                          //       //     playerController: logic.playerController2,
-                          //       //     waveformType: WaveformType.long,
-                          //       //     padding: EdgeInsets.only(
-                          //       //         top: 5, bottom: 5, right: 5, left: 5),
-                          //       //     decoration: BoxDecoration(
-                          //       //       color: Color(0xffF15C89),
-                          //       //     ),
-                          //       //     enableSeekGesture: true,
-                          //       //     continuousWaveform: true,
-                          //       //     animationDuration:
-                          //       //         const Duration(milliseconds: 200),
-                          //       //     playerWaveStyle: const PlayerWaveStyle(
-                          //       //         scaleFactor: 90,
-                          //       //         fixedWaveColor: Colors.black54,
-                          //       //         liveWaveColor: Colors.white,
-                          //       //         waveCap: StrokeCap.round,
-                          //       //         spacing: 5,
-                          //       //         showTop: true,
-                          //       //         showSeekLine: true,
-                          //       //         seekLineColor: Colors.yellow,
-                          //       //         seekLineThickness: 5,
-                          //       //         showBottom: true),
-                          //       //   ),
-                          //     ],
-                          //   ),
-                          // ),
-                          // Row(
-                          //   children: [
-                          //     Stack(
-                          //       clipBehavior: Clip.none,
-                          //       alignment: Alignment.bottomRight,
-                          //       children: [
-                          //         SvgPicture.asset(ImageAssets.sound),
-                          //         Align(
-                          //           alignment: Alignment.bottomRight,
-                          //           child: Container(
-                          //             decoration: BoxDecoration(
-                          //               shape: BoxShape.circle,
-                          //               color: Colors.white,
-                          //             ),
-                          //             child: Icon(
-                          //               Icons.add,
-                          //               size: 14.sp,
-                          //             ),
-                          //           ),
-                          //         )
-                          //       ],
-                          //     ),
-                          //     SizedBox(
-                          //       width: AppSize.s14.w,
-                          //     ),
-                          //     Container(
-                          //       height: AppSize.s50.h,
-                          //       child: AudioFileWaveforms(
-                          //         size:
-                          //             Size(MediaQuery.of(context).size.width / 2, 70),
-                          //         playerController: logic.playerController2,
-                          //         waveformType: WaveformType.fitWidth,
-                          //         decoration: BoxDecoration(
-                          //           color: Color(0xffF15C89),
-                          //         ),
-                          //         enableSeekGesture: true,
-                          //         continuousWaveform: true,
-                          //         animationDuration:
-                          //             const Duration(milliseconds: 200),
-                          //         playerWaveStyle: const PlayerWaveStyle(
-                          //             scaleFactor: 90,
-                          //             fixedWaveColor: Colors.black54,
-                          //             liveWaveColor: Colors.white,
-                          //             waveCap: StrokeCap.round,
-                          //             spacing: 5,
-                          //             showTop: true,
-                          //             showSeekLine: true,
-                          //             seekLineColor: Colors.yellow,
-                          //             seekLineThickness: 5,
-                          //             showBottom: true),
-                          //       ),
-                          //     )
-                          //   ],
-                          // ),
-
-                          //
-                          // (logic.videoEditorController != null &&
-                          //         logic.videoEditorController!.initialized)
-                          //     ? Container(
-                          //         width: Get.width,
-                          //         margin: EdgeInsets.symmetric(vertical: 60 / 4),
-                          //         child: TrimTimeline(
-                          //           controller: logic.videoEditorController!,
-                          //           padding: const EdgeInsets.only(top: 10),
-                          //         ),
-                          //       )
-                          //     : SizedBox(),
-                        ],
+                        ),
                       ),
-                    ),
+                      // })
+                    ],
                   ),
-                  // })
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                    child: Obx(() => (logic.createVideoStatus.value ==
+                            CreateVideoStatus.LOADING)
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : const SizedBox()),
+                  )
                 ],
               ),
             ),

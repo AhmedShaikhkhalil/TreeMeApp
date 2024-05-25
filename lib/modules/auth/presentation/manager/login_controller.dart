@@ -49,9 +49,10 @@ class LoginController extends GetxController {
   }
 
   Future<void> login() async {
-    final registerModel =
-        await _authDataSource.login(loginNumberController.text.trim(),
-            loginPasswordController.text.trim(), _storage.refreshToken ?? '');
+    final registerModel = await _authDataSource.login(
+        loginNumberController.text.trim(),
+        loginPasswordController.text.trim(),
+        _storage.refreshToken ?? '');
     registerModel.fold((l) {
       // _verifyPhone(loginNumberController.text.trim());
       errorToast(l.message);
@@ -106,39 +107,35 @@ class LoginController extends GetxController {
   }
 
   Future<void> verifyPhone(String password, String phone) async {
-    try{
-        await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: phone,
-         verificationCompleted: (PhoneAuthCredential credential) async {
-           await FirebaseAuth.instance
-              .signInWithCredential(credential)
-               .then((value) async {
-             if (value.user != null) {
-              login();
-            }
-          });
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: phone,
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            await FirebaseAuth.instance
+                .signInWithCredential(credential)
+                .then((value) async {
+              if (value.user != null) {
+                login();
+              }
+            });
+          },
+          verificationFailed: (FirebaseAuthException e) {
+            errorToast(e.message ?? 'Error');
+          },
+          codeSent: (String? verficationID, int? resendToken) {
+            verificationIdUser = verficationID;
+            _resendToken = resendToken;
 
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          errorToast(e.message??'Error');
-        },
-        codeSent: (String? verficationID, int? resendToken) {
-          verificationIdUser = verficationID;
-          _resendToken = resendToken;
-
-          Get.to(() => OTPLoginScreen());
-        },
-        codeAutoRetrievalTimeout: (String verificationID) {
-          verificationID = verificationIdUser??'' ;
-        },
-        timeout: Duration(seconds: 9));
-     }catch (e){
+            Get.to(() => OTPLoginScreen());
+          },
+          codeAutoRetrievalTimeout: (String verificationID) {
+            verificationID = verificationIdUser ?? '';
+          },
+          timeout: Duration(seconds: 9));
+    } catch (e) {
       log('verifyPhoneNumber $e');
     }
-
   }
-
-
 
   Future<void> permission() async {
     var per = Permission.contacts.request();

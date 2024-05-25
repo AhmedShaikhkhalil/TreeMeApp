@@ -98,6 +98,7 @@ class SelectCharacterScreen extends GetView<CreateEventController> {
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 20.0,
+                                    mainAxisSpacing: 20,
                                     mainAxisExtent: 232),
                             itemCount: controller.rxEventCharactersModel.length,
                             itemBuilder: (context, int index) => InkWell(
