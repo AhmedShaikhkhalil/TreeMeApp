@@ -51,13 +51,9 @@ class CreateEventController extends GetxController {
   void setRxCharacteres(List<CharacterModel> value) =>
       rxEventCharactersModel.value = value;
 
-
-
   final RxList<AudioModel> rxEventAudiosModel = <AudioModel>[].obs;
   void setRxAudiosModel(List<AudioModel> value) =>
       rxEventAudiosModel.value = value;
-
-
 
   final rxNewEventModelRequestStatus = RequestStatus.LOADING.obs;
   void setRxNewEventModelRequestStatus(RequestStatus value) =>
@@ -87,6 +83,22 @@ class CreateEventController extends GetxController {
 
       log(l.message.toString());
       log(l.code.toString());
+
+      setRxEventType(EventTypeModel.fromJson({
+        "data": [
+          {
+            "id": 1,
+            "name": "BIRTHDAY",
+            "description": "brbI",
+            "image": "images/GINP1DwAzRdZc2admI0000Mq00m814kDI0d29tqL.jpg",
+            "created_at": "2023-07-24T11:05:04.000000Z",
+            "updated_at": "2023-07-24T11:05:04.000000Z",
+            " c o l o r S ": " # f f 0 0 8 0 ，非 £ f 6 4 b 1 "
+          },
+        ]
+      }));
+      setRxRequestStatus(RequestStatus.SUCESS);
+
       // errorToast(l.message);
     }, (r) {
       log(r.toString());
@@ -123,9 +135,6 @@ class CreateEventController extends GetxController {
       // print(_myContactModel.toString());
     });
   }
-
-
-
 
   Future<void> getAudiosEvent() async {
     // setRxRequestStatus(RequestStatus.LOADING);

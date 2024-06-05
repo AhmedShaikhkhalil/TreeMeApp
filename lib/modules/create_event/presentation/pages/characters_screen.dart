@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:treeme/core/resources/color_manager.dart';
 import 'package:treeme/core/resources/font_manager.dart';
 import 'package:treeme/core/resources/styles_manager.dart';
 import 'package:treeme/core/resources/values_manager.dart';
 import 'package:treeme/core/widgets/custom_elevated_button_widget.dart';
 
+import '../../../../core/config/apis/config_api.dart';
 import '../../../../core/helpers/constants.dart';
 import '../manager/create_event_controller.dart';
 
@@ -99,7 +101,7 @@ class SelectCharacterScreen extends GetView<CreateEventController> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 20.0,
                                     mainAxisSpacing: 20,
-                                    mainAxisExtent: 232),
+                                    mainAxisExtent: 240),
                             itemCount: controller.rxEventCharactersModel.length,
                             itemBuilder: (context, int index) => InkWell(
                               onTap: () {
@@ -122,16 +124,27 @@ class SelectCharacterScreen extends GetView<CreateEventController> {
                                         const SizedBox(
                                           height: 18,
                                         ),
-                                        SizedBox(
-                                          height: 160,
-                                          width: AppSize.s265,
-                                          child: Image.network(
-                                            controller
-                                                .rxEventCharactersModel[index]
-                                                .image!,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
+                                        controller.rxEventCharactersModel[index]
+                                                    .image!
+                                                    .split('.')
+                                                    .last ==
+                                                'json'
+                                            ? Lottie.network(API.imageUrl(
+                                                controller
+                                                    .rxEventCharactersModel[
+                                                        index]
+                                                    .image!))
+                                            : SizedBox(
+                                                height: 160,
+                                                width: AppSize.s265,
+                                                child: Image.network(
+                                                  controller
+                                                      .rxEventCharactersModel[
+                                                          index]
+                                                      .image!,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
                                         const SizedBox(height: 4),
                                         Padding(
                                           padding: const EdgeInsets.only(

@@ -35,14 +35,17 @@ class TypeThemeWidgets extends StatelessWidget {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           )),
-      margin: EdgeInsets.symmetric(horizontal: AppSize.s12.w, vertical: AppSize.s8.h),
+      margin: EdgeInsets.symmetric(
+          horizontal: AppSize.s12.w, vertical: AppSize.s8.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(
-                  top: AppSize.s30.h, left: AppSize.s30.w, bottom: AppSize.s14.h),
+                  top: AppSize.s30.h,
+                  left: AppSize.s30.w,
+                  bottom: AppSize.s14.h),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +76,13 @@ class TypeThemeWidgets extends StatelessWidget {
             ),
           ),
           CachedNetworkImage(
-            imageUrl: API.imageUrl(eventTypeModel.image ?? ''),
+            imageUrl:
+                'https://upload.wikimedia.org/wikipedia/commons/7/70/Example.png',
+            // imageUrl: API.imageUrl(eventTypeModel.image ?? ''),
+            width: 100,
+          ),
+          SizedBox(
+            width: 10.0,
           )
         ],
       ),

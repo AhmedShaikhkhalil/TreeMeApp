@@ -112,8 +112,8 @@ class CreateMediaController extends GetxController
   final player = AudioPlayer();
 
   Rx<CreateVideoStatus> createVideoStatus = CreateVideoStatus.INITIAL.obs;
-  void setRxCreateVideoStatus(CreateVideoStatus _value) =>
-      createVideoStatus.value = _value;
+  void setRxCreateVideoStatus(CreateVideoStatus value) =>
+      createVideoStatus.value = value;
   @override
   void onInit() {
     super.onInit();
@@ -139,12 +139,18 @@ class CreateMediaController extends GetxController
   void addTextOverlay(TextOverlay textOverlay) {
     textOverlays.add(textOverlay);
     boardController.add(StackBoardItem(
-      child: Text(
-        textOverlay.text,
-        style: TextStyle(
-          color: textOverlay.textColor,
-        ),
-      ),
+      child: Obx(() {
+        return Text(
+          textOverlay.text,
+          style: TextStyle(
+            color: textOverlay.textColor,
+            fontSize: textOverlays
+                .where((p0) => p0.id == textOverlay.id)
+                .first
+                .fontSize,
+          ),
+        );
+      }),
       caseStyle: const CaseStyle(iconSize: 30),
       // onDel: () {
       //   // print('deleted');
@@ -269,12 +275,12 @@ class CreateMediaController extends GetxController
         onPressed: () {
           Get.back();
           TextOverlay textOverlay = TextOverlay(
-            text: text,
-            id: idCounter,
-            fontSize: fontSize,
-            textColor: textColor,
-            fontFamily: 'Comfortaa',
-          );
+              text: text,
+              id: idCounter,
+              fontSize: fontSize,
+              textColor: textColor,
+              fontFamily: 'Comfortaa',
+              size: Size(100, 100));
           addTextOverlay(textOverlay);
         },
         child: const Text('Add'),

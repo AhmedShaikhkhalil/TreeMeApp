@@ -185,8 +185,8 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
 
           return SafeArea(
             child: SingleChildScrollView(
-              // physics: const NeverScrollableScrollPhysics(),
-              // primary: false,
+              physics: const NeverScrollableScrollPhysics(),
+              primary: false,
               child: Stack(
                 children: [
                   Column(
@@ -242,108 +242,126 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                               customBuilder: (StackBoardItem t) {
                                 // if (t is CustomItem) {
                                 return ItemCase(
-                                  key: Key('StackBoardItem${t.id}'),
-                                  // <==== must
-                                  isCenter: true,
-                                  onDel: () {
-                                    logic.boardController.remove(t.id);
-                                  },
-                                  onTap: () {
-                                    // logic.boardController.moveItemToTop(t.id);
-                                  },
-                                  onOffsetChanged: (offset) {
-                                    print(offset);
+                                    key: Key('StackBoardItem${t.id}'),
+                                    // <==== must
+                                    isCenter: true,
+                                    onDel: () {
+                                      logic.boardController.remove(t.id);
+                                      if (t.child is Image) {
+                                        logic.imageOverlays.removeWhere(
+                                            (element) => element.id == t.id);
+                                      } else if (t.child is Text) {
+                                        logic.textOverlays.removeWhere(
+                                            (element) => element.id == t.id);
+                                      }
+                                    },
+                                    onTap: () {
+                                      // logic.boardController.moveItemToTop(t.id);
+                                    },
+                                    onOffsetChanged: (offset) {
+                                      print(offset);
 
-                                    if (t.child is Image) {
-                                      Offset newOffset = Offset(
-                                          offset.dx / videoWidthRatio,
-                                          offset.dy * videoHieghtRatio);
-                                      print(newOffset);
-                                      int index = logic.imageOverlays
-                                          .indexWhere((p0) => p0.id == t.id);
+                                      if (t.child is Image) {
+                                        Offset newOffset = Offset(
+                                            offset.dx / videoWidthRatio,
+                                            offset.dy * videoHieghtRatio);
+                                        print(newOffset);
+                                        int index = logic.imageOverlays
+                                            .indexWhere((p0) => p0.id == t.id);
 
-                                      logic.imageOverlays[index] = logic
-                                          .imageOverlays[index]
-                                        ..position = newOffset;
-
-                                      // replaceWhere(
-                                      //     (p0) => p0.id == t.id, (imageOverlay) {
-                                      //   imageOverlay.position = newOffset;
-                                      //   return imageOverlay;
-                                      // });
-                                    } else {
-                                      Offset newOffset = Offset(
-                                          offset.dx * videoWidthRatio,
-                                          offset.dy * videoHieghtRatio);
-                                      print(newOffset);
-                                      int index = logic.textOverlays
-                                          .indexWhere((p0) => p0.id == t.id);
-
-                                      logic.textOverlays[index] = logic
-                                          .textOverlays[index]
-                                        ..position = newOffset;
-                                      // logic.textOverlays.replaceWhere(
-                                      //     (p0) => p0.id == t.id, (textOverlay) {
-                                      //   textOverlay.position = newOffset;
-                                      //   return textOverlay;
-                                      // });
-                                    }
-                                    // return false;
-                                  },
-                                  onSizeChanged: (size) {
-                                    Size newSize = Size(
-                                        size.width * videoWidthRatio,
-                                        size.height * videoHieghtRatio);
-                                    if (t.child is Image) {
-                                      int index = logic.imageOverlays
-                                          .indexWhere((p0) => p0.id == t.id);
-                                      setState(() {
                                         logic.imageOverlays[index] = logic
                                             .imageOverlays[index]
-                                          ..size = newSize;
-                                        // logic.imageOverlays.replaceWhere(
-                                        //     (p0) => p0.id == t.id, (imageOverlays) {
-                                        //   imageOverlays.size = newSize;
-                                        //   return imageOverlays;
-                                        // });
-                                      });
-                                    } else {
-                                      int index = logic.textOverlays
-                                          .indexWhere((p0) => p0.id == t.id);
-                                      logic.textOverlays[index] = logic
-                                          .textOverlays[index]
-                                        ..size = newSize;
-                                      // logic.textOverlays.replaceWhere(
-                                      //     (p0) => p0.id == t.id,
-                                      //     (textOverlay) {
-                                      //   textOverlay.position = offset;
-                                      //   return textOverlay;
-                                      // });
+                                          ..position = newOffset;
 
-                                      return false;
-                                    }
-                                  },
-                                  caseStyle: const CaseStyle(
-                                    borderColor: Colors.grey,
-                                    iconColor: Colors.white,
-                                  ),
-                                  child: t.child is Image
-                                      ? Obx(() {
-                                          return SizedBox(
-                                              width: logic.imageOverlays
-                                                  .firstWhere((element) =>
-                                                      element.id == t.id)
-                                                  .size
-                                                  .width,
-                                              height: logic.imageOverlays
-                                                  .firstWhere((element) =>
-                                                      element.id == t.id)
-                                                  .size
-                                                  .height,
-                                              child: t.child);
-                                        })
-                                      : t.child,
-                                );
+                                        // replaceWhere(
+                                        //     (p0) => p0.id == t.id, (imageOverlay) {
+                                        //   imageOverlay.position = newOffset;
+                                        //   return imageOverlay;
+                                        // });
+                                      } else {
+                                        Offset newOffset = Offset(
+                                            offset.dx * videoWidthRatio,
+                                            offset.dy * videoHieghtRatio);
+                                        print(newOffset);
+                                        int index = logic.textOverlays
+                                            .indexWhere((p0) => p0.id == t.id);
+                                        if (index != -1) {
+                                          logic.textOverlays[index] = logic
+                                              .textOverlays[index]
+                                            ..position = newOffset;
+                                        }
+                                        // logic.textOverlays.replaceWhere(
+                                        //     (p0) => p0.id == t.id, (textOverlay) {
+                                        //   textOverlay.position = newOffset;
+                                        //   return textOverlay;
+                                        // });
+                                      }
+                                      // return false;
+                                    },
+                                    onSizeChanged: (size) {
+                                      print(size);
+
+                                      Size newSize = Size(
+                                          size.width * videoWidthRatio,
+                                          size.height * videoHieghtRatio);
+                                      if (t.child is Image) {
+                                        int index = logic.imageOverlays
+                                            .indexWhere((p0) => p0.id == t.id);
+                                        setState(() {
+                                          logic.imageOverlays[index] = logic
+                                              .imageOverlays[index]
+                                            ..size = newSize;
+                                          // logic.imageOverlays.replaceWhere(
+                                          //     (p0) => p0.id == t.id, (imageOverlays) {
+                                          //   imageOverlays.size = newSize;
+                                          //   return imageOverlays;
+                                          // });
+                                        });
+                                      } else {
+                                        int index = logic.textOverlays
+                                            .indexWhere((p0) => p0.id == t.id);
+                                        if (index != -1) {
+                                          setState(() {
+                                            logic.textOverlays[index] = logic
+                                                .textOverlays[index]
+                                              ..size = newSize
+                                              ..fontSize =
+                                                  (newSize.shortestSide / 2);
+                                          });
+                                          return true;
+                                        }
+
+                                        // logic.textOverlays.replaceWhere(
+                                        //     (p0) => p0.id == t.id,
+                                        //     (textOverlay) {
+                                        //   textOverlay.position = offset;
+                                        //   return textOverlay;
+                                        // });
+
+                                        return false;
+                                      }
+                                    },
+                                    caseStyle: const CaseStyle(
+                                      borderColor: Colors.grey,
+                                      iconColor: Colors.white,
+                                    ),
+                                    child: t.child is Image
+                                        ? Obx(() {
+                                            return SizedBox(
+                                                width: logic.imageOverlays
+                                                    .firstWhere((element) =>
+                                                        element.id == t.id)
+                                                    .size
+                                                    .width,
+                                                height: logic.imageOverlays
+                                                    .firstWhere((element) =>
+                                                        element.id == t.id)
+                                                    .size
+                                                    .height,
+                                                child: t.child);
+                                          })
+                                        : t.child);
+
                                 // }
 
                                 // return null;
