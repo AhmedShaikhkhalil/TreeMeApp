@@ -276,7 +276,7 @@ class CreateMediaController extends GetxController
           Get.back();
           TextOverlay textOverlay = TextOverlay(
               text: text,
-              id: idCounter,
+              id: idCounter++,
               fontSize: fontSize,
               textColor: textColor,
               fontFamily: 'Comfortaa',

@@ -26,7 +26,7 @@ class TypeThemeWidgets extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppSize.s27.r),
           gradient: LinearGradient(
             colors: eventTypeModel.colors == null
-                ? [Color(0xff8271F2), Color(0xffA99EFF)]
+                ? [const Color(0xff8271F2), const Color(0xffA99EFF)]
                 : eventTypeModel.colors!
                     .split(',')
                     .map((e) => HexColor.fromHex(e))
@@ -81,7 +81,7 @@ class TypeThemeWidgets extends StatelessWidget {
             // imageUrl: API.imageUrl(eventTypeModel.image ?? ''),
             width: 100,
           ),
-          SizedBox(
+          const SizedBox(
             width: 10.0,
           )
         ],
