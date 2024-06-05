@@ -24,6 +24,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:gal/gal.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:stack_board/stack_board.dart';
@@ -170,7 +171,10 @@ class CreateMediaController extends GetxController
         File(imageOverlay.selectedImage ?? ''),
         scale: 2,
         fit: BoxFit.fill,
-        width: imageOverlay.size.width,
+        width: imageOverlays
+            .firstWhere((element) => element.id == imageOverlay.id)
+            .size
+            .width,
         height: imageOverlay.size.height,
       ),
       // onDel: () {
@@ -185,13 +189,21 @@ class CreateMediaController extends GetxController
     characters.add(imageOverlay);
     boardController.add(StackBoardItem(
       id: imageOverlay.id,
-      child: Image.file(
-        File(imageOverlay.selectedImage ?? ''),
-        scale: 2,
-        fit: BoxFit.fill,
-        width: imageOverlay.size.width + 100,
-        height: imageOverlay.size.height + 100,
-      ),
+      child: Obx(() {
+        return Image.file(
+          File(imageOverlay.selectedImage ?? ''),
+          scale: 2,
+          fit: BoxFit.cover,
+          width: characters
+              .firstWhere((element) => element.id == imageOverlay.id)
+              .size
+              .width,
+          height: characters
+              .firstWhere((element) => element.id == imageOverlay.id)
+              .size
+              .height,
+        );
+      }),
       // onDel: () {
       //   print('deleted');
       //   return Future.value(imageOverlays.remove(imageOverlay));
@@ -1126,7 +1138,8 @@ class CreateMediaController extends GetxController
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 20.0,
-                    mainAxisExtent: 172),
+                    mainAxisSpacing: 20,
+                    mainAxisExtent: 170),
                 itemCount: createEventController.rxEventCharactersModel.length,
                 itemBuilder: (context, int index) => InkWell(
                   onTap: () {
@@ -1149,27 +1162,36 @@ class CreateMediaController extends GetxController
                             const SizedBox(
                               height: 18,
                             ),
-                            SizedBox(
-                              height: 100,
-                              width: AppSize.s265,
-                              child: Image.network(
-                                createEventController
-                                    .rxEventCharactersModel[index].image!,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                            createEventController
+                                        .rxEventCharactersModel[index].image!
+                                        .split('.')
+                                        .last ==
+                                    'json'
+                                ? Lottie.network(createEventController
+                                    .rxEventCharactersModel[index].image!)
+                                : SizedBox(
+                                    height: 100,
+                                    width: AppSize.s265,
+                                    child: Image.network(
+                                      createEventController
+                                          .rxEventCharactersModel[index].image!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                             const SizedBox(height: 4),
                             Padding(
                               padding:
-                                  const EdgeInsets.only(right: 8.0, left: 20),
+                                  const EdgeInsets.only(right: 8.0, left: 15),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '\$${createEventController.rxEventCharactersModel[index].price!}',
+                                        '\$${createEventController.rxEventCharactersModel[index].price!.trim()}',
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 10,
@@ -1295,7 +1317,7 @@ class CreateMediaController extends GetxController
       confirm: TextButton(
         onPressed: () async {
           String characterFile = await downloadImage(selectedCharacter.value);
-          addImageOverlay(ImageOverly(characterFile, 50, 50, 1,
+          addCharacterOverlay(ImageOverly(characterFile, 50, 50, 1,
               const Offset(0, 0), 1, false, idCounter++));
 
           Get.back();

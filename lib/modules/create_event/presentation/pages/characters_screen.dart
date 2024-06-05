@@ -129,11 +129,9 @@ class SelectCharacterScreen extends GetView<CreateEventController> {
                                                     .split('.')
                                                     .last ==
                                                 'json'
-                                            ? Lottie.network(API.imageUrl(
-                                                controller
-                                                    .rxEventCharactersModel[
-                                                        index]
-                                                    .image!))
+                                            ? Lottie.network(controller
+                                                .rxEventCharactersModel[index]
+                                                .image!)
                                             : SizedBox(
                                                 height: 160,
                                                 width: AppSize.s265,
