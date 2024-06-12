@@ -101,7 +101,8 @@ class LoginScreen extends StatelessWidget {
                             bottom: AppSize.s18.h),
                         fillColor: ColorManager.white,
                         hintStyle: getRegularStyle(
-                            color: ColorManager.hintColor, fontSize: FontSize.s16.sp),
+                            color: ColorManager.hintColor,
+                            fontSize: FontSize.s16.sp),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(AppSize.s10.r),
                             borderSide: BorderSide.none),
@@ -112,7 +113,7 @@ class LoginScreen extends StatelessWidget {
                         // suffixIcon: suffix,
                         hintText: AppStrings.phoneNumber,
                       ),
-                      initialCountryCode: 'PS',
+                      initialCountryCode: 'AE',
                       keyboardType: TextInputType.number,
                       onSubmitted: (p0) {
                         print(p0);
@@ -181,7 +182,8 @@ class LoginScreen extends StatelessWidget {
                             shadowColor: Colors.transparent,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppSize.s16.r)),
+                                borderRadius:
+                                    BorderRadius.circular(AppSize.s16.r)),
                             padding: EdgeInsets.zero,
                             minimumSize: Size(double.infinity, 64.h)),
                         onPressed: () {
@@ -194,7 +196,8 @@ class LoginScreen extends StatelessWidget {
                         child: Text(
                           AppStrings.login,
                           style: getBoldStyle(
-                              color: ColorManager.white, fontSize: FontSize.s16.sp),
+                              color: ColorManager.white,
+                              fontSize: FontSize.s16.sp),
                         ),
                       ),
                     ),
