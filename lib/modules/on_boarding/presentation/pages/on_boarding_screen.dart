@@ -162,7 +162,7 @@ class OnBoardingScreen extends StatelessWidget {
           Positioned(
               left: AppSize.s0.w,
               // bottom: 369,
-              top: 400,
+              top: MediaQuery.of(context).size.height / 2.5,
               child: Image.asset(
                 ImageAssets.calender,
               )),
