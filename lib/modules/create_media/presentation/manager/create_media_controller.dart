@@ -140,18 +140,20 @@ class CreateMediaController extends GetxController
   void addTextOverlay(TextOverlay textOverlay) {
     textOverlays.add(textOverlay);
     boardController.add(StackBoardItem(
-      child: Obx(() {
-        return Text(
-          textOverlay.text,
-          style: TextStyle(
-            color: textOverlay.textColor,
-            fontSize: textOverlays
-                .where((p0) => p0.id == textOverlay.id)
-                .first
-                .fontSize,
-          ),
-        );
-      }),
+      child: SizedBox(
+        child: Obx(() {
+          return Text(
+            textOverlay.text,
+            style: TextStyle(
+              color: textOverlay.textColor,
+              fontSize: textOverlays
+                  .where((p0) => p0.id == textOverlay.id)
+                  .first
+                  .fontSize,
+            ),
+          );
+        }),
+      ),
       caseStyle: const CaseStyle(iconSize: 30),
       // onDel: () {
       //   // print('deleted');
@@ -164,6 +166,7 @@ class CreateMediaController extends GetxController
 
   void findOverlay(int id) {}
   void addImageOverlay(ImageOverly imageOverlay) {
+    print(imageOverlay.selectedImage!.split('.'));
     imageOverlays.add(imageOverlay);
     boardController.add(StackBoardItem(
       id: imageOverlay.id,
@@ -190,19 +193,32 @@ class CreateMediaController extends GetxController
     boardController.add(StackBoardItem(
       id: imageOverlay.id,
       child: Obx(() {
-        return Image.file(
-          File(imageOverlay.selectedImage ?? ''),
-          scale: 2,
-          fit: BoxFit.cover,
-          width: characters
-              .firstWhere((element) => element.id == imageOverlay.id)
-              .size
-              .width,
-          height: characters
-              .firstWhere((element) => element.id == imageOverlay.id)
-              .size
-              .height,
-        );
+        return imageOverlay.selectedImage!.split('.').last == 'json'
+            ? Lottie.file(
+                File(imageOverlay.selectedImage!),
+                fit: BoxFit.fill,
+                width: characters
+                    .firstWhere((element) => element.id == imageOverlay.id)
+                    .size
+                    .width,
+                height: characters
+                    .firstWhere((element) => element.id == imageOverlay.id)
+                    .size
+                    .height,
+              )
+            : Image.file(
+                File(imageOverlay.selectedImage ?? ''),
+                scale: 2,
+                fit: BoxFit.cover,
+                width: characters
+                    .firstWhere((element) => element.id == imageOverlay.id)
+                    .size
+                    .width,
+                height: characters
+                    .firstWhere((element) => element.id == imageOverlay.id)
+                    .size
+                    .height,
+              );
       }),
       // onDel: () {
       //   print('deleted');
@@ -1030,7 +1046,7 @@ class CreateMediaController extends GetxController
 
           chewieController = ChewieController(
             videoPlayerController: videoPlayerController!,
-            // autoPlay: true,
+            autoPlay: false,
             looping: true,
           );
           update();

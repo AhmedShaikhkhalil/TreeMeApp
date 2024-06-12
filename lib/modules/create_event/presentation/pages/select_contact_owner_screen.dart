@@ -46,7 +46,8 @@ class SelectOwnerContact extends GetView<CreateEventController> {
                         child: Text(
                           'Select Owner',
                           style: getBoldStyle(
-                              color: ColorManager.goodMorning, fontSize: FontSize.s16.sp),
+                              color: ColorManager.goodMorning,
+                              fontSize: FontSize.s16.sp),
                         ),
                       ),
                       leading: GestureDetector(
@@ -57,7 +58,8 @@ class SelectOwnerContact extends GetView<CreateEventController> {
                           margin: EdgeInsets.only(left: AppSize.s12.w),
                           // width: 50.w,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(AppSize.s12.r),
+                              borderRadius:
+                                  BorderRadius.circular(AppSize.s12.r),
                               border: Border.all(
                                   color: ColorManager.white.withOpacity(0.29),
                                   width: AppSize.s1.w),
@@ -94,7 +96,8 @@ class SelectOwnerContact extends GetView<CreateEventController> {
                     hasScrollBody: true,
                     // fillOverscroll: true,
                     child: Obx(() {
-                      switch (controller.contactController.rxRequestStatus.value) {
+                      switch (
+                          controller.contactController.rxRequestStatus.value) {
                         case RequestStatus.LOADING:
                           return Center(
                             child: CircularProgressIndicator.adaptive(),
@@ -102,17 +105,18 @@ class SelectOwnerContact extends GetView<CreateEventController> {
 
                         case RequestStatus.SUCESS:
                           return GroupedListView<Data, String>(
-                            elements: controller
-                                    .contactController.rxMyContactModel.value.data ??
+                            elements: controller.contactController
+                                    .rxMyContactModel.value.data ??
                                 [],
                             groupBy: (element) => element.status ?? '',
 
-                            groupSeparatorBuilder: (String groupByValue) => controller
-                                .contactController
-                                .groupSeparatorBuilder(groupByValue),
+                            groupSeparatorBuilder: (String groupByValue) =>
+                                controller.contactController
+                                    .groupSeparatorBuilder(groupByValue),
                             itemBuilder: (context, Data element) => Container(
                               margin: EdgeInsets.symmetric(
-                                  horizontal: AppSize.s30.w, vertical: AppSize.s5.h),
+                                  horizontal: AppSize.s30.w,
+                                  vertical: AppSize.s5.h),
                               child: ListTile(
                                 // onTap: () {
                                 //   if (element.userData != null) {
@@ -121,18 +125,20 @@ class SelectOwnerContact extends GetView<CreateEventController> {
                                 // },
                                 tileColor: ColorManager.white,
                                 shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(AppSize.s10.r)),
+                                    borderRadius:
+                                        BorderRadius.circular(AppSize.s10.r)),
                                 leading: CircleAvatar(
                                     radius: AppSize.s28,
-                                    foregroundImage:   CachedNetworkImageProvider(element.userData?.avatar== null ?  'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png': API.imageUrl(
-
-                                        element.userData?.avatar))
-                                ),
+                                    foregroundImage: CachedNetworkImageProvider(
+                                        element.userData?.avatar == null
+                                            ? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                                            : API.imageUrl(
+                                                element.userData?.avatar))),
                                 contentPadding: EdgeInsets.only(
                                     left: 12, top: 18, bottom: 12, right: 16),
                                 horizontalTitleGap: 8,
                                 title: Text(
-                                  '${element.userData?.name ?? element.phone}',
+                                  '${element.userData?.contacts ?? element.phone}',
                                   style: getBoldStyle(
                                       color: ColorManager.goodMorning,
                                       fontSize: FontSize.s16.sp),
@@ -146,15 +152,17 @@ class SelectOwnerContact extends GetView<CreateEventController> {
                                             fontSize: FontSize.s16.sp),
                                       ),
                                 trailing: element.userData == null
-                                    ? TextButton(onPressed: () {
-                                       String message =
-                                            "Try Tree me: app://com.wiz.treeme/invite";
-                                        List<String> recipents = [
-                                          element.phone ?? ""
-                                        ];
+                                    ? TextButton(
+                                        onPressed: () {
+                                          String message =
+                                              "Try Tree me: app://com.wiz.treeme/invite";
+                                          List<String> recipents = [
+                                            element.phone ?? ""
+                                          ];
 
-                                        _sendSMS(message, recipents);
-                                    }, child: Text('Invite'))
+                                          _sendSMS(message, recipents);
+                                        },
+                                        child: Text('Invite'))
                                     : Obx(() {
                                         return Radio(
                                           value: element.userData?.id,
@@ -196,7 +204,8 @@ class SelectOwnerContact extends GetView<CreateEventController> {
           ],
         ));
   }
-    void _sendSMS(String message, List<String> recipents) async {
+
+  void _sendSMS(String message, List<String> recipents) async {
     String _result = await sendSMS(message: message, recipients: recipents)
         .catchError((onError) {
       print(onError);

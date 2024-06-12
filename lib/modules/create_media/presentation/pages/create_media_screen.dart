@@ -1,10 +1,12 @@
 import 'dart:io';
 
 // import 'package:easy_audio_trimmer/easy_audio_trimmer.dart' as trimmer;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:lottie/lottie.dart';
 // import 'package:helpers/helpers.dart';
 // import 'package:helpers/helpers/transition.dart';
 import 'package:stack_board/stack_board.dart';
@@ -207,12 +209,32 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                     fit: BoxFit.cover,
                                     // aspectRatio: logic.videoEditorController!
                                     //     .preferredCropAspectRatio!,
-                                    child: SizedBox(
-                                      height: 300,
-                                      width: 150,
-                                      child: CropGridViewer.preview(
-                                          controller:
-                                              logic.videoEditorController!),
+                                    child: Stack(
+                                      children: [
+                                        SizedBox(
+                                          height: 300,
+                                          width: 150,
+                                          child: CropGridViewer.preview(
+                                              controller:
+                                                  logic.videoEditorController!),
+                                        ),
+                                        // Positioned(
+                                        //   top: 0,
+                                        //   right: 0,
+                                        //   child: InkWell(
+                                        //     onTap: () {},
+                                        //     child: const CircleAvatar(
+                                        //       backgroundColor: Colors.grey,
+                                        //       radius: 14.0,
+                                        //       child: Icon(
+                                        //         Icons.close,
+                                        //         size: 20,
+                                        //         color: Colors.white,
+                                        //       ),
+                                        //     ),
+                                        //   ),
+                                        // )
+                                      ],
                                     ),
                                   )
                                 : (logic.videoPlayerController != null &&
@@ -250,6 +272,9 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                         logic.imageOverlays.removeWhere(
                                             (element) => element.id == t.id);
                                       } else if (t.child is Obx) {
+                                        logic.characters.removeWhere(
+                                            (element) => element.id == t.id);
+                                      } else if (t.child is SizedBox) {
                                         logic.textOverlays.removeWhere(
                                             (element) => element.id == t.id);
                                       }
@@ -338,7 +363,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                                 .textOverlays[index]
                                               ..size = newSize
                                               ..fontSize =
-                                                  (newSize.shortestSide / 2);
+                                                  (newSize.shortestSide / 3);
                                           });
                                           return true;
                                         }
@@ -387,7 +412,15 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                                                         .height,
                                                     child: t.child);
                                               })
-                                            : t.child);
+                                            : Obx(() {
+                                                return SizedBox(
+                                                    width: logic.textOverlays
+                                                        .firstWhere((element) =>
+                                                            element.id == t.id)
+                                                        .size!
+                                                        .width,
+                                                    child: t.child);
+                                              }));
 
                                 // }
 
@@ -1601,9 +1634,20 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
 
                                                     print("End $duration");
                                                   },
-                                                  child: Image.file(File(logic
-                                                      .characters[index]
-                                                      .selectedImage!)),
+                                                  child: logic.characters[index]
+                                                              .selectedImage!
+                                                              .split('.')
+                                                              .last ==
+                                                          'json'
+                                                      ? Lottie.file(
+                                                          File(logic
+                                                              .characters[index]
+                                                              .selectedImage!),
+                                                          fit: BoxFit.fill,
+                                                        )
+                                                      : Image.file(File(logic
+                                                          .characters[index]
+                                                          .selectedImage!)),
                                                 ),
                                                 // child: Stack(
                                                 //   alignment: Alignment.center,

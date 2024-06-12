@@ -76,9 +76,9 @@ class TypeThemeWidgets extends StatelessWidget {
             ),
           ),
           CachedNetworkImage(
-            imageUrl:
-                'https://upload.wikimedia.org/wikipedia/commons/7/70/Example.png',
-            // imageUrl: API.imageUrl(eventTypeModel.image ?? ''),
+            // imageUrl:
+            // 'https://upload.wikimedia.org/wikipedia/commons/7/70/Example.png',
+            imageUrl: API.imageUrl(eventTypeModel.image ?? ''),
             width: 100,
           ),
           const SizedBox(
