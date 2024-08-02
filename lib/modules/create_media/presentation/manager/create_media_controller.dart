@@ -1,5 +1,9 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_session.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:audio_waveforms/audio_waveforms.dart';
@@ -31,6 +35,7 @@ import 'package:stack_board/stack_board.dart';
 import 'package:treeme/core/resources/resource.dart';
 import 'package:treeme/modules/create_event/data/models/character_model.dart';
 import 'package:treeme/modules/create_media/domain/entities/image_overlay.dart';
+import 'package:treeme/modules/create_media/domain/video_status.enum.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_editor/video_editor.dart';
 import 'package:video_player/video_player.dart';
@@ -115,6 +120,10 @@ class CreateMediaController extends GetxController
   Rx<CreateVideoStatus> createVideoStatus = CreateVideoStatus.INITIAL.obs;
   void setRxCreateVideoStatus(CreateVideoStatus value) =>
       createVideoStatus.value = value;
+
+  var status = VideoStatus.initial.obs;
+  var videoPrecentage = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -308,7 +317,8 @@ class CreateMediaController extends GetxController
               fontSize: fontSize,
               textColor: textColor,
               fontFamily: 'Comfortaa',
-              size: Size(100, 100));
+              size: Size(100, 100),
+              position: Offset(0, 0));
           addTextOverlay(textOverlay);
         },
         child: const Text('Add'),
@@ -855,25 +865,34 @@ class CreateMediaController extends GetxController
   //     print("Current frame rate: ${statistics.getVideoFps()}");
   //   });
   // }
-  Future<void> initializeVideoPlayer() async {
-    setRxCreateVideoStatus(CreateVideoStatus.LOADING);
 
+  Future<void> initializeVideoPlayer() async {
+    status.value = VideoStatus.creating;
     String inputVideoPath = videoFilePath;
     Directory tempDir = await getApplicationDocumentsDirectory();
     String outputDir = tempDir.path;
     String outputVideoPath = path.join(outputDir, 'output1.mp4');
 
-    // Define start time and duration for trimming
-    String startTime = "00:00:10"; // Start at 10 seconds
-    String duration = "00:00:30"; // Duration of 30 seconds
-
     // Check if the video file exists
     if (!await File(inputVideoPath).exists()) {
       errorToast("Video file does not exist.");
-
-      setRxCreateVideoStatus(CreateVideoStatus.ERROR);
+      status.value = VideoStatus.error;
       return;
     }
+
+    // Define start time and duration for trimming
+    String startTime = videoEditorController!.startTrim.inSeconds.toString();
+    String duration = (videoEditorController!.endTrim.inSeconds -
+            videoEditorController!.startTrim.inSeconds)
+        .toString();
+
+    // Copy the font file to a writable directory
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String fontFilePath = path.join(appDocDir.path, 'Comfortaa-Light.ttf');
+    ByteData data = await rootBundle.load('assets/fonts/Comfortaa-Light.ttf');
+    List<int> bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    await File(fontFilePath).writeAsBytes(bytes);
 
     // Initialize the FFmpeg command with the input video and trimming
     String ffmpegCommand = "-ss $startTime -t $duration -i $inputVideoPath";
@@ -882,21 +901,25 @@ class CreateMediaController extends GetxController
     int inputIndex = 1;
 
     // Add the new audio input if provided
-    if (selectedAudio.value.id != null &&
-        await File(selectedAudio.value.localPath!).exists()) {
+    bool hasAudio = selectedAudio.value.id != null &&
+        await File(selectedAudio.value.localPath!).exists();
+    if (hasAudio) {
       ffmpegCommand += " -i ${selectedAudio.value.localPath!}";
       inputIndex++; // Increment input index for additional inputs
     }
 
     // Adding multiple image overlays
     String filterComplex = "";
-    for (var overlay in imageOverlays) {
-      ffmpegCommand += " -i ${overlay.selectedImage}";
-      filterComplex +=
-          "[$inputIndex:v]scale=${overlay.size.width}:${overlay.size.height}[img$inputIndex];";
-      filterComplex +=
-          "[0:v][img$inputIndex]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,${0},${10})'[v$inputIndex];";
-      inputIndex++;
+    bool hasImages = imageOverlays.isNotEmpty;
+    if (hasImages) {
+      for (var overlay in imageOverlays) {
+        ffmpegCommand += " -i ${overlay.selectedImage}";
+        filterComplex +=
+            "[$inputIndex:v]scale=${overlay.size.width}:${overlay.size.height}[img$inputIndex];";
+        filterComplex +=
+            "[0:v][img$inputIndex]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,0,10)'[v$inputIndex];";
+        inputIndex++;
+      }
     }
 
     // Set the last video output from overlays as the input for texts
@@ -906,10 +929,162 @@ class CreateMediaController extends GetxController
     }
 
     // Adding multiple text overlays
+    bool hasText = textOverlays.isNotEmpty;
+    if (hasText) {
+      for (var textOverlay in textOverlays) {
+        filterComplex +=
+            "$lastVideo drawtext=fontfile='$fontFilePath':text='${textOverlay.text}':x=${textOverlay.position!.dx - 200}:y=${textOverlay.position!.dy + 200}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,0,10)'[v$inputIndex];";
+        lastVideo = "[v$inputIndex]";
+        inputIndex++;
+      }
+    }
+
+    // Remove the last semicolon if present
+    if (filterComplex.isNotEmpty && filterComplex.endsWith(';')) {
+      filterComplex = filterComplex.substring(0, filterComplex.length - 1);
+    }
+
+    // Complete the FFmpeg command
+    ffmpegCommand += " -filter_complex \"$filterComplex\"";
+    if (hasAudio) {
+      ffmpegCommand +=
+          " -map 0:v -map 1:a? -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else {
+      ffmpegCommand +=
+          " -map 0:v -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+    }
+
+    print(ffmpegCommand);
+
+    // Execute FFmpeg
+    await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+      final returnCode = await session.getReturnCode();
+      if (returnCode!.isValueSuccess()) {
+        print("FFmpeg process successful, video saved to $outputVideoPath");
+
+        setRxCreateVideoStatus(CreateVideoStatus.SUCCESS);
+        await initializeVideoPlayerController(outputVideoPath);
+      } else {
+        errorToast(
+            "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+        FirebaseCrashlytics.instance.recordFlutterError(
+            FlutterErrorDetails(exception: await session.getLogsAsString()));
+        setRxCreateVideoStatus(CreateVideoStatus.ERROR);
+      }
+    }, (Log log) {
+      FirebaseCrashlytics.instance.log(log.getMessage());
+      print(log.getMessage());
+    }, (Statistics statistics) {
+      print("Current frame rate: ${statistics.getVideoFps()}");
+    });
+  }
+
+  Future<void> processVideoWithTextOnly() async {
+    status.value = VideoStatus.creating;
+    String inputVideoPath = videoFilePath;
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String outputDir = tempDir.path;
+    String outputVideoPath = path.join(outputDir, 'output1.mp4');
+
+    // Check if the video file exists
+    if (!await File(inputVideoPath).exists()) {
+      errorToast("Video file does not exist.");
+      status.value = VideoStatus.error;
+      return;
+    }
+
+    // Define start time and duration for trimming
+    String startTime = videoEditorController!.startTrim.inSeconds.toString();
+    String duration = (videoEditorController!.endTrim.inSeconds -
+            videoEditorController!.startTrim.inSeconds)
+        .toString();
+
+    // Copy the font file to a writable directory
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String fontFilePath = path.join(appDocDir.path, 'Comfortaa-Light.ttf');
+    ByteData data = await rootBundle.load('assets/fonts/Comfortaa-Light.ttf');
+    List<int> bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    await File(fontFilePath).writeAsBytes(bytes);
+
+    // Initialize the FFmpeg command with the input video and trimming
+    String ffmpegCommand = "-ss $startTime -t $duration -i $inputVideoPath";
+
+    // Adding multiple text overlays
+    String filterComplex = "";
     for (var textOverlay in textOverlays) {
       filterComplex +=
-          "$lastVideo drawtext=text='${textOverlay.text}':x=${textOverlay.position!.dx - 200}:y=${textOverlay.position!.dy + 200}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,${0},${10})'[v$inputIndex];";
-      lastVideo = "[v$inputIndex]";
+          "drawtext=fontfile='$fontFilePath':text='${textOverlay.text}':x=${textOverlay.position!.dx}:y=${textOverlay.position!.dy}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,0,10)',";
+    }
+
+    // Remove the last comma if present
+    if (filterComplex.isNotEmpty && filterComplex.endsWith(',')) {
+      filterComplex = filterComplex.substring(0, filterComplex.length - 1);
+    }
+
+    // Complete the FFmpeg command
+    ffmpegCommand +=
+        " -filter_complex \"$filterComplex\" -map 0:v -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+
+    print(ffmpegCommand);
+
+    // Execute FFmpeg
+    await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+      final returnCode = await session.getReturnCode();
+      if (returnCode!.isValueSuccess()) {
+        print("FFmpeg process successful, video saved to $outputVideoPath");
+
+        setRxCreateVideoStatus(CreateVideoStatus.SUCCESS);
+        await initializeVideoPlayerController(outputVideoPath);
+      } else {
+        errorToast(
+            "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+        FirebaseCrashlytics.instance.recordFlutterError(
+            FlutterErrorDetails(exception: await session.getLogsAsString()));
+        setRxCreateVideoStatus(CreateVideoStatus.ERROR);
+      }
+    }, (Log log) {
+      FirebaseCrashlytics.instance.log(log.getMessage());
+      print(log.getMessage());
+    }, (Statistics statistics) {
+      print("Current frame rate: ${statistics.getVideoFps()}");
+    });
+  }
+
+  Future<void> processVideoWithImagesOnly() async {
+    status.value = VideoStatus.creating;
+    String inputVideoPath = videoFilePath;
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String outputDir = tempDir.path;
+    String outputVideoPath = path.join(outputDir, 'output1.mp4');
+
+    // Check if the video file exists
+    if (!await File(inputVideoPath).exists()) {
+      errorToast("Video file does not exist.");
+      status.value = VideoStatus.error;
+      return;
+    }
+
+    // Define start time and duration for trimming
+    String startTime = videoEditorController!.startTrim.inSeconds.toString();
+    String duration = (videoEditorController!.endTrim.inSeconds -
+            videoEditorController!.startTrim.inSeconds)
+        .toString();
+
+    // Initialize the FFmpeg command with the input video and trimming
+    String ffmpegCommand = "-ss $startTime -t $duration -i $inputVideoPath";
+
+    // Adding multiple image overlays
+    String filterComplex = "";
+    int inputIndex = 1;
+    String lastOverlayOutput = "[0:v]";
+    for (var overlay in imageOverlays) {
+      ffmpegCommand += " -i ${overlay.selectedImage}";
+      filterComplex +=
+          "[$inputIndex:v]scale=${overlay.size.width}:${overlay.size.height}[img$inputIndex];";
+      filterComplex +=
+          "$lastOverlayOutput[img$inputIndex]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,0,10)'[v$inputIndex];";
+      lastOverlayOutput = "[v$inputIndex]";
       inputIndex++;
     }
 
@@ -919,14 +1094,10 @@ class CreateMediaController extends GetxController
     }
 
     // Complete the FFmpeg command
-    if (selectedAudio.value.id != null &&
-        await File(selectedAudio.value.localPath!).exists()) {
-      ffmpegCommand +=
-          " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
-    } else {
-      ffmpegCommand +=
-          " -filter_complex \"$filterComplex\" -map \"$lastVideo\" -map 0:a -c:v libx264 -c:a aac -y $outputVideoPath";
-    }
+    ffmpegCommand +=
+        " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+
+    print(ffmpegCommand);
 
     // Execute FFmpeg
     await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
@@ -934,21 +1105,372 @@ class CreateMediaController extends GetxController
       if (returnCode!.isValueSuccess()) {
         print("FFmpeg process successful, video saved to $outputVideoPath");
 
-        setRxCreateVideoStatus(CreateVideoStatus.SUCESS);
+        setRxCreateVideoStatus(CreateVideoStatus.SUCCESS);
         await initializeVideoPlayerController(outputVideoPath);
       } else {
         errorToast(
             "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+        FirebaseCrashlytics.instance.recordFlutterError(
+            FlutterErrorDetails(exception: await session.getLogsAsString()));
         setRxCreateVideoStatus(CreateVideoStatus.ERROR);
       }
     }, (Log log) {
+      FirebaseCrashlytics.instance.log(log.getMessage());
       print(log.getMessage());
     }, (Statistics statistics) {
       print("Current frame rate: ${statistics.getVideoFps()}");
     });
   }
 
+  Future<void> processVideoWithAudioOnly() async {
+    status.value = VideoStatus.creating;
+    String inputVideoPath = videoFilePath;
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String outputDir = tempDir.path;
+    String outputVideoPath = path.join(outputDir, 'output1.mp4');
+
+    // Check if the video file exists
+    if (!await File(inputVideoPath).exists()) {
+      errorToast("Video file does not exist.");
+      status.value = VideoStatus.error;
+      return;
+    }
+
+    // Check if the audio file exists
+    if (selectedAudio.value.id == null ||
+        !await File(selectedAudio.value.localPath!).exists()) {
+      errorToast("Audio file does not exist.");
+      status.value = VideoStatus.error;
+      return;
+    }
+
+    // Define start time and duration for trimming
+    String startTime = videoEditorController!.startTrim.inSeconds.toString();
+    String duration = (videoEditorController!.endTrim.inSeconds -
+            videoEditorController!.startTrim.inSeconds)
+        .toString();
+
+    // Initialize the FFmpeg command with the input video and trimming
+    String ffmpegCommand =
+        "-ss $startTime -t $duration -i $inputVideoPath -i ${selectedAudio.value.localPath} -map 0:v -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+
+    print(ffmpegCommand);
+
+    // Execute FFmpeg
+    await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+      final returnCode = await session.getReturnCode();
+      if (returnCode!.isValueSuccess()) {
+        print("FFmpeg process successful, video saved to $outputVideoPath");
+
+        setRxCreateVideoStatus(CreateVideoStatus.SUCCESS);
+        await initializeVideoPlayerController(outputVideoPath);
+      } else {
+        errorToast(
+            "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+        FirebaseCrashlytics.instance.recordFlutterError(
+            FlutterErrorDetails(exception: await session.getLogsAsString()));
+        setRxCreateVideoStatus(CreateVideoStatus.ERROR);
+      }
+    }, (Log log) {
+      FirebaseCrashlytics.instance.log(log.getMessage());
+      print(log.getMessage());
+    }, (Statistics statistics) {
+      print("Current frame rate: ${statistics.getVideoFps()}");
+    });
+  }
+
+  Future<void> processVideo(VideoProcessingState state) async {
+    status.value = VideoStatus.creating;
+    String inputVideoPath = videoFilePath;
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String outputDir = tempDir.path;
+    String outputVideoPath = path.join(outputDir, 'output1.mp4');
+
+    // Check if the video file exists
+    if (!await File(inputVideoPath).exists()) {
+      errorToast("Video file does not exist.");
+      status.value = VideoStatus.error;
+      return;
+    }
+
+    // Define start time and duration for trimming
+    String startTime = videoEditorController!.startTrim.inSeconds.toString();
+    String duration = (videoEditorController!.endTrim.inSeconds -
+            videoEditorController!.startTrim.inSeconds)
+        .toString();
+
+    // Copy the font file to a writable directory
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String fontFilePath = path.join(appDocDir.path, 'Comfortaa-Light.ttf');
+    ByteData data = await rootBundle.load('assets/fonts/Comfortaa-Light.ttf');
+    List<int> bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    await File(fontFilePath).writeAsBytes(bytes);
+
+    // Initialize the FFmpeg command with the input video and trimming
+    String ffmpegCommand = "-ss $startTime -t $duration -i $inputVideoPath";
+
+    // Index for additional inputs
+    int inputIndex = 1;
+
+    // Check if there are any text, image, or audio overlays
+    bool hasAudio = selectedAudio.value.id != null &&
+        await File(selectedAudio.value.localPath!).exists();
+    bool hasImages = imageOverlays.isNotEmpty;
+    bool hasText = textOverlays.isNotEmpty;
+
+    // Add the new audio input if provided
+    if (hasAudio) {
+      ffmpegCommand += " -i ${selectedAudio.value.localPath!}";
+      inputIndex++; // Increment input index for additional inputs
+    }
+
+    // Adding multiple image overlays
+    String filterComplex = "";
+    String lastOverlayOutput = "[0:v]";
+    if (hasImages) {
+      for (var overlay in imageOverlays) {
+        ffmpegCommand += " -i ${overlay.selectedImage}";
+        filterComplex +=
+            "[$inputIndex:v]scale=${overlay.size.width}:${overlay.size.height}[img$inputIndex];";
+        filterComplex +=
+            "$lastOverlayOutput[img$inputIndex]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,0,10)'[v$inputIndex];";
+        lastOverlayOutput = "[v$inputIndex]";
+        inputIndex++;
+      }
+    }
+
+    // Adding multiple text overlays
+    if (hasText) {
+      for (var textOverlay in textOverlays) {
+        filterComplex +=
+            "$lastOverlayOutput drawtext=fontfile='$fontFilePath':text='${textOverlay.text}':x=${textOverlay.position!.dx}:y=${textOverlay.position!.dy}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,0,10)'[v$inputIndex];";
+        lastOverlayOutput = "[v$inputIndex]";
+        inputIndex++;
+      }
+    }
+
+    // Remove the last semicolon if present
+    if (filterComplex.isNotEmpty && filterComplex.endsWith(';')) {
+      filterComplex = filterComplex.substring(0, filterComplex.length - 1);
+    }
+
+    // Construct FFmpeg command based on the state
+    switch (state) {
+      case VideoProcessingState.videoWithTextOnly:
+      case VideoProcessingState.videoWithImagesOnly:
+      case VideoProcessingState.videoWithImagesAndText:
+        ffmpegCommand +=
+            " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+        break;
+
+      case VideoProcessingState.videoWithAudioOnly:
+        ffmpegCommand +=
+            " -map 0:v -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+        break;
+
+      case VideoProcessingState.videoWithAudioAndImages:
+      case VideoProcessingState.videoWithAudioAndText:
+      case VideoProcessingState.videoWithTextImagesAndAudio:
+        ffmpegCommand +=
+            " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+        break;
+    }
+    print(ffmpegCommand);
+
+    // Execute FFmpeg
+    await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+      final returnCode = await session.getReturnCode();
+      if (returnCode!.isValueSuccess()) {
+        print("FFmpeg process successful, video saved to $outputVideoPath");
+
+        setRxCreateVideoStatus(CreateVideoStatus.SUCCESS);
+        await initializeVideoPlayerController(outputVideoPath);
+      } else {
+        errorToast(
+            "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+        FirebaseCrashlytics.instance.recordFlutterError(
+            FlutterErrorDetails(exception: await session.getLogsAsString()));
+        setRxCreateVideoStatus(CreateVideoStatus.ERROR);
+      }
+    }, (Log log) {
+      FirebaseCrashlytics.instance.log(log.getMessage());
+      print(log.getMessage());
+    }, (Statistics statistics) {
+      print("Current frame rate: ${statistics.getVideoFps()}");
+    });
+  }
+
+  Future<void> processVideowithcases() async {
+    status.value = VideoStatus.creating;
+    String inputVideoPath = videoFilePath;
+    Directory tempDir = await getApplicationDocumentsDirectory();
+    String outputDir = tempDir.path;
+    String outputVideoPath = path.join(outputDir, 'output1.mp4');
+
+    // Check if the video file exists
+    if (!await File(inputVideoPath).exists()) {
+      errorToast("Video file does not exist.");
+      status.value = VideoStatus.error;
+      return;
+    }
+
+    // Define start time and duration for trimming
+    String startTime = videoEditorController!.startTrim.inSeconds.toString();
+    String duration = (videoEditorController!.endTrim.inSeconds -
+            videoEditorController!.startTrim.inSeconds)
+        .toString();
+
+    // Copy the font file to a writable directory
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String fontFilePath = path.join(appDocDir.path, 'Comfortaa-Light.ttf');
+    ByteData data = await rootBundle.load('assets/fonts/Comfortaa-Light.ttf');
+    List<int> bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    await File(fontFilePath).writeAsBytes(bytes);
+
+    // Initialize the FFmpeg command with the input video and trimming
+    String ffmpegCommand = "-ss $startTime -t $duration -i $inputVideoPath";
+
+    // Index for additional inputs
+    int inputIndex = 1;
+
+    // Check if there are any text, image, or audio overlays
+    bool hasAudio = selectedAudio.value.id != null &&
+        await File(selectedAudio.value.localPath!).exists();
+    bool hasImages = imageOverlays.isNotEmpty;
+    bool hasText = textOverlays.isNotEmpty;
+    bool hasCharacters = characters.isNotEmpty;
+
+    // Add the new audio input if provided
+    if (hasAudio) {
+      ffmpegCommand += " -i ${selectedAudio.value.localPath!}";
+      inputIndex++; // Increment input index for additional inputs
+    }
+
+    // Adding multiple image overlays
+    String filterComplex = "";
+    String lastOverlayOutput = "[0:v]";
+    if (hasImages) {
+      for (var overlay in imageOverlays) {
+        ffmpegCommand += " -i ${overlay.selectedImage}";
+        filterComplex +=
+            "[$inputIndex:v]scale=${overlay.size.width}:${overlay.size.height}[img$inputIndex];";
+        filterComplex +=
+            "$lastOverlayOutput[img$inputIndex]overlay=${overlay.position.dx}:${overlay.position.dy}:enable='between(t,0,10)'[v$inputIndex];";
+        lastOverlayOutput = "[v$inputIndex]";
+        inputIndex++;
+      }
+    }
+
+    // Adding multiple JSON character animations
+    // Adding multiple JSON character animations
+    if (hasCharacters) {
+      for (var character in characters) {
+        // Assuming character.selectedImage is a path to a video file converted from JSON animation
+        ffmpegCommand += " -i ${character.selectedImage}";
+        filterComplex +=
+            "[$inputIndex:v]scale=${character.size.width}:${character.size.height}[char$inputIndex];";
+        filterComplex +=
+            "$lastOverlayOutput[char$inputIndex]overlay=${character.position.dx}:${character.position.dy}:enable='between(t,0,10)'[v$inputIndex];";
+        lastOverlayOutput = "[v$inputIndex]";
+        inputIndex++;
+      }
+    }
+
+    // Adding multiple text overlays
+    if (hasText) {
+      for (var textOverlay in textOverlays) {
+        filterComplex +=
+            "$lastOverlayOutput drawtext=fontfile='$fontFilePath':text='${textOverlay.text}':x=${textOverlay.position!.dx}:y=${textOverlay.position!.dy}:fontsize=${textOverlay.fontSize}:fontcolor=${toHexString(textOverlay.textColor)}:enable='between(t,0,10)'[v$inputIndex];";
+        lastOverlayOutput = "[v$inputIndex]";
+        inputIndex++;
+      }
+    }
+
+    // Remove the last semicolon if present
+    if (filterComplex.isNotEmpty && filterComplex.endsWith(';')) {
+      filterComplex = filterComplex.substring(0, filterComplex.length - 1);
+    }
+
+    // Construct FFmpeg command based on the presence of audio, images, text, and JSON animations
+    if (hasText && !hasImages && !hasAudio && !hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+    } else if (!hasText && hasImages && !hasAudio && !hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+    } else if (!hasText && !hasImages && hasAudio && !hasCharacters) {
+      ffmpegCommand +=
+          " -map 0:v -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else if (hasText && hasImages && !hasAudio && !hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+    } else if (!hasText && hasImages && hasAudio && !hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else if (hasText && !hasImages && hasAudio && !hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else if (hasText && hasImages && hasAudio && !hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else if (!hasText && !hasImages && !hasAudio && hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+    } else if (hasText && !hasImages && !hasAudio && hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+    } else if (!hasText && hasImages && !hasAudio && hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+    } else if (!hasText && !hasImages && hasAudio && hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else if (hasText && hasImages && !hasAudio && hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 0:a? -c:v libx264 -c:a aac -y $outputVideoPath";
+    } else if (hasText && !hasImages && hasAudio && hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else if (!hasText && hasImages && hasAudio && hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    } else if (hasText && hasImages && hasAudio && hasCharacters) {
+      ffmpegCommand +=
+          " -filter_complex \"$filterComplex\" -map $lastOverlayOutput -map 1:a -c:v libx264 -c:a aac -shortest -y $outputVideoPath";
+    }
+    print(ffmpegCommand);
+
+    // Execute FFmpeg
+    await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+      final returnCode = await session.getReturnCode();
+      if (returnCode!.isValueSuccess()) {
+        print("FFmpeg process successful, video saved to $outputVideoPath");
+
+        setRxCreateVideoStatus(CreateVideoStatus.SUCCESS);
+        await initializeVideoPlayerController(outputVideoPath);
+      } else {
+        errorToast(
+            "Failed to process video with FFmpeg. Return Code: ${returnCode.getValue()}");
+        FirebaseCrashlytics.instance.recordFlutterError(
+            FlutterErrorDetails(exception: await session.getLogsAsString()));
+        setRxCreateVideoStatus(CreateVideoStatus.ERROR);
+      }
+    }, (Log log) {
+      FirebaseCrashlytics.instance.log(log.getMessage());
+      print(log.getMessage());
+    }, (Statistics statistics) {
+      print("Current frame rate: ${statistics.getVideoFps()}");
+    });
+  }
+
+  void errorToast(String message) {
+    // Implement error toast functionality
+  }
+
   Future<void> initializeVideoPlayerController(String videoPath) async {
+    await Gal.putVideo(videoPath);
     videoPlayerController = VideoPlayerController.file(File(videoPath));
     await videoPlayerController!.initialize();
     chewieController = ChewieController(
@@ -957,112 +1479,138 @@ class CreateMediaController extends GetxController
       looping: true,
     );
 
-    await Gal.putVideo(videoPath).then((value) {});
-
-    // String? url = await uploadVideoToFirebase(videoPath);
-
-    // if (url != null) {
+    print('saved');
     createEventController.urlMedia.value = videoPath;
     createEventController.createNewEvent();
-    // }
     update();
   }
 
-  Future<void> createVideoFromimages() async {
-    Directory tempDir = await getApplicationDocumentsDirectory();
-    String outputDir = tempDir.path;
-    String outputVideoPath = path.join(outputDir, 'putout3.mp4');
-
-    //   String baseCommand = "ffmpeg";
-
-    //   // Initialize filter complex string
-    //   String filterComplex = "-filter_complex \"";
-
-    //   // Iterate over image overlays to build the filter complex part
-    //   for (int i = 0; i < imageOverlays.length; i++) {
-    //     ImageOverly overlay = imageOverlays[i];
-    //     // Assuming each image will be displayed for 5 seconds
-    //     String imageInput =
-    //         "-loop 1 -t 5 -i ${overlay.selectedImage} ";
-    //     baseCommand += " $imageInput";
-
-    //     // If there's text to overlay, add it to the filter complex
-    //     // if (overlay.text.isNotEmpty) {
-    //     //   filterComplex +=
-    //     //       "[${i}:v]drawtext=text='${overlay.text}':x=${overlay.positionX}:y=${overlay.positionY}:fontsize=24:fontcolor=white,";
-    //     // }
-    //         filterComplex += "fps=25[${i}v]; "; // Ensure consistent frame rate for concat
-
-    //   }
-    //  String concatInputs = imageOverlays.asMap().keys.map((i) => "[${i}v]").join("");
-    // filterComplex += "$concatInputs concat=n=${imageOverlays.length}:v=1:a=0 [v]\" -map \"[v]\"";
-
-    //   // String ffmpegCommand =
-    //   //     "ffmpeg -framerate 1/5 -i  image%d.jpg -c:v libx264 -r 30 -pix_fmt yuv420p slideshow.mp4";
-
-    //     String finalCommand = "$baseCommand  $filterComplex -c:v libx264 -pix_fmt yuv420p -r 30 $outputVideoPath";
-
-// Start directly with FFmpeg options, no need for "ffmpeg" at the start
-    String inputFiles = "";
-    String filterComplex = "-filter_complex \"";
-
-    String targetResolution = "1600:1200";
-    String targetSar = "1";
-    // Generate input file options and filter chains for each image
-    for (int i = 0; i < imageOverlays.length; i++) {
-      inputFiles += "-loop 1 -t 5 -i '${imageOverlays[i].selectedImage}' ";
-      // Apply scale, setsar, and text overlay if needed
-      String filters = "[${i}:v]scale=$targetResolution,setsar=$targetSar";
-      // Apply text overlay if needed
-      // if (imageOverlays[i].text.isNotEmpty) {
-      //   filterComplex +=
-      //       "[${i}:v]drawtext=text='${imageOverlays[i].text.replace("'", "\\'")}':x=${imageOverlays[i].positionX}:y=${imageOverlays[i].positionY}:fontsize=24:fontcolor=white,";
-      // }
-      filterComplex +=
-          "$filters[v$i]; "; // Append processed video stream to filter chain
-      // Ensure consistent frame rate for concat
-    }
-
-    // Concatenate all processed video streams
-    String concatInputs =
-        imageOverlays.asMap().keys.map((i) => "[${i}v]").join("");
-    filterComplex +=
-        "$concatInputs concat=n=${imageOverlays.length}:v=1:a=0 [v]\" -map \"[v]\"";
-
-    // Assemble the complete command without the "ffmpeg" at the start
-    String finalCommand =
-        "$inputFiles $filterComplex -c:v mpeg4 -pix_fmt yuv420p -r 30 $outputVideoPath";
-
-    await FFmpegKit.executeAsync(finalCommand, (Session session) async {
-      session.getReturnCode().then(
-        (returnCode) async {
-          // if (returnCode == ReturnCode.success) {
-          print(returnCode);
-          await Gal.putVideo(outputVideoPath).then((value) {});
-
-          videoPlayerController =
-              VideoPlayerController.file(File(outputVideoPath));
-          await videoPlayerController!.initialize();
-
-          chewieController = ChewieController(
-            videoPlayerController: videoPlayerController!,
-            autoPlay: false,
-            looping: true,
-          );
-          update();
-          // } else {
-          //   addTextResult =
-          //       'Failed to add text to video. Return Code: $returnCode';
-          // }
-        },
-      );
-    }, (Log log) {
-      print(log.getMessage());
-    }, (Statistics statistics) {
-      print(statistics.getVideoFps());
-      // CALLED WHEN SESSION GENERATES STATISTICS
-    });
+  Future<int> executeFFmpegCommand(String ffmpegCommand) async {
+    final sessionId =
+        await compute(_executeFFmpegCommandInIsolate, ffmpegCommand);
+    return sessionId;
   }
+
+  Future<int> _executeFFmpegCommandInIsolate(String ffmpegCommand) async {
+    final session =
+        await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
+      final returnCode = await session.getReturnCode();
+      if (ReturnCode.isSuccess(returnCode)) {
+        print("Command succeeded.");
+      } else if (ReturnCode.isCancel(returnCode)) {
+        print("Command cancelled.");
+      } else {
+        print("Command failed.");
+      }
+    }, (Log log) {
+      if (kDebugMode) {
+        print(log.getMessage());
+      }
+    }, (Statistics statistics) {
+      final videoPercentage = statistics.getSpeed().toInt();
+      if (kDebugMode) {
+        print("Current frame rate: ${statistics.getVideoFps()}");
+      }
+    });
+
+    return session.getSessionId()!;
+  }
+
+//   Future<void> createVideoFromimages() async {
+//     Directory tempDir = await getApplicationDocumentsDirectory();
+//     String outputDir = tempDir.path;
+//     String outputVideoPath = path.join(outputDir, 'putout3.mp4');
+
+//     //   String baseCommand = "ffmpeg";
+
+//     //   // Initialize filter complex string
+//     //   String filterComplex = "-filter_complex \"";
+
+//     //   // Iterate over image overlays to build the filter complex part
+//     //   for (int i = 0; i < imageOverlays.length; i++) {
+//     //     ImageOverly overlay = imageOverlays[i];
+//     //     // Assuming each image will be displayed for 5 seconds
+//     //     String imageInput =
+//     //         "-loop 1 -t 5 -i ${overlay.selectedImage} ";
+//     //     baseCommand += " $imageInput";
+
+//     //     // If there's text to overlay, add it to the filter complex
+//     //     // if (overlay.text.isNotEmpty) {
+//     //     //   filterComplex +=
+//     //     //       "[${i}:v]drawtext=text='${overlay.text}':x=${overlay.positionX}:y=${overlay.positionY}:fontsize=24:fontcolor=white,";
+//     //     // }
+//     //         filterComplex += "fps=25[${i}v]; "; // Ensure consistent frame rate for concat
+
+//     //   }
+//     //  String concatInputs = imageOverlays.asMap().keys.map((i) => "[${i}v]").join("");
+//     // filterComplex += "$concatInputs concat=n=${imageOverlays.length}:v=1:a=0 [v]\" -map \"[v]\"";
+
+//     //   // String ffmpegCommand =
+//     //   //     "ffmpeg -framerate 1/5 -i  image%d.jpg -c:v libx264 -r 30 -pix_fmt yuv420p slideshow.mp4";
+
+//     //     String finalCommand = "$baseCommand  $filterComplex -c:v libx264 -pix_fmt yuv420p -r 30 $outputVideoPath";
+
+// // Start directly with FFmpeg options, no need for "ffmpeg" at the start
+//     String inputFiles = "";
+//     String filterComplex = "-filter_complex \"";
+
+//     String targetResolution = "1600:1200";
+//     String targetSar = "1";
+//     // Generate input file options and filter chains for each image
+//     for (int i = 0; i < imageOverlays.length; i++) {
+//       inputFiles += "-loop 1 -t 5 -i '${imageOverlays[i].selectedImage}' ";
+//       // Apply scale, setsar, and text overlay if needed
+//       String filters = "[${i}:v]scale=$targetResolution,setsar=$targetSar";
+//       // Apply text overlay if needed
+//       // if (imageOverlays[i].text.isNotEmpty) {
+//       //   filterComplex +=
+//       //       "[${i}:v]drawtext=text='${imageOverlays[i].text.replace("'", "\\'")}':x=${imageOverlays[i].positionX}:y=${imageOverlays[i].positionY}:fontsize=24:fontcolor=white,";
+//       // }
+//       filterComplex +=
+//           "$filters[v$i]; "; // Append processed video stream to filter chain
+//       // Ensure consistent frame rate for concat
+//     }
+
+//     // Concatenate all processed video streams
+//     String concatInputs =
+//         imageOverlays.asMap().keys.map((i) => "[${i}v]").join("");
+//     filterComplex +=
+//         "$concatInputs concat=n=${imageOverlays.length}:v=1:a=0 [v]\" -map \"[v]\"";
+
+//     // Assemble the complete command without the "ffmpeg" at the start
+//     String finalCommand =
+//         "$inputFiles $filterComplex -c:v mpeg4 -pix_fmt yuv420p -r 30 $outputVideoPath";
+
+//     await FFmpegKit.executeAsync(finalCommand, (Session session) async {
+//       session.getReturnCode().then(
+//         (returnCode) async {
+//           // if (returnCode == ReturnCode.success) {
+//           print(returnCode);
+//           await Gal.putVideo(outputVideoPath).then((value) {});
+
+//           videoPlayerController =
+//               VideoPlayerController.file(File(outputVideoPath));
+//           await videoPlayerController!.initialize();
+
+//           chewieController = ChewieController(
+//             videoPlayerController: videoPlayerController!,
+//             autoPlay: false,
+//             looping: true,
+//           );
+//           update();
+//           // } else {
+//           //   addTextResult =
+//           //       'Failed to add text to video. Return Code: $returnCode';
+//           // }
+//         },
+//       );
+//     }, (Log log) {
+//       print(log.getMessage());
+//     }, (Statistics statistics) {
+//       print(statistics.getVideoFps());
+//       // CALLED WHEN SESSION GENERATES STATISTICS
+//     });
+//   }
 
   List<Widget> trimSlider(BuildContext context) {
     return [
@@ -1514,8 +2062,21 @@ class CreateMediaController extends GetxController
     }
   }
 }
+
+enum VideoProcessingState {
+  videoWithTextOnly,
+  videoWithImagesOnly,
+  videoWithAudioOnly,
+  videoWithImagesAndText,
+  videoWithAudioAndImages,
+  videoWithAudioAndText,
+  videoWithTextImagesAndAudio,
+}
 // import 'package:get/get.dart';
 
 // class CreateMediaController extends GetxController{
 
 // }
+
+
+

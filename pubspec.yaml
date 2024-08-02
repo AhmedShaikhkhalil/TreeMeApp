@@ -80,7 +80,7 @@ dependencies:
   firebase_core: ^2.14.0
   firebase_auth: ^4.6.3
   firebase_messaging: ^14.6.3
-  firebase_analytics: ^10.4.3
+  firebase_analytics: ^10.10.7
   cloud_firestore: ^4.8.1
   get_storage: ^2.1.1
   curl_logger_dio_interceptor: ^1.0.0
@@ -115,6 +115,7 @@ dependencies:
 #      ref: main
   flutter_local_notifications: ^15.1.0+1
   video_editor: ^3.0.0
+  firebase_crashlytics: ^3.5.7
 #  stories_editor:
 #    git:
 #      url: https://github.com/Mohammed1907s/stories_editor.git

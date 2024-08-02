@@ -21,7 +21,7 @@ class AppConfig {
 
 enum RequestStatus { LOADING, SUCESS, ERROR }
 
-enum CreateVideoStatus { LOADING, SUCESS, ERROR, INITIAL }
+enum CreateVideoStatus { LOADING, SUCCESS, ERROR, INITIAL }
 
 extension HexColor on Color {
   static Color fromHex(String hexString) {
