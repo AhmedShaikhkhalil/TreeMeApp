@@ -369,7 +369,7 @@ class ContactsScreen extends GetView<MyContactController> {
                                 if (element.userData != null) {
                                   ShowBottomSheetHelperImpl().showBottomSheet(
                                       ShowBottomSheetInput(Container(
-                                    height: 300,
+                                    height: 374,
                                     padding: EdgeInsets.all(AppSize.s20.h),
                                     decoration: BoxDecoration(
                                       color: ColorManager.white,

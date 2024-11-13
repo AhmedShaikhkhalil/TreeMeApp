@@ -70,7 +70,7 @@ class NavBarController extends GetxController with GetSingleTickerProviderStateM
       print(tabIndex.value);
       Get.offNamedUntil(
         pages[index],
-        (page) => page.settings.name == '/home',
+            (page) => page.settings.name == '/home',
         id: 1,
       );
       // Get.keys[1]!.currentState!.pushNamed(pages[index]);
@@ -188,14 +188,14 @@ class NavBarController extends GetxController with GetSingleTickerProviderStateM
             color: Colors.amber,
           ),
         );
-      // binding: CartBinding());
+    // binding: CartBinding());
       default:
         return GetPageRoute(
             settings: settings,
             transition: Transition.leftToRight,
             page: () => Container(
-                  child: const Text('NO Page'),
-                ));
+              child: const Text('NO Page'),
+            ));
     }
   }
 

@@ -187,10 +187,12 @@ class LoginScreen extends StatelessWidget {
                             padding: EdgeInsets.zero,
                             minimumSize: Size(double.infinity, 64.h)),
                         onPressed: () {
+                          print('validate');
+                          print(_formKey.currentState!.validate());
                           if (_formKey.currentState!.validate()) {
-                            logic.login();
-                            // logic.verifyPhone(logic.loginPasswordController.text.trim(),
-                            //     logic.loginNumberController.text.trim());
+                            // logic.login();
+                            logic.verifyPhone(logic.loginPasswordController.text.trim(),
+                                logic.loginNumberController.text.trim());
                           }
                         },
                         child: Text(

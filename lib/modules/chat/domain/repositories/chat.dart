@@ -61,6 +61,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   bool _isAttachmentUploading = false;
+
   // late types.Room room;
   final FlutterSoundRecorder recorder = FlutterSoundRecorder();
 
@@ -152,13 +153,40 @@ class _ChatPageState extends State<ChatPage> {
     Response data = await Get.find<WebServiceConnections>().postFirebaseRequest(
         useMyPath: true,
         data: {
-          "to": fcmToken,
-          "notification": {"body": body, "title": AppConfig.firstName},
+          'message': {
+            // 'token': 'Bearer ya29.c.c0ASRK0GbA4VIWzEhTphCnhHzuDnkCeWfUJMnTQTeM8mymEkDlyKoZwDLRxJ0uBpWE3eNH2yfKle3vN0JaPrJaTu9RAnWQU2d1yefRzrWzRHwJ9_F8tY1azX_h0JX19IAY2El_D5QNTiCtDPomHXEY0VmtG5Gvs1_eYBNDSmvUS0HbbE1s1iStoUzLaYvnqDEI_6_opiGV_QnbWicAxpc-kQma1bJdmipyG1JWO_xCbY84az81ZFB4ZE7qlnJvt-YCtcF0hnDHI0SOzgvz5gg40C4pJmdzRIWRC16pgJVdekri9yaYCar_GdwXVsqod6e0BMNm_dWguCIotzYSWiswm_j5Yj22MnvLLC50xyY0wvgQsWnljI9vvY8tKAT387Ameuy2JgykhjdlF_Qe6qfBgY6gJVRFfmrQJFj4Xqmt9kIQVYXjVWisl_JjF2iw8UWd2ar8a6M31u7By8MIvbkgxUjvxYicZjdYSkUYWmyXfymXrpd1jFZMhl0Rs4qq67kSIrcFdVOXYiFJIM86zzJn5aklRye0-hsR0h-90fRrM8UYbJn-59hWORg98c1byUB1FOqOkkkO8_wqRvh_1Swa8aJXV0anRc5Rdn5FU6nWn3zzBOJVQ43_4zZktbhhm0Yhah0ud2_n_tbJhu_VjOlt26gW7iVl7iXfrs1zIfJhQF80z7xSn8RswQlkitu8dj8Yt_jndyUtnFJw8q9Rd1SweWQ1WopgIyzJMmubUviQ2Y0uyvwn-UmSndF8Q7foSz1O4rxkjvhskYFR_6QoUUmMxkhY8M41fqZnz3BZ69kbQU3zxax6zunv0nQvjii1zI0F5-SggwaI92QbQx2x06BIo9OmBFdB6rmet1tR298Bifya-yhZipqna01IbVIx7IezaaUVV8__byduq6ZRMMwFfRWIitovo82w4MU0gWX7ZzcaugW46Sv5o_XWyfVcda0lbkRpv4vBF-ghtidSWgdhj6ua9zz-kXXnScSQh755mOp2_5hbu2plUZ2',
+           // 'token': 'd-tnab5Odkzel58wW8Vs6H:APA91bG78vB5L6R1iP8Ou1PSK5ys_jEMfQMAbk_d6W__saahvpGcWlE3r7Ou-uCdXNdumKKSJoujFiuOqh2Nsvvky4vxyod5YXi2ys8GqA8aNYf5seVDeE8bvQGyjTel6-HuEBHfIAyE',
+            'token': fcmToken,
+            'notification': {
+              'body': body,
+              'title': AppConfig.firstName,
+            }
+          }
         },
-        path: 'https://fcm.googleapis.com/fcm/send');
+        // path: 'https://fcm.googleapis.com/fcm/send');
+        path:
+            'https://fcm.googleapis.com/v1/projects/treeme-chat/messages:send');
 
     print(data.data.toString());
   }
+
+  /**
+      Future<void> sendNotification(
+      String fcmToken,
+      String body,
+      ) async {
+      Response data = await Get.find<WebServiceConnections>().postFirebaseRequest(
+      useMyPath: true,
+      data: {
+      "to": fcmToken,
+      "notification": {"body": body, "title": AppConfig.firstName},
+      },
+      // path: 'https://fcm.googleapis.com/fcm/send');
+      path: 'https://fcm.googleapis.com/v1/projects/treeme-chat/messages:send');
+
+      print(data.data.toString());
+      }
+   **/
 
   initRecorder() async {
     final status = await Permission.microphone.request();
@@ -487,7 +515,11 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void sendMessage(dynamic partialMessage, String roomId, bool? isPin) async {
-    if (FirebaseAuth.instance.currentUser == null) return;
+
+    if (FirebaseAuth.instance.currentUser == null) {
+      await FirebaseAuth.instance.currentUser?.reload();
+    }
+    if (FirebaseAuth.instance.currentUser == null) {return;}
 
     types.Message? message;
 
@@ -553,10 +585,39 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _handleSendPressed(types.PartialText message) {
+
+    List<String> testFcm =
+    ['Bearer ya29.c.c0ASRK0GZV_gscQbu_YcXKQrF8C9gN3ZmI8xcnHDCI-Cp3SJzIXKwTerix7KP-WK-ADPBJr0l05O0ufrmhyGaOyLuAboqo2SnkodA5yOXVh05PqgsoXwZK1c4MIS1rrUHTMOpdV0S-SgPjxvlA4gpPWs8Xkn0L7xChPX9uKlaEW4ly74LhsOo7mEk_7Hll1rSQNotREjpnE3PopyaNoIvymQuJAOxX7rvpt3sGFBZnJBmCtikhleguSDhxyAUtdGdTlh9QMVfngvn_EjAI2h93_6nufwam4K1TdL44LMY9yGFRzB_eNiN6IOLbeK4e-IMe83g4BOSKW1YNahSijkPbXMqCzO6hnim0HcXNOaeDir0ZfAmZhaZrKneigQE387PZUv0O1aV437o5zbVhyOiR_lMk_z_prfnkUY5Wk_WxQFx8YsIuYV-dtjXzfsR9bmUnal1-W0qX42OjVbVfSuw3nFrS3VFZvgI0rFdJiMvdqOXZ21BZkhs0l80ji5wmWawZ6WS8RO946xs4Sc65qYg9ucgX3fbowJ0Rhb9knWiJWFtb4_wOZdUgu1OZI7jaWJxdRtz5VVl9dBy0oan41FUqoOkmMOJX-Jtdt19doOldOX-_xg4nUv3n-7IfgR5ZqRgQOlkphaYVrR610Sfphf1MW7kaXfJOyBqVU-SQmeogIYh_7fdhf4fy_MI_uMmSOUym5c-80oc0ZRb8pQdgvqh7ygh7118sFFcIjFnfSmu2O88OgyIQu5O_j5uZnbe5VtbnSJzhBO66BSlgtrpQxuzwsO56Zje7nukfyhn5aasRu6gjxnZaFIoo0nbfOIy8bo-oOqkq1o0J70M1i4evZvVIY_oIZOvjpvwMOpUaU_wd8q4OmOZ0F_k6Up24dOd3bZS9vMiXlBsa14flcY4dca2gnXcxeSncVw0da5WxtwXQ01axqJM63YXUxb900Vc84lb057nx9WyMaBmgyMw1J9OM2sQJZx4eg6B0yv0k85YjVzegyjfzlhFFQB1',
+      'Bearer ya29.c.c0ASRK0GZV_gscQbu_YcXKQrF8C9gN3ZmI8xcnHDCI-Cp3SJzIXKwTerix7KP-WK-ADPBJr0l05O0ufrmhyGaOyLuAboqo2SnkodA5yOXVh05PqgsoXwZK1c4MIS1rrUHTMOpdV0S-SgPjxvlA4gpPWs8Xkn0L7xChPX9uKlaEW4ly74LhsOo7mEk_7Hll1rSQNotREjpnE3PopyaNoIvymQuJAOxX7rvpt3sGFBZnJBmCtikhleguSDhxyAUtdGdTlh9QMVfngvn_EjAI2h93_6nufwam4K1TdL44LMY9yGFRzB_eNiN6IOLbeK4e-IMe83g4BOSKW1YNahSijkPbXMqCzO6hnim0HcXNOaeDir0ZfAmZhaZrKneigQE387PZUv0O1aV437o5zbVhyOiR_lMk_z_prfnkUY5Wk_WxQFx8YsIuYV-dtjXzfsR9bmUnal1-W0qX42OjVbVfSuw3nFrS3VFZvgI0rFdJiMvdqOXZ21BZkhs0l80ji5wmWawZ6WS8RO946xs4Sc65qYg9ucgX3fbowJ0Rhb9knWiJWFtb4_wOZdUgu1OZI7jaWJxdRtz5VVl9dBy0oan41FUqoOkmMOJX-Jtdt19doOldOX-_xg4nUv3n-7IfgR5ZqRgQOlkphaYVrR610Sfphf1MW7kaXfJOyBqVU-SQmeogIYh_7fdhf4fy_MI_uMmSOUym5c-80oc0ZRb8pQdgvqh7ygh7118sFFcIjFnfSmu2O88OgyIQu5O_j5uZnbe5VtbnSJzhBO66BSlgtrpQxuzwsO56Zje7nukfyhn5aasRu6gjxnZaFIoo0nbfOIy8bo-oOqkq1o0J70M1i4evZvVIY_oIZOvjpvwMOpUaU_wd8q4OmOZ0F_k6Up24dOd3bZS9vMiXlBsa14flcY4dca2gnXcxeSncVw0da5WxtwXQ01axqJM63YXUxb900Vc84lb057nx9WyMaBmgyMw1J9OM2sQJZx4eg6B0yv0k85YjVzegyjfzlhFFQB1',
+      'Bearer ya29.c.c0ASRK0GZV_gscQbu_YcXKQrF8C9gN3ZmI8xcnHDCI-Cp3SJzIXKwTerix7KP-WK-ADPBJr0l05O0ufrmhyGaOyLuAboqo2SnkodA5yOXVh05PqgsoXwZK1c4MIS1rrUHTMOpdV0S-SgPjxvlA4gpPWs8Xkn0L7xChPX9uKlaEW4ly74LhsOo7mEk_7Hll1rSQNotREjpnE3PopyaNoIvymQuJAOxX7rvpt3sGFBZnJBmCtikhleguSDhxyAUtdGdTlh9QMVfngvn_EjAI2h93_6nufwam4K1TdL44LMY9yGFRzB_eNiN6IOLbeK4e-IMe83g4BOSKW1YNahSijkPbXMqCzO6hnim0HcXNOaeDir0ZfAmZhaZrKneigQE387PZUv0O1aV437o5zbVhyOiR_lMk_z_prfnkUY5Wk_WxQFx8YsIuYV-dtjXzfsR9bmUnal1-W0qX42OjVbVfSuw3nFrS3VFZvgI0rFdJiMvdqOXZ21BZkhs0l80ji5wmWawZ6WS8RO946xs4Sc65qYg9ucgX3fbowJ0Rhb9knWiJWFtb4_wOZdUgu1OZI7jaWJxdRtz5VVl9dBy0oan41FUqoOkmMOJX-Jtdt19doOldOX-_xg4nUv3n-7IfgR5ZqRgQOlkphaYVrR610Sfphf1MW7kaXfJOyBqVU-SQmeogIYh_7fdhf4fy_MI_uMmSOUym5c-80oc0ZRb8pQdgvqh7ygh7118sFFcIjFnfSmu2O88OgyIQu5O_j5uZnbe5VtbnSJzhBO66BSlgtrpQxuzwsO56Zje7nukfyhn5aasRu6gjxnZaFIoo0nbfOIy8bo-oOqkq1o0J70M1i4evZvVIY_oIZOvjpvwMOpUaU_wd8q4OmOZ0F_k6Up24dOd3bZS9vMiXlBsa14flcY4dca2gnXcxeSncVw0da5WxtwXQ01axqJM63YXUxb900Vc84lb057nx9WyMaBmgyMw1J9OM2sQJZx4eg6B0yv0k85YjVzegyjfzlhFFQB1',
+
+    ];
+      //'d-tnab5Odkzel58wW8Vs6H:APA91bG78vB5L6R1iP8Ou1PSK5ys_jEMfQMAbk_d6W__saahvpGcWlE3r7Ou-uCdXNdumKKSJoujFiuOqh2Nsvvky4vxyod5YXi2ys8GqA8aNYf5seVDeE8bvQGyjTel6-HuEBHfIAyE',
+    // ['d-tnab5Odkzel58wW8Vs6H:APA91bG78vB5L6R1iP8Ou1PSK5ys_jEMfQMAbk_d6W__saahvpGcWlE3r7Ou-uCdXNdumKKSJoujFiuOqh2Nsvvky4vxyod5YXi2ys8GqA8aNYf5seVDeE8bvQGyjTel6-HuEBHfIAyE',
+      // 'd-tnab5Odkzel58wW8Vs6H:APA91bG78vB5L6R1iP8Ou1PSK5ys_jEMfQMAbk_d6W__saahvpGcWlE3r7Ou-uCdXNdumKKSJoujFiuOqh2Nsvvky4vxyod5YXi2ys8GqA8aNYf5seVDeE8bvQGyjTel6-HuEBHfIAyE'];
+     //'daJ9tGFlD0_ssUXFS5csrv:APA91bFv64ahS4qN44VcJHrDQ-nwSI9YRs3XakUTA0-yjWAO_1mNiR-23j6eD9f-Yvf96IoF0cI7LNu373-mkbjV9sR9zfOfRJQterPDyM5unZnvVk8tLA-c5MrFos_tJznobpoOUsgj',
+     //'dKMLL6XBCEtrl0GF9wN-kD:APA91bG1cCI4_V-5vU1KfodW6J4RFcRMFHqYbIZpLRQhpJQ5Ae049lwDYHVI9gFT6DpFMk2e648qSAZHrJkyC1Nv6v_1fRqg1WrbusQ63elyPM96twJyYox4Y_qn9yBiRwRVkgbcVRFF'];
+      // 'd-tnab5Odkzel58wW8Vs6H:APA91bG78vB5L6R1iP8Ou1PSK5ys_jEMfQMAbk_d6W__saahvpGcWlE3r7Ou-uCdXNdumKKSJoujFiuOqh2Nsvvky4vxyod5YXi2ys8GqA8aNYf5seVDeE8bvQGyjTel6-HuEBHfIAyE'];
+      // 'fkvOuiFcQ0qPyKg-uemD8p:APA91bH4xTknxhmZIbytcLYQa95qrWD97EkRK2MucQwLN_Z1ZTDCAuUU4fFt7TiRw5sg5IqM75IJ8H6UC4u5Dl9G85HKLoYRNpNwUIeCIttd-gsbac5YmAD5rv-tBvRas0BJJ5m7Ynp8'];
+
+    print('here fcm');
+    print(widget.fcmUser.isNullOrBlank);
     print(message.text);
+
     sendMessage(message, widget.room.id, null);
+
     print(widget.fcmUser);
+
     if (widget.fcmUser != null) {
+      print('first one');
+      log(widget.fcmUser!.first);
+      print('last one');
+      log(widget.fcmUser!.last);
+
+      // testFcm.forEach((element) {
+      //   sendNotification(element ?? '', message.text);
+      // });
+
       widget.fcmUser?.forEach((element) {
         sendNotification(element ?? '', message.text);
       });
@@ -597,6 +658,7 @@ class _ChatPageState extends State<ChatPage> {
                 : BubbleNip.rightBottom,
         child: child,
       );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -623,6 +685,7 @@ class _ChatPageState extends State<ChatPage> {
         initialData: widget.room,
         stream: FirebaseChatCore.instance.room(widget.room.id),
         builder: (context, snapshot) {
+          print('inside chat');
           log(snapshot.data.toString());
           try {
             return Stack(
@@ -631,6 +694,12 @@ class _ChatPageState extends State<ChatPage> {
                   initialData: const <types.Message>[],
                   stream: FirebaseChatCore.instance.messages(widget.room),
                   builder: (context, snapshot) {
+                    print('inside 2');
+                    print(FirebaseChatCore.instance.messages(widget.room).length);
+                    print(snapshot.data);
+                    print(snapshot.hasData);
+                    print(snapshot.hasError);
+                    print(snapshot.error);
                     return Chat(
                       // audioMessageBuilder: (p0, {messageWidth}) {
                       //   return Lottie.network('${p0}',

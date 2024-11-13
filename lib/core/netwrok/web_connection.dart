@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:treeme/core/utils/image_picker/i_image_file.dart';
 import 'package:treeme/core/utils/services/storage.dart';
 
+import '../../modules/chat/presentation/pages/generate_token_new.dart';
 import '../config/apis/auth_header.dart';
 import '../config/apis/config_api.dart';
 import '../helpers/page_loading_dialog/page_loading_dialog.dart';
@@ -134,6 +135,7 @@ class WebServiceConnections {
     dio.Response response;
     try {
       if (file != null) {
+        print('sendinggg1');
         dio.FormData formData = dio.FormData.fromMap({
           "avatar": await dio.MultipartFile.fromFile(
             file.path,
@@ -149,16 +151,25 @@ class WebServiceConnections {
           data: formData,
         );
       } else {
+        /**have to edit token
+         *
+         */
+        print('sendinggg2');
+
+        final oauth2Token = await FirebaseAccessToken().getToken();
+
+
         response = await _dioInstance.post(
           useMyPath ? path! : '${API.baseUrl}$path',
           options: dio.Options(headers: {
-            'content-type': 'application/json',
-            "Accept": "application/json",
-            'Authorization':
-                'key=AAAADlBZSWI:APA91bGnSsyLd5lTQlqa_tvb-ILjKVqLg2V1StUCIY9gBPWImhxiF0qWszpBviqfgiAAqAoxSr8N1DAV0LDlggq3y9s-62A5FirADU7Yf319x7SEOJ-ayFqFvyCM8CmAnZJuWHO1e8b1'
+            'Authorization': 'Bearer $oauth2Token',
+            // 'Authorization': 'Bearer ya29.c.c0ASRK0GYZcOc0ovAIQ67tVV9qAqkDuZttpu5FVnGqTjsgVuUtryOmqaeA2LQGX0cqqAQOHWe14e0TDJ2nlBZxlNgrUrJlQzzOV3DEjC_AZJfQucTdp6c-XfYNB4yZqgw7jyt2MOvF1ZxNLz3UfMYWxoRqAVtx0EghrxLEYRWMKTmRdlIKZZmSjXtB7CycehGgpo2-9ODbiJRo3TjXY5roePrvAvqjLd8R9lKxhVpBYLpMxEdfmftX3ppUFP_6Xp18wR4yxZnL9wa__vEccsP8WT8EcxJ3hp2HryhYlIHHVthEJ6iySO6xqIThkbCbkMTgneXN2_d8_ttQBfFYGrws_25oT311TzocBpDCWNrSByKQvHnjE2EfEKgN384PY5F5jow2h6qR1ypSXVhX1FpOWkhxBRxxUqarvykQIxjSOWIrUiSuSytfv2znWYcWb4t-cJSxuZtM_z3RMzgfxB_puMQF2Q5yqhaoUstq9Jjp7B1YdS8-FWtfdxVqmi05OJke7u9qsUI3smV5Ifm1pjhuxqxoUtt_-4QUSZJeZXmIY0sn2n08WJ948OS8Ia0Jxurwfn78QWvBanYX_Xa9-nrY_SU0uo-w50v7MpO9YiVXje1Y0l2-lbscv-M14md60bxWs0eJo_7VzaUFjtYW2bJn0905_iOUyMBp2BFhpc1_SpVkWsnws98OXk0FtZkoUBlBnXm7-_9pt_z_pxd-a9iucqBkqklnbYlaUqUoykZlORWY-aBR3vtWoO_bSJ0FWqJ3tyfk2qmakz83IlaOzwoeI4v8s9zzIzVsjiJYyVzxIhFaOdWO9Ma3jv8d0y5Infa3lWsahnZ5qV7zSVxcxb2eVapfqtYe_MMwUMVfBfF6S2e1okQa_3OBaFteuOew57uFS29FedqrhtRFmfwV0b1I008i5zBaSZi--mjtl7BmFrRQ1s9citR1Wi4JYB3tXFdqd2jmks7zBl2craa-8UkoocWrtyq6dWOQ9wdoM4ejbza-aYXms933M_6',
+            'content-type' : 'application/json',
           }),
           data: data,
         );
+        
+
         print('${response.statusMessage}');
       }
       log("log:path:$path:${response.data}");

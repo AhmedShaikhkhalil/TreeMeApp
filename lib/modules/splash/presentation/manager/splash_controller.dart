@@ -42,6 +42,8 @@ class SplashController extends GetxController with GetSingleTickerProviderStateM
     super.onReady();
 
     _startShakeAnimation();
+    print('splash Forwarding');
+
     print('${_storage.jwtToken}');
     Future.delayed(
       Duration(seconds: 4),

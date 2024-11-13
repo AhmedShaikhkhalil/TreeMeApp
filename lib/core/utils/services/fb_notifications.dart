@@ -88,7 +88,7 @@ mixin FbNotifications {
   //ANDROID
   static void initializeForegroundNotificationForAndroid() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Message Received: ${message.messageId}');
+      print(' Message Received: ${message.messageId}');
 
       RemoteNotification? notification = message.notification;
       AndroidNotification? androidNotification = notification?.android;

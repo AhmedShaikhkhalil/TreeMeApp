@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -72,7 +73,7 @@ class LoginController extends GetxController {
       successToast(r.message!);
 
       // Get.toNamed(AppRoutes.)
-// FirebaseChatCore.instance.firebaseUser = FirebaseAuth.instance.currentUser ;
+      // FirebaseChatCore.instance.firebaseUser = FirebaseAuth.instance.currentUser ;
       //
     });
     clearTextField();
@@ -120,12 +121,14 @@ class LoginController extends GetxController {
             });
           },
           verificationFailed: (FirebaseAuthException e) {
+            print('error here');
             errorToast(e.message ?? 'Error');
           },
           codeSent: (String? verficationID, int? resendToken) {
             verificationIdUser = verficationID;
             _resendToken = resendToken;
 
+            print('test verification');
             Get.to(() => OTPLoginScreen());
           },
           codeAutoRetrievalTimeout: (String verificationID) {
@@ -154,6 +157,7 @@ class LoginController extends GetxController {
     String? token = await FirebaseMessaging.instance.getToken();
     _storage.refreshToken = token ?? '';
     log('fcmtoken ${token.toString()}');
+    print('fcm refreshed');
   }
 }
 // PhoneAuthCredential credential = PhoneAuthProvider.credential(

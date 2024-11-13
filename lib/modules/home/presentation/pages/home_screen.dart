@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:animate_do/animate_do.dart';
@@ -25,6 +26,7 @@ import '../../../../core/resources/font_manager.dart';
 import '../../../../core/resources/strings_manager.dart';
 import '../../../../core/resources/styles_manager.dart';
 import '../../../../core/utils/svg_provider.dart';
+import '../../../chat/presentation/pages/generate_token_new.dart';
 import '../widgets/arc_widget.dart';
 import '../widgets/counter_delivered_widget.dart';
 import '../widgets/event_widget.dart';
@@ -306,6 +308,11 @@ class HomeScreen extends GetView<HomeController> {
                                       controller.rxMyHomeModel.value
                                               .conversationData ==
                                           null) {
+                                    print('hiooo');
+                                    print(controller.rxMyHomeModel.value.conversationData?.isEmpty);
+                                    print(controller.rxMyHomeModel.value
+                                        .conversationData ==
+                                        null);
                                     return Center(
                                       child: Text(
                                         'NO Data',

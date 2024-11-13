@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/TreeMe_local.iml" filepath="$PROJECT_DIR$/.idea/TreeMe_local.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TreeMe_local copy.iml" filepath="$PROJECT_DIR$/TreeMe_local copy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/app/src/debug/debug.iml" filepath="$PROJECT_DIR$/android/app/src/debug/debug.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/app/src/profile/profile.iml" filepath="$PROJECT_DIR$/android/app/src/profile/profile.iml" />
     </modules>
   </component>
 </project>

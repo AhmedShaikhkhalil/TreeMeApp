@@ -1466,6 +1466,7 @@ class CreateMediaController extends GetxController
   }
 
   void errorToast(String message) {
+    print(message);
     // Implement error toast functionality
   }
 
@@ -1686,7 +1687,7 @@ class CreateMediaController extends GetxController
   void showCharacterOverlayDialog(BuildContext context) {
     Get.defaultDialog(
       title: 'Add Character Overlay',
-      titlePadding: const EdgeInsets.all(20),
+      titlePadding: const EdgeInsets.all(10),
       content: GetBuilder<CreateMediaController>(builder: (logic) {
         switch (createEventController.contactController.rxRequestStatus.value) {
           case RequestStatus.LOADING:

@@ -7,7 +7,7 @@ import Foundation
 
 import audioplayers_darwin
 import cloud_firestore
-import connectivity_plus_macos
+import connectivity_plus
 import ffmpeg_kit_flutter_full_gpl
 import file_selector_macos
 import firebase_analytics
@@ -23,7 +23,7 @@ import path_provider_foundation
 import photo_manager
 import record_macos
 import shared_preferences_foundation
-import sqflite
+import sqflite_darwin
 import url_launcher_macos
 import video_player_avfoundation
 import wakelock_macos

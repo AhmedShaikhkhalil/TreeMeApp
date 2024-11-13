@@ -1,4 +1,5 @@
 // import 'package:flutter/animation.dart';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,7 +11,9 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:get/get.dart';
 import 'package:intl_phone_field/phone_number.dart';
-import 'package:libphonenumber/libphonenumber.dart';
+// import 'package:flutter_libphonenumber/flutter_libphonenumber.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
+
 import 'package:treeme/core/config/apis/config_api.dart';
 import 'package:treeme/core/utils/services/storage.dart';
 import 'package:treeme/modules/home/data/data_sources/home_data_source.dart';
@@ -197,7 +200,10 @@ if(timestampValue != null ) {
   //       );
   // }
 
-  Future<List<String>> getValidPhoneNumbers(List<String> numbers) async {
+ /**
+  * //TO KNOW: base method!
+  *
+  * Future<List<String>> getValidPhoneNumbers(List<String> numbers) async {
     final List<String> validNumbers = [];
 
     for (String number in numbers) {
@@ -218,9 +224,75 @@ if(timestampValue != null ) {
 
     return validNumbers;
   }
+  **/
 
-  bool hasInternationalPhoneNumber(String input) {
-    PhoneNumber(countryISOCode: '', countryCode: '', number: input).isValidNumber();
+  Future<List<String>> getValidPhoneNumbers(List<String> numbers) async {
+    final List<String> validNumbers = [];
+
+    for (String number in numbers) {
+      try {
+        bool? isValid = await isValidNum(
+          number,
+          '', // Replace with the relevant country code
+        );
+
+        if (isValid!) {
+          print(number);
+          validNumbers.add(number.replaceAll(RegExp(r'[-\s]'), ''));
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    return validNumbers;
+  }
+  /** new method
+
+  Future<bool>isValidNum(phoneNumber, isoCode)async{
+    bool? valid;
+    final res = parse(phoneNumber,region: isoCode);
+
+    try {
+      final res = await parse(
+        phoneNumber,
+        region:
+        isoCode,
+      );
+
+      const JsonEncoder encoder =
+      JsonEncoder.withIndent('  ');
+
+      valid = encoder.convert(res).isNotEmpty ? true : false;
+
+    } catch (e) {
+      print(e);
+      valid = false;
+    }
+
+    return valid ?? false;
+  }
+**/
+
+  /**newer**/
+
+
+  Future<bool> isValidNum(phoneNumber, isoCode)async{
+
+    final valid = phoneNumber.isValid();
+    final validMobile = phoneNumber.isValid(type: PhoneNumberType.mobile);
+    final validFixed = phoneNumber.isValid(type: PhoneNumberType.fixedLine);
+    print('valid: $valid'); // true
+    print('valid mobile: $validMobile'); // true
+    print('valid fixed line: $validFixed'); // false
+
+    return validMobile ?? false;
+  }
+
+/**another edition**/
+  bool hasInternationalPhoneNumber( input) {
+   // PhoneNumber(countryISOCode: '', countryCode: '', number: input).isValidNumber();
+    final validMobile = input.isValid(type: PhoneNumberType.mobile);
     RegExp pattern = RegExp(
       r'^\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$',
       caseSensitive: false,

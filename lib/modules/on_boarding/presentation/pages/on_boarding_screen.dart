@@ -66,96 +66,98 @@ class OnBoardingScreen extends StatelessWidget {
                   top: Radius.elliptical(145, 35),
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: AppSize.s30.h,
-                  ),
-                  SizedBox(
-                    height: AppSize.s10.h,
-                    child: ListView.builder(
-                        itemCount: 3,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            height: AppSize.s9.h,
-                            width: AppSize.s9.w,
-                            margin: EdgeInsets.symmetric(
-                                horizontal: AppSize.s2_5.w),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: index == 1
-                                    ? Colors.blue
-                                    : Color(0xFFD9D9D9)),
-                          );
-                        }),
-                  ),
-                  SizedBox(
-                    height: AppSize.s39.h,
-                  ),
-                  RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(children: [
-                        TextSpan(
-                            text: AppStrings.onBoardingTitle,
-                            style: getBoldStyle(
-                                color: ColorManager.textFontColor,
-                                fontSize: FontSize.s36.sp),
-                            children: [
-                              WidgetSpan(
-                                  child: Lottie.network(
-                                      'https://fonts.gstatic.com/s/e/notoemoji/latest/1f973/lottie.json',
-                                      height: AppSize.s50.h,
-                                      width: AppSize.s50.w))
-                            ])
-                      ])),
-                  SizedBox(
-                    height: AppSize.s30.h,
-                  ),
-                  RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(children: [
-                        TextSpan(
-                            text: AppStrings.onBoardingLabel,
-                            style: getMediumStyle(
-                                color: ColorManager.textFont1Color,
-                                fontSize: FontSize.s16.sp),
-                            children: [
-                              WidgetSpan(
-                                  child: Lottie.network(
-                                      'https://fonts.gstatic.com/s/e/notoemoji/latest/1f609/lottie.json',
-                                      height: AppSize.s20.h,
-                                      width: AppSize.s20.w))
-                            ])
-                      ])),
-                  SizedBox(
-                    height: AppSize.s57.h,
-                  ),
-                  FloatingActionButton(
-                    onPressed: () => Get.toNamed(AppRoutes.login),
-                    child: Container(
-                      width: AppSize.s80.w,
-                      height: AppSize.s80.h,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                                color: ColorManager.shadowButton,
-                                offset: Offset(0, 24.h),
-                                blurRadius: 24)
-                          ],
-                          gradient: ColorManager().gradientFloating),
-                      child: const Icon(
-                        Icons.arrow_forward,
-                        size: 30,
-                      ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: AppSize.s30.h,
                     ),
-                  )
-                ],
+                    SizedBox(
+                      height: AppSize.s10.h,
+                      child: ListView.builder(
+                          itemCount: 3,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              height: AppSize.s9.h,
+                              width: AppSize.s9.w,
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: AppSize.s2_5.w),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: index == 1
+                                      ? Colors.blue
+                                      : Color(0xFFD9D9D9)),
+                            );
+                          }),
+                    ),
+                    SizedBox(
+                      height: AppSize.s39.h,
+                    ),
+                    RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(children: [
+                          TextSpan(
+                              text: AppStrings.onBoardingTitle,
+                              style: getBoldStyle(
+                                  color: ColorManager.textFontColor,
+                                  fontSize: FontSize.s36.sp),
+                              children: [
+                                WidgetSpan(
+                                    child: Lottie.network(
+                                        'https://fonts.gstatic.com/s/e/notoemoji/latest/1f973/lottie.json',
+                                        height: AppSize.s50.h,
+                                        width: AppSize.s50.w))
+                              ])
+                        ])),
+                    SizedBox(
+                      height: AppSize.s30.h,
+                    ),
+                    RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(children: [
+                          TextSpan(
+                              text: AppStrings.onBoardingLabel,
+                              style: getMediumStyle(
+                                  color: ColorManager.textFont1Color,
+                                  fontSize: FontSize.s16.sp),
+                              children: [
+                                WidgetSpan(
+                                    child: Lottie.network(
+                                        'https://fonts.gstatic.com/s/e/notoemoji/latest/1f609/lottie.json',
+                                        height: AppSize.s20.h,
+                                        width: AppSize.s20.w))
+                              ])
+                        ])),
+                    SizedBox(
+                      height: AppSize.s57.h,
+                    ),
+                    FloatingActionButton(
+                      onPressed: () => Get.toNamed(AppRoutes.login),
+                      child: Container(
+                        width: AppSize.s80.w,
+                        height: AppSize.s80.h,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: ColorManager.shadowButton,
+                                  offset: Offset(0, 24.h),
+                                  blurRadius: 24)
+                            ],
+                            gradient: ColorManager().gradientFloating),
+                        child: const Icon(
+                          Icons.arrow_forward,
+                          size: 30,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

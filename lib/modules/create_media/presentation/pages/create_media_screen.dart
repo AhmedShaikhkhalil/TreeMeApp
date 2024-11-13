@@ -163,6 +163,7 @@ class _CreateMediaScreenState extends State<CreateMediaScreen>
                       GetBuilder<CreateMediaController>(builder: (logic) {
                         return GestureDetector(
                           onTap: () {
+                            print('hion');
                             logic.processVideowithcases();
                           },
                           child: Container(
